@@ -2,12 +2,16 @@
 
 """
 Run CABLE either for a subset(single) flux set, or all the sites in a directory.
-This script edits a starting "cable.nml" file.
+This script also allows you to edit the namelist internal.
+
+Todo
+----
+ * Pass site dictionary so that the namelist can vary by site.
 
 That's all folks.
 """
 __author__ = "Martin De Kauwe"
-__version__ = "1.0 (14.09.2017)"
+__version__ = "1.0 (14.10.2017)"
 __email__ = "mdekauwe@gmail.com"
 
 import os
@@ -58,7 +62,7 @@ class RunCable(object):
                             "casafile%cnpbiome": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/pftlookup_csiro_v16_17tiles.csv")),
             }
             self.adjust_param_file(replace_dict)
-            
+
             # run the model
             if self.verbose:
                 os.system("%s" % (self.cable_exe))
