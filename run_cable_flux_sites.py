@@ -42,7 +42,7 @@ class RunCable(object):
 
             out_fname = os.path.join(self.output_dir, "%s_out.nc" % (site))
             if os.path.isfile(out_fname):
-                os.remove(out_nc_fname)
+                os.remove(out_fname)
 
             out_log_fname = os.path.join(self.log_dir, "%s_log.nc" % (site))
             if os.path.isfile(out_log_fname):
