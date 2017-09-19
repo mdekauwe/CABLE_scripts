@@ -29,7 +29,7 @@ class RunCable(object):
 
     def __init__(self, site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
-                 exe, aux_dir, verbose, SPIN_UP=False):
+                 exe, aux_dir, verbose):
 
         self.site = site
         self.driver_dir = driver_dir
@@ -44,11 +44,12 @@ class RunCable(object):
         self.cable_exe = exe
         self.aux_dir = aux_dir
         self.verbose = verbose
-        self.SPIN_UP = SPIN_UP
 
-    def main(self):
+    def main(self, SPIN_UP=False, TRANSIENT=False):
 
-        if self.SPIN_UP == True:
+        if SPIN_UP == True:
+
+            restart_fname = "%s_casa_rst.nc" % (self.site)
 
             # Initial spin
             self.setup_ini_spin()
@@ -57,21 +58,25 @@ class RunCable(object):
 
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
-                restart_fname = "%s_casa_rst.nc" % (self.site)
                 self.setup_re_spin(restart_fname, number=num)
                 self.run_me()
                 self.clean_up_re_spin(number=num)
 
-                restart_fname = "%s_casa_rst.nc" % (self.site)
                 self.setup_analytical_spin(restart_fname, number=num)
                 self.run_me()
                 self.clean_up_anlytical_spin(number=num)
 
             # one final spin
-            restart_fname = "%s_casa_rst.nc" % (self.site)
             self.setup_re_spin(restart_fname, number=4)
             self.run_me()
             self.clean_up_re_spin(number=4)
+
+            for f in glob.glob("c2c_*_dump.nc"):
+                os.remove(f)
+            
+        if TRANSIENT == True:
+            self.setup_transient()
+            self.run_me()
 
     def adjust_nml_file(self, fname, replacements):
         """ adjust CABLE NML file and write over the original.
@@ -121,10 +126,140 @@ class RunCable(object):
             elif not row.startswith("&"):
                 key = row.split("=")[0]
                 val = row.split("=")[1]
-                lines[i] = " ".join((key, "=",
-                                     replacements_dict.get(key.strip(), val)))
+                lines[i] = " ".join((key.rstrip(), "=",
+                                     replacements_dict.get(key.strip(), val.lstrip())))
 
         return '\n'.join(lines) + '\n'
+
+    def setup_transient(self):
+        replace_dict = {
+                        "RunType": '"transient"',
+        }
+        self.adjust_nml_file(self.site_nml_fn, replace_dict)
+
+        out_log_fname = os.path.join(self.log_dir,
+                                     "%s_log_transient" % (site))
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
+
+        replace_dict = {
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "output%averaging": "'monthly'",
+                        "icycle": "2",
+                        "cable_user%YearStart": "1852",
+                        "cable_user%YearEnd": "2001",
+        }
+        self.adjust_nml_file(self.nml_fn, replace_dict)
+
+    def setup_ini_spin(self):
+        shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
+                        self.site_nml_fn)
+        shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
+                        self.nml_fn)
+
+        # Replace with Vanessa's starting file, this is hardwired until,
+        # cable.nml reflects Vanessa's inputs
+        vanessa_nml_fn = "ancillary_files/cable.nml.cable_casa_POP_from_zero"
+        shutil.copyfile(vanessa_nml_fn, self.nml_fn)
+
+        out_fname = os.path.join(self.output_dir, "%s_spin.nc" % (site))
+        if os.path.isfile(out_fname):
+            os.remove(out_fname)
+
+        out_log_fname = os.path.join(self.log_dir,
+                                     "%s_log_zero" % (site))
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
+
+        replace_dict = {
+                        "RunType": '"spinup"',
+                        "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
+                        "spinstartyear": "2002",
+                        "spinendyear": "2003",
+                        "spinCO2": "284.7",
+                        "spinNdep": "0.79",
+                        "spinPdep": "0.144",
+        }
+        self.adjust_nml_file(self.site_nml_fn, replace_dict)
+
+        restart_fname = "%s_cable_rst.nc" % (site)
+        replace_dict = {
+                        "filename%met": "'%s'" % (self.met_fname),
+                        "filename%out": "'%s'" % (out_fname),
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "filename%restart_out": "'%s'" % (restart_fname),
+                        "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
+                        "filename%veg": "'%s%s'" % (self.driver_dir, veg_param_fn),
+                        "filename%soil": "'%sdef_soil_params.txt'" % (self.driver_dir),
+                        "output%restart": ".TRUE.",
+                        "fixedCO2": "380.0",
+                        "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
+                        "casafile%cnpbiome": "'%s'" % (os.path.join(self.driver_dir, "pftlookup_csiro_v16_17tiles_Cumberland.csv")),
+                        "cable_user%RunIden": "'%s'" % (self.site),
+                        "cable_user%POP_out": "'rst'",
+                        "cable_user%POP_rst": "'./'",
+                        "cable_user%POP_fromZero": ".T.",
+                        "cable_user%CASA_fromZero": ".T.",
+
+        }
+        self.adjust_nml_file(self.nml_fn, replace_dict)
+
+    def setup_re_spin(self, restart_fname, number=None):
+
+        out_log_fname = os.path.join(self.log_dir,
+                                     "%s_log_ccp_%d" % (site, number))
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
+
+        replace_dict = {
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "filename%restart_in": "'%s'" % (restart_fname),
+                        "filename%restart_out": "'%s'" % (restart_fname),
+                        "cable_user%POP_fromZero": ".F.",
+                        "cable_user%CASA_fromZero": ".F.",
+                        "cable_user%POP_out": "'rst'",
+                        "cable_user%POP_rst": "'./'",
+                        "cable_user%CLIMATE_fromZero": ".F.",
+                        "cable_user%CASA_DUMP_READ": ".FALSE.",
+                        "cable_user%CASA_DUMP_WRITE": ".TRUE.",
+                        "cable_user%CASA_NREP": "0",
+                        "cable_user%SOIL_STRUC": "'sli'",
+                        "icycle": "2",
+                        "cable_user%POP_out": "'rst'",
+                        "leaps": ".TRUE.",
+                        "spincasa": ".FALSE.",
+                        "casafile%cnpipool": "' '",
+                        "casafile%c2cdumppath": "' '",
+                        "output%restart": ".TRUE.",
+
+        }
+        self.adjust_nml_file(self.nml_fn, replace_dict)
+
+    def setup_analytical_spin(self, restart_fname, number):
+
+        out_log_fname = os.path.join(self.log_dir,
+                                     "%s_log_analytic_%d" % (site, number))
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
+
+        replace_dict = {
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "icycle": "12",
+                        "filename%restart_out": "'%s'" % (restart_fname),
+                        "cable_user%POP_fromZero": ".F.",
+                        "cable_user%POP_fromZero": ".F.",
+                        "cable_user%CLIMATE_fromZero": ".F.",
+                        "cable_user%CASA_DUMP_READ": ".TRUE.",
+                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
+                        "cable_user%CASA_NREP": "1",
+                        "cable_user%POP_out": "'ini'",
+                        "cable_user%SOIL_STRUC": "'default'",
+                        "leaps": ".FALSE.",
+                        "spincasa": ".TRUE.",
+                        "casafile%cnpipool": 'poolcnpIn.csv',
+                        "casafile%c2cdumppath": "'./'",
+        }
+        self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def run_me(self):
         # run the model
@@ -206,119 +341,6 @@ class RunCable(object):
         for f in glob.glob("c2c_*_dump.nc"):
             os.remove(f)
 
-    def setup_ini_spin(self):
-        shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
-                        self.site_nml_fn)
-        shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
-                        self.nml_fn)
-
-        # Replace with Vanessa's starting file, this is hardwired until,
-        # cable.nml reflects Vanessa's inputs
-        vanessa_nml_fn = "ancillary_files/cable.nml.cable_casa_POP_from_zero"
-        shutil.copyfile(vanessa_nml_fn, self.nml_fn)
-
-        out_fname = os.path.join(self.output_dir, "%s_spin.nc" % (site))
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
-
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_zero.nc" % (site))
-        if os.path.isfile(out_log_fname):
-            os.remove(out_log_fname)
-
-        replace_dict = {
-                        "RunType": '"spinup"',
-                        "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
-                        "spinstartyear": "2002",
-                        "spinendyear": "2003",
-                        "spinCO2": "284.7",
-                        "spinNdep": "0.79",
-                        "spinPdep": "0.144",
-        }
-        self.adjust_nml_file(self.site_nml_fn, replace_dict)
-
-        restart_fname = "%s_cable_rst.nc" % (site)
-        replace_dict = {
-                        "filename%met": "'%s'" % (self.met_fname),
-                        "filename%out": "'%s'" % (out_fname),
-                        "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s'" % (restart_fname),
-                        "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
-                        "filename%veg": "'%s%s'" % (self.driver_dir, veg_param_fn),
-                        "filename%soil": "'%sdef_soil_params.txt'" % (self.driver_dir),
-                        "output%restart": ".TRUE.",
-                        "fixedCO2": "380.0",
-                        "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
-                        "casafile%cnpbiome": "'%s'" % (os.path.join(self.driver_dir, "pftlookup_csiro_v16_17tiles_Cumberland.csv")),
-                        "cable_user%RunIden": "'%s'" % (self.site),
-                        "cable_user%POP_out": "'rst'",
-                        "cable_user%POP_rst": "'./'",
-                        "cable_user%POP_fromZero": ".T.",
-                        "cable_user%CASA_fromZero": ".T.",
-
-        }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
-
-    def setup_re_spin(self, restart_fname, number=None):
-
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_ccp_%d.nc" % (site, number))
-        if os.path.isfile(out_log_fname):
-            os.remove(out_log_fname)
-
-        replace_dict = {
-                        "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_in": "'%s'" % (restart_fname),
-                        "filename%restart_out": "'%s'" % (restart_fname),
-                        "cable_user%POP_fromZero": ".F.",
-                        "cable_user%CASA_fromZero": ".F.",
-                        "cable_user%POP_out": "'rst'",
-                        "cable_user%POP_rst": "'./'",
-                        "cable_user%CLIMATE_fromZero": ".F.",
-                        "cable_user%CASA_DUMP_READ": ".FALSE.",
-                        "cable_user%CASA_DUMP_WRITE": ".TRUE.",
-                        "cable_user%CASA_NREP": "0",
-                        "cable_user%SOIL_STRUC": "'sli'",
-                        "icycle": "2",
-                        "cable_user%POP_out": "'rst'",
-                        "leaps": ".TRUE.",
-                        "spincasa": ".FALSE.",
-                        "casafile%cnpipool": "' '",
-                        "casafile%c2cdumppath": "' '",
-                        "output%restart": ".TRUE.",
-
-
-                        #"cable_user%CASA_SPIN_STARTYEAR": "'%s'" % (str(start_yr)),
-                        #"cable_user%CASA_SPIN_ENDYEAR": "'%s'" % (str(end_yr)),
-        }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
-
-    def setup_analytical_spin(self, restart_fname, number):
-
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_analytic_%d.nc" % (site, number))
-        if os.path.isfile(out_log_fname):
-            os.remove(out_log_fname)
-
-        replace_dict = {
-                        "filename%log": "'%s'" % (out_log_fname),
-                        "icycle": "12",
-                        "filename%restart_out": "'%s'" % (restart_fname),
-                        "cable_user%POP_fromZero": ".F.",
-                        "cable_user%POP_fromZero": ".F.",
-                        "cable_user%CLIMATE_fromZero": ".F.",
-                        "cable_user%CASA_DUMP_READ": ".TRUE.",
-                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
-                        "cable_user%CASA_NREP": "1",
-                        "cable_user%POP_out": "'ini'",
-                        "cable_user%SOIL_STRUC": "'default'",
-                        "leaps": ".FALSE.",
-                        "spincasa": ".TRUE.",
-                        "casafile%cnpipool": 'poolcnpIn.csv',
-                        "casafile%c2cdumppath": "'./'",
-        }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
-
 
 
 
@@ -344,9 +366,10 @@ if __name__ == "__main__":
     exe = "../../src/CABLE_SLI_JV_ratio/CABLE-trunk_checks_extract_sli_optimise_JVratio_vanessa/offline/cable"
     aux_dir = "../../src/CABLE-AUX/"
     verbose = True
-    SPIN_UP = True
 
+    SPIN_UP = True
+    TRANSIENT = False
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
-                 exe, aux_dir, verbose, SPIN_UP=True)
-    C.main()
+                 exe, aux_dir, verbose)
+    C.main(SPIN_UP, TRANSIENT)
