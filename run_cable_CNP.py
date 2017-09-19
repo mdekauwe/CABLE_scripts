@@ -73,7 +73,7 @@ class RunCable(object):
 
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
-            
+
         if TRANSIENT == True:
             self.setup_transient()
             self.run_me()
@@ -130,26 +130,6 @@ class RunCable(object):
                                      replacements_dict.get(key.strip(), val.lstrip())))
 
         return '\n'.join(lines) + '\n'
-
-    def setup_transient(self):
-        replace_dict = {
-                        "RunType": '"transient"',
-        }
-        self.adjust_nml_file(self.site_nml_fn, replace_dict)
-
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_transient" % (site))
-        if os.path.isfile(out_log_fname):
-            os.remove(out_log_fname)
-
-        replace_dict = {
-                        "filename%log": "'%s'" % (out_log_fname),
-                        "output%averaging": "'monthly'",
-                        "icycle": "2",
-                        "cable_user%YearStart": "1852",
-                        "cable_user%YearEnd": "2001",
-        }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_ini_spin(self):
         shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
@@ -228,7 +208,7 @@ class RunCable(object):
                         "cable_user%POP_out": "'rst'",
                         "leaps": ".TRUE.",
                         "spincasa": ".FALSE.",
-                        "casafile%cnpipool": "' '",
+                        "casafile%cnpipool": "''",
                         "casafile%c2cdumppath": "' '",
                         "output%restart": ".TRUE.",
 
@@ -260,6 +240,31 @@ class RunCable(object):
                         "casafile%c2cdumppath": "'./'",
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
+
+    def setup_transient(self):
+        replace_dict = {
+                        "RunType": '"transient"',
+                        "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
+        }
+        self.adjust_nml_file(self.site_nml_fn, replace_dict)
+
+        out_log_fname = os.path.join(self.log_dir,
+                                     "%s_log_transient" % (site))
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
+
+        replace_dict = {
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "output%averaging": "'monthly'",
+                        "icycle": "2",
+                        "cable_user%YearStart": "1852",
+                        "cable_user%YearEnd": "2001",
+                        "casafile%cnpipool": "''",
+                        "cable_user%POP_out": "'epi'",
+                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
+        }
+        self.adjust_nml_file(self.nml_fn, replace_dict)
+
 
     def run_me(self):
         # run the model
@@ -359,7 +364,7 @@ if __name__ == "__main__":
 
     met_fname = os.path.join(met_dir, '%s.1.4_met.nc' % (site))
     co2_ndep_fname = os.path.join(co2_ndep_dir,
-                                  "AmaFACE_co2npdepforcing_1850_2100_AMB.csv")
+                                  "AmaFACE_co2ndepforcing_1850_2015_AMB.csv")
     veg_param_fn = "def_veg_params_zr_clitt_fixed.txt"
     log_dir = "logs"
 
@@ -367,8 +372,8 @@ if __name__ == "__main__":
     aux_dir = "../../src/CABLE-AUX/"
     verbose = True
 
-    SPIN_UP = True
-    TRANSIENT = False
+    SPIN_UP = False
+    TRANSIENT = True
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
                  exe, aux_dir, verbose)
