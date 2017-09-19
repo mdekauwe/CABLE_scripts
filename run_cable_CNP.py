@@ -180,8 +180,8 @@ class RunCable(object):
         # is this robust?
         tag = self.site[:-2]
 
-        fromx = "%s_ini.nc" % (tag)
-        to = "%s_ini_zero.nc" % (tag)
+        fromx = "pop_%s_ini.nc" % (tag)
+        to = "pop_%s_ini_zero.nc" % (tag)
         shutil.copyfile(fromx, to)
 
         fromx = "%s_climate_rst.nc" % (tag)
