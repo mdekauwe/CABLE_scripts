@@ -50,29 +50,28 @@ class RunCable(object):
 
         if self.SPIN_UP == True:
 
-            #"""
+            # Initial spin
             self.setup_ini_spin()
             self.run_me()
-            self.clean_up(ini=True)
-            #"""
-            """
+            self.clean_up_ini_spin()
+
+            # 3 sets of spins & analytical spins
+            for num in range(1, 4):
+                restart_fname = "%s_casa_rst.nc" % (self.site)
+                self.setup_re_spin(restart_fname, number=num)
+                self.run_me()
+                self.clean_up_re_spin(number=num)
+
+                restart_fname = "%s_casa_rst.nc" % (self.site)
+                self.setup_analytical_spin(restart_fname, number=num)
+                self.run_me()
+                self.clean_up_anlytical_spin(number=num)
+
+            # one final spin
             restart_fname = "%s_casa_rst.nc" % (self.site)
-            self.setup_re_spin(restart_fname, number=1)
+            self.setup_re_spin(restart_fname, number=4)
             self.run_me()
-            self.clean_up(ini=False, number=1)
-            """
-            #restart_fname = "%s_casa_rst.nc" % (self.site)
-            #self.re_spin(restart_fname, analytical_spin=True)
-            #self.clean_up(ini=False, number=1)
-
-            #"""
-
-            """
-            restart_fname = "%s_casa_rst.nc" % (self.site)
-            for i,n in enumerate([1,2]):
-                self.re_spin(restart_fname)
-                self.clean_up(ini=False, number=n)
-            """
+            self.clean_up_re_spin(number=4)
 
     def adjust_nml_file(self, fname, replacements):
         """ adjust CABLE NML file and write over the original.
@@ -134,58 +133,78 @@ class RunCable(object):
         else:
             os.system("%s 1>&2" % (self.cable_exe))
 
-    def clean_up(self, ini=True, number=None):
+    def clean_up_ini_spin(self):
 
         # is this robust?
         tag = self.site[:-2]
 
-        if ini:
-            for f in glob.glob("*.out"):
-                os.remove(f)
-            os.remove("new_sumbal")
-            os.remove("cnpfluxOut.csv")
-            os.remove("%s_1822_1851_casa_out.nc" % (tag))
+        for f in glob.glob("*.out"):
+            os.remove(f)
+        os.remove("new_sumbal")
+        os.remove("cnpfluxOut.csv")
+        os.remove("%s_1822_1851_casa_out.nc" % (tag))
 
-            fromx = "pop_%s_ini.nc" % (tag)
-            to = "pop_%s_ini_zero.nc" % (tag)
-            to = os.path.join(self.restart_dir, to)
-            shutil.copyfile(fromx, to)
+        fromx = "pop_%s_ini.nc" % (tag)
+        to = "pop_%s_ini_zero.nc" % (tag)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
 
-            fromx = "%s_climate_rst.nc" % (tag)
-            to = "%s_climate_rst_zero.nc" % (tag)
-            to = os.path.join(self.restart_dir, to)
-            shutil.copyfile(fromx, to)
+        fromx = "%s_climate_rst.nc" % (tag)
+        to = "%s_climate_rst_zero.nc" % (tag)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
 
-            fromx = "%s_casa_rst.nc" % (tag)
-            to = "%s_casa_rst_zero.nc" % (tag)
-            to = os.path.join(self.restart_dir, to)
-            shutil.copyfile(fromx, to)
-        else:
-            fromx = "pop_%s_ini.nc" % (tag)
-            to = "pop_%s_ini_ccp%d.nc" % (tag, number)
-            to = os.path.join(self.restart_dir, to)
-            shutil.copyfile(fromx, to)
+        fromx = "%s_casa_rst.nc" % (tag)
+        to = "%s_casa_rst_zero.nc" % (tag)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
 
-            fromx = "%s_climate_rst.nc" % (tag)
-            to = "%s_climate_rst_ccp%d.nc" % (tag, number)
-            to = os.path.join(self.restart_dir, to)
-            shutil.copyfile(fromx, to)
+    def clean_up_re_spin(self, number=None):
 
-            fromx = "%s_casa_rst.nc" % (tag)
-            to = "%s_casa_rst_ccp%d.nc" % (tag, number)
-            to = os.path.join(self.restart_dir, to)
-            shutil.copyfile(fromx, to)
+        # is this robust?
+        tag = self.site[:-2]
 
-            for f in glob.glob("c2c_*_dump.nc"):
-                os.remove(f)
+        fromx = "pop_%s_ini.nc" % (tag)
+        to = "pop_%s_ini_ccp%d.nc" % (tag, number)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
 
-            for f in glob.glob("*_casa_out"):
-                os.remove(f)
+        fromx = "%s_climate_rst.nc" % (tag)
+        to = "%s_climate_rst_ccp%d.nc" % (tag, number)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
 
-            for f in glob.glob("*.out"):
-                os.remove(f)
+        fromx = "%s_casa_rst.nc" % (tag)
+        to = "%s_casa_rst_ccp%d.nc" % (tag, number)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
 
-        return
+        os.remove("new_sumbal")
+        os.remove("cnpfluxOut.csv")
+
+        for f in glob.glob("*_casa_out.nc"):
+            os.remove(f)
+
+        for f in glob.glob("*.out"):
+            os.remove(f)
+
+    def clean_up_anlytical_spin(self, number=None):
+
+        # is this robust?
+        tag = self.site[:-2]
+
+        fromx = "%s_casa_rst.nc" % (tag)
+        to = "%s_casa_rst_saa%d.nc" % (tag, number)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
+
+        fromx = "pop_%s_ini.nc" % (tag)
+        to = "pop_%s_ini_saa%d.nc" % (tag, number)
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(fromx, to)
+
+        for f in glob.glob("c2c_*_dump.nc"):
+            os.remove(f)
 
     def setup_ini_spin(self):
         shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
@@ -218,7 +237,7 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
-        restart_fname = "%s_restart.nc" % (site)
+        restart_fname = "%s_cable_rst.nc" % (site)
         replace_dict = {
                         "filename%met": "'%s'" % (self.met_fname),
                         "filename%out": "'%s'" % (out_fname),
@@ -253,6 +272,8 @@ class RunCable(object):
                         "filename%restart_out": "'%s'" % (restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
+                        "cable_user%POP_out": "'rst'",
+                        "cable_user%POP_rst": "'./'",
                         "cable_user%CLIMATE_fromZero": ".F.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".TRUE.",
@@ -264,36 +285,39 @@ class RunCable(object):
                         "spincasa": ".FALSE.",
                         "casafile%cnpipool": "' '",
                         "casafile%c2cdumppath": "' '",
+                        "output%restart": ".TRUE.",
+
+
                         #"cable_user%CASA_SPIN_STARTYEAR": "'%s'" % (str(start_yr)),
                         #"cable_user%CASA_SPIN_ENDYEAR": "'%s'" % (str(end_yr)),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
-    def analytical_spin(self, restart_fname, number=None, analytical_spin=False):
+    def setup_analytical_spin(self, restart_fname, number):
 
-        if analytical_spin:
-            out_log_fname = os.path.join(self.log_dir,
-                                         "%s_log_analytic.nc" % (site))
-            if os.path.isfile(out_log_fname):
-                os.remove(out_log_fname)
-            replace_dict = {
-                            "filename%log": "'%s'" % (out_log_fname),
-                            "icycle": "12",
-                            "filename%restart_out": "'%s'" % (restart_fname),
-                            "cable_user%POP_fromZero": ".F.",
-                            "cable_user%POP_fromZero": ".F.",
-                            "cable_user%CLIMATE_fromZero": ".F.",
-                            "cable_user%CASA_DUMP_READ": ".TRUE.",
-                            "cable_user%CASA_DUMP_WRITE": ".FALSE.",
-                            "cable_user%CASA_NREP": "1",
-                            "cable_user%POP_out": "'ini'",
-                            "cable_user%SOIL_STRUC": "'default'",
-                            "leaps": ".FALSE.",
-                            "spincasa": ".TRUE.",
-                            "casafile%cnpipool": 'poolcnpIn.csv',
-                            "casafile%c2cdumppath": "'./'",
-            }
-            self.adjust_nml_file(self.nml_fn, replace_dict)
+        out_log_fname = os.path.join(self.log_dir,
+                                     "%s_log_analytic_%d.nc" % (site, number))
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
+
+        replace_dict = {
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "icycle": "12",
+                        "filename%restart_out": "'%s'" % (restart_fname),
+                        "cable_user%POP_fromZero": ".F.",
+                        "cable_user%POP_fromZero": ".F.",
+                        "cable_user%CLIMATE_fromZero": ".F.",
+                        "cable_user%CASA_DUMP_READ": ".TRUE.",
+                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
+                        "cable_user%CASA_NREP": "1",
+                        "cable_user%POP_out": "'ini'",
+                        "cable_user%SOIL_STRUC": "'default'",
+                        "leaps": ".FALSE.",
+                        "spincasa": ".TRUE.",
+                        "casafile%cnpipool": 'poolcnpIn.csv',
+                        "casafile%c2cdumppath": "'./'",
+        }
+        self.adjust_nml_file(self.nml_fn, replace_dict)
 
 
 
