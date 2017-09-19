@@ -180,16 +180,16 @@ class RunCable(object):
         # is this robust?
         tag = self.site[:-2]
 
-        fromx = "pop_%s_ini.nc" % (tag)
-        to = "pop_%s_ini_zero.nc" % (tag)
+        fromx = "%s_ini.nc" % (tag)
+        to = "%s_ini_zero.nc" % (tag)
         shutil.copyfile(fromx, to)
 
-        fromx = "pop_%s_climate_rst.nc" % (tag)
-        to = "pop_%s_climate_rst_zero.nc" % (tag)
+        fromx = "%s_climate_rst.nc" % (tag)
+        to = "%s_climate_rst_zero.nc" % (tag)
         shutil.copyfile(fromx, to)
 
-        fromx = "pop_%s_casa_rst.nc" % (tag)
-        to = "pop_%s_casa_rst_zero.nc" % (tag)
+        fromx = "%s_casa_rst.nc" % (tag)
+        to = "%s_casa_rst_zero.nc" % (tag)
         shutil.copyfile(fromx, to)
 
     def re_spin(self):
