@@ -49,12 +49,24 @@ class RunCable(object):
 
         if SPIN_UP == True:
 
-            restart_fname = "%s_casa_rst.nc" % (self.site)
+            restart_fname = "%s_cable_rst.nc" % (self.site)
 
             # Initial spin
             self.setup_ini_spin()
             self.run_me()
             self.clean_up_ini_spin()
+
+            #num=1
+            #self.setup_re_spin(restart_fname, number=num)
+            #self.run_me()
+            #self.clean_up_re_spin(number=num)
+
+            """
+            # Initial spin
+            self.setup_ini_spin()
+            self.run_me()
+            self.clean_up_ini_spin()
+
 
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
@@ -73,7 +85,7 @@ class RunCable(object):
 
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
-
+            """
         if TRANSIENT == True:
             self.setup_transient()
             self.run_me()
@@ -142,7 +154,8 @@ class RunCable(object):
         vanessa_nml_fn = "ancillary_files/cable.nml.cable_casa_POP_from_zero"
         shutil.copyfile(vanessa_nml_fn, self.nml_fn)
 
-        out_fname = os.path.join(self.output_dir, "%s_spin.nc" % (site))
+        out_fname = os.path.join(self.output_dir,
+                                 "%s_out_cable_zero.nc" % (site))
         if os.path.isfile(out_fname):
             os.remove(out_fname)
 
@@ -172,7 +185,6 @@ class RunCable(object):
                         "filename%veg": "'%s%s'" % (self.driver_dir, veg_param_fn),
                         "filename%soil": "'%sdef_soil_params.txt'" % (self.driver_dir),
                         "output%restart": ".TRUE.",
-                        "fixedCO2": "380.0",
                         "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
                         "casafile%cnpbiome": "'%s'" % (os.path.join(self.driver_dir, "pftlookup_csiro_v16_17tiles_Cumberland.csv")),
                         "cable_user%RunIden": "'%s'" % (self.site),
@@ -284,20 +296,28 @@ class RunCable(object):
         os.remove("cnpfluxOut.csv")
         os.remove("%s_1822_1851_casa_out.nc" % (tag))
 
+        # shouldn't need the inbetween step once vanessa fixes her code
+        # but currently it is truncating the name
         fromx = "pop_%s_ini.nc" % (tag)
-        to = "pop_%s_ini_zero.nc" % (tag)
+        from_fixed = "pop_%s_ini.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "pop_%s_ini_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
         fromx = "%s_climate_rst.nc" % (tag)
-        to = "%s_climate_rst_zero.nc" % (tag)
+        from_fixed = "%s_climate_rst.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "%s_climate_rst_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
         fromx = "%s_casa_rst.nc" % (tag)
-        to = "%s_casa_rst_zero.nc" % (tag)
+        from_fixed = "%s_casa_rst.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "%s_casa_rst_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
     def clean_up_re_spin(self, number=None):
 
@@ -305,19 +325,25 @@ class RunCable(object):
         tag = self.site[:-2]
 
         fromx = "pop_%s_ini.nc" % (tag)
-        to = "pop_%s_ini_ccp%d.nc" % (tag, number)
+        from_fixed = "pop_%s_ini.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "pop_%s_ini_ccp%d.nc" % (self.site, number)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
         fromx = "%s_climate_rst.nc" % (tag)
-        to = "%s_climate_rst_ccp%d.nc" % (tag, number)
+        from_fixed = "%s_climate_rst.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "%s_climate_rst_ccp%d.nc" % (self.site, number)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
         fromx = "%s_casa_rst.nc" % (tag)
-        to = "%s_casa_rst_ccp%d.nc" % (tag, number)
+        from_fixed = "%s_casa_rst.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "%s_casa_rst_ccp%d.nc" % (self.site, number)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
         os.remove("new_sumbal")
         os.remove("cnpfluxOut.csv")
@@ -334,20 +360,21 @@ class RunCable(object):
         tag = self.site[:-2]
 
         fromx = "%s_casa_rst.nc" % (tag)
-        to = "%s_casa_rst_saa%d.nc" % (tag, number)
+        from_fixed = "%s_casa_rst.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "%s_casa_rst_saa%d.nc" % (self.site, number)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
         fromx = "pop_%s_ini.nc" % (tag)
-        to = "pop_%s_ini_saa%d.nc" % (tag, number)
+        from_fixed = "pop_%s_ini.nc" % (self.site)
+        os.rename(fromx, from_fixed)
+        to = "pop_%s_ini_saa%d.nc" % (self.site, number)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(fromx, to)
+        shutil.copyfile(from_fixed, to)
 
         for f in glob.glob("c2c_*_dump.nc"):
             os.remove(f)
-
-
-
 
 if __name__ == "__main__":
 
@@ -372,8 +399,8 @@ if __name__ == "__main__":
     aux_dir = "../../src/CABLE-AUX/"
     verbose = True
 
-    SPIN_UP = False
-    TRANSIENT = True
+    SPIN_UP = True
+    TRANSIENT = False
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
                  exe, aux_dir, verbose)
