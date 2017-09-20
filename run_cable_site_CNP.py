@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-Tumbarumba
-==========
+Site run with full CNP (and Pop)
+================================
 
 - Model spin-up: using K34 tower info, CO2=284.7; NDEP-0.79 kg N ha-1 yr-1;
                  PDEP=0.144 kg P ha-1 yr-1
