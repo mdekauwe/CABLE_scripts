@@ -56,18 +56,6 @@ class RunCable(object):
             self.run_me()
             self.clean_up_ini_spin()
 
-            #num=1
-            #self.setup_re_spin(restart_fname, number=num)
-            #self.run_me()
-            #self.clean_up_re_spin(number=num)
-
-            """
-            # Initial spin
-            self.setup_ini_spin()
-            self.run_me()
-            self.clean_up_ini_spin()
-
-
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.setup_re_spin(restart_fname, number=num)
@@ -85,7 +73,7 @@ class RunCable(object):
 
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
-            """
+
         if TRANSIENT == True:
             self.setup_transient()
             self.run_me()
@@ -199,9 +187,14 @@ class RunCable(object):
     def setup_re_spin(self, restart_fname, number=None):
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_ccp_%d" % (site, number))
+                                     "%s_log_ccp%d" % (site, number))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
+
+        out_fname = os.path.join(self.output_dir,
+                                 "%s_out_cable_ccp%d.nc" % (site, number))
+        if os.path.isfile(out_fname):
+            os.remove(out_fname)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
@@ -223,7 +216,7 @@ class RunCable(object):
                         "casafile%cnpipool": "''",
                         "casafile%c2cdumppath": "' '",
                         "output%restart": ".TRUE.",
-
+                        "filename%out": "'%s'" % (out_fname),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
@@ -248,7 +241,7 @@ class RunCable(object):
                         "cable_user%SOIL_STRUC": "'default'",
                         "leaps": ".FALSE.",
                         "spincasa": ".TRUE.",
-                        "casafile%cnpipool": 'poolcnpIn.csv',
+                        "casafile%cnpipool": "'poolcnpIn.csv'",
                         "casafile%c2cdumppath": "'./'",
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
@@ -265,6 +258,11 @@ class RunCable(object):
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
+        out_fname = os.path.join(self.output_dir,
+                                 "%s_out_cable_transient.nc" % (site))
+        if os.path.isfile(out_fname):
+            os.remove(out_fname)
+
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "output%averaging": "'monthly'",
@@ -274,6 +272,7 @@ class RunCable(object):
                         "casafile%cnpipool": "''",
                         "cable_user%POP_out": "'epi'",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
+                        "filename%out": "'%s'" % (out_fname),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
@@ -287,8 +286,9 @@ class RunCable(object):
 
     def clean_up_ini_spin(self):
 
-        # is this robust?
+        # Fudge till Vanessa fixes truncation issue
         tag = self.site[:-2]
+        sitex = "TumbaFluxn"
 
         for f in glob.glob("*.out"):
             os.remove(f)
@@ -299,49 +299,50 @@ class RunCable(object):
         # shouldn't need the inbetween step once vanessa fixes her code
         # but currently it is truncating the name
         fromx = "pop_%s_ini.nc" % (tag)
-        from_fixed = "pop_%s_ini.nc" % (self.site)
+        from_fixed = "pop_%s_ini.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "pop_%s_ini_zero.nc" % (self.site)
+        to = "pop_%s_ini_zero.nc" % (sitex)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
         fromx = "%s_climate_rst.nc" % (tag)
-        from_fixed = "%s_climate_rst.nc" % (self.site)
+        from_fixed = "%s_climate_rst.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "%s_climate_rst_zero.nc" % (self.site)
+        to = "%s_climate_rst_zero.nc" % (sitex)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
         fromx = "%s_casa_rst.nc" % (tag)
-        from_fixed = "%s_casa_rst.nc" % (self.site)
+        from_fixed = "%s_casa_rst.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "%s_casa_rst_zero.nc" % (self.site)
+        to = "%s_casa_rst_zero.nc" % (sitex)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
     def clean_up_re_spin(self, number=None):
 
-        # is this robust?
+        # Fudge till Vanessa fixes truncation issue
         tag = self.site[:-2]
+        sitex = "TumbaFluxn"
 
         fromx = "pop_%s_ini.nc" % (tag)
-        from_fixed = "pop_%s_ini.nc" % (self.site)
+        from_fixed = "pop_%s_ini.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "pop_%s_ini_ccp%d.nc" % (self.site, number)
+        to = "pop_%s_ini_ccp%d.nc" % (sitex, number)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
         fromx = "%s_climate_rst.nc" % (tag)
-        from_fixed = "%s_climate_rst.nc" % (self.site)
+        from_fixed = "%s_climate_rst.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "%s_climate_rst_ccp%d.nc" % (self.site, number)
+        to = "%s_climate_rst_ccp%d.nc" % (sitex, number)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
         fromx = "%s_casa_rst.nc" % (tag)
-        from_fixed = "%s_casa_rst.nc" % (self.site)
+        from_fixed = "%s_casa_rst.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "%s_casa_rst_ccp%d.nc" % (self.site, number)
+        to = "%s_casa_rst_ccp%d.nc" % (sitex, number)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
@@ -356,20 +357,21 @@ class RunCable(object):
 
     def clean_up_anlytical_spin(self, number=None):
 
-        # is this robust?
+        # Fudge till Vanessa fixes truncation issue
         tag = self.site[:-2]
+        sitex = "TumbaFluxn"
 
         fromx = "%s_casa_rst.nc" % (tag)
-        from_fixed = "%s_casa_rst.nc" % (self.site)
+        from_fixed = "%s_casa_rst.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "%s_casa_rst_saa%d.nc" % (self.site, number)
+        to = "%s_casa_rst_saa%d.nc" % (sitex, number)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
         fromx = "pop_%s_ini.nc" % (tag)
-        from_fixed = "pop_%s_ini.nc" % (self.site)
+        from_fixed = "pop_%s_ini.nc" % (sitex)
         os.rename(fromx, from_fixed)
-        to = "pop_%s_ini_saa%d.nc" % (self.site, number)
+        to = "pop_%s_ini_saa%d.nc" % (sitex, number)
         to = os.path.join(self.restart_dir, to)
         shutil.copyfile(from_fixed, to)
 
@@ -400,7 +402,7 @@ if __name__ == "__main__":
     verbose = True
 
     SPIN_UP = True
-    TRANSIENT = False
+    TRANSIENT = True
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
                  exe, aux_dir, verbose)
