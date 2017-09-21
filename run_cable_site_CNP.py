@@ -56,12 +56,6 @@ class RunCable(object):
             self.run_me()
             self.clean_up(ini=True, tag="zero")
 
-            #num=1
-            #self.setup_re_spin(restart_fname, number=num)
-            #self.run_me()
-            #self.clean_up(re_spin=True, tag="ccp%d" % (num))
-
-            """
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.setup_re_spin(restart_fname, number=num)
@@ -77,10 +71,8 @@ class RunCable(object):
             self.setup_re_spin(restart_fname, number=num)
             self.run_me()
             self.clean_up(re_spin=True, tag="ccp%d" % (num))
-
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
-            """
 
         if TRANSIENT == True:
             self.setup_transient()
@@ -88,7 +80,7 @@ class RunCable(object):
             self.clean_up(transient=True, tag="transient")
 
         if SIMULATION == True:
-            self.setup_historical()
+            self.setup_simulation()
             self.run_me()
             self.clean_up(tag="simulation")
 
@@ -295,7 +287,7 @@ class RunCable(object):
 
     def setup_simulation(self):
         replace_dict = {
-                        "RunType": '"""',
+                        "RunType": '"historical"',
         }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
@@ -315,7 +307,7 @@ class RunCable(object):
                         "output%averaging": "'all'",
                         "icycle": "3",
                         "cable_user%YearStart": "2000",
-                        "cable_user%YearEnd": "2010",
+                        "cable_user%YearEnd": "2005",
                         "casafile%cnpipool": "''",
                         "cable_user%POP_out": "'epi'",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
@@ -346,8 +338,6 @@ class RunCable(object):
         if re_spin:
             for f in glob.glob("*.out"):
                 os.remove(f)
-            for f in glob.glob("c2c_*_dump.nc"):
-                os.remove(f)
 
             os.remove("new_sumbal")
             os.remove("cnpfluxOut.csv")
@@ -356,6 +346,7 @@ class RunCable(object):
         if analytical:
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
+            os.remove("cnpfluxOut.csv")
 
         if transient:
             for f in glob.glob("*.out"):
@@ -394,22 +385,6 @@ class RunCable(object):
                           "%s_cable_rst_%s.nc" % (self.site, tag))
         shutil.copyfile(fromx, to)
 
-    def _clean_up_anlytical_spin(self, number=None):
-
-        for f in glob.glob("c2c_*_dump.nc"):
-            os.remove(f)
-
-        fromx = "%s_casa_rst.nc" % (self.site)
-        to = os.path.join(self.restart_dir,
-                          "%s_casa_rst_saa%d.nc" % (self.site, number))
-        shutil.copyfile(fromx, to)
-
-        fromx = "pop_%s_ini.nc" % (self.site)
-        to = os.path.join(self.restart_dir,
-                          "pop_%s_ini_saa%d.nc" % (self.site, number))
-        shutil.copyfile(fromx, to)
-
-
 
 if __name__ == "__main__":
 
@@ -444,9 +419,9 @@ if __name__ == "__main__":
     aux_dir = "../../src/CABLE-AUX/"
     verbose = False
 
-    SPIN_UP = True
+    SPIN_UP = False
     TRANSIENT = False
-    SIMULATION = False
+    SIMULATION = True
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
                  exe, aux_dir, verbose)
