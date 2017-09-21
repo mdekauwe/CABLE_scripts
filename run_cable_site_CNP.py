@@ -330,13 +330,6 @@ class RunCable(object):
             os.remove("cnpfluxOut.csv")
             os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
 
-        if re_spin:
-            for f in glob.glob("*.out"):
-                os.remove(f)
-            os.remove("new_sumbal")
-            os.remove("cnpfluxOut.csv")
-            os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
-
         if analytical:
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
@@ -345,16 +338,12 @@ class RunCable(object):
         if transient:
             for f in glob.glob("*.out"):
                 os.remove(f)
-
             for f in glob.glob("*_out.nc"):
                 os.remove(f)
-
             for f in glob.glob("*_out.nc"):
                 os.remove(f)
-
             for f in glob.glob("%s_*_pop_rst.nc" % (self.site)):
                 os.remove(f)
-
             os.remove("new_sumbal")
             os.remove("cnpfluxOut.csv")
             os.remove("cnpspinlast5.txt")
