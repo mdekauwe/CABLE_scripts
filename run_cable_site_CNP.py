@@ -52,19 +52,25 @@ class RunCable(object):
             restart_fname = "%s_cable_rst.nc" % (self.site)
 
             # Initial spin
-            self.setup_ini_spin()
-            self.run_me()
-            self.clean_up(ini=True, tag="zero")
+            #self.setup_ini_spin()
+            #self.run_me()
+            #self.clean_up(ini=True, tag="zero")
 
+            num=1
+            self.setup_re_spin(restart_fname, number=num)
+            self.run_me()
+            self.clean_up(re_spin=True, tag="ccp%d" % (num))
+
+            """
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.setup_re_spin(restart_fname, number=num)
                 self.run_me()
-                self.clean_up(re_spin=True, tag="ccp%d" % (number))
+                self.clean_up(re_spin=True, tag="ccp%d" % (num))
 
                 self.setup_analytical_spin(restart_fname, number=num)
                 self.run_me()
-                self.clean_up(analytical=True, tag="saa%d" % (number))
+                self.clean_up(analytical=True, tag="saa%d" % (num))
 
             # one final spin
             num = 4
@@ -74,6 +80,7 @@ class RunCable(object):
 
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
+            """
 
         if TRANSIENT == True:
             self.setup_transient()
@@ -326,7 +333,7 @@ class RunCable(object):
         else:
             os.system("%s 1>&2" % (self.cable_exe))
 
-    def clean_up_(self, ini=False, re_spin=False, analytical=False,
+    def clean_up(self, ini=False, re_spin=False, analytical=False,
                   transient=False, tag=None):
 
         if ini:
@@ -438,7 +445,7 @@ if __name__ == "__main__":
     verbose = False
 
     SPIN_UP = True
-    TRANSIENT = True
+    TRANSIENT = False
     HISTORICAL = False
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
