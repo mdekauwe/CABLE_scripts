@@ -24,6 +24,7 @@ import sys
 import glob
 import shutil
 import tempfile
+import netCDF4 as nc
 
 class RunCable(object):
 
@@ -40,6 +41,7 @@ class RunCable(object):
         self.nml_fn = nml_fn
         self.site_nml_fn = site_nml_fn
         self.veg_param_fn = veg_param_fn
+        self.restart_fname = "%s_cable_rst.nc" % (self.site)
         self.log_dir = log_dir
         self.cable_exe = exe
         self.aux_dir = aux_dir
@@ -47,9 +49,14 @@ class RunCable(object):
 
     def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
 
-        if SPIN_UP == True:
+        f = nc.Dataset(self.met_fname)
+        time = nc.num2date(f.variables['time'][:],
+                           f.variables['time'].units)
 
-            restart_fname = "%s_cable_rst.nc" % (self.site)
+        start_yr = time[0].year
+        end_yr = time[-1].year
+
+        if SPIN_UP == True:
 
             # Initial spin
             self.setup_ini_spin()
@@ -58,17 +65,17 @@ class RunCable(object):
 
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
-                self.setup_re_spin(restart_fname, number=num)
+                self.setup_re_spin(number=num)
                 self.run_me()
                 self.clean_up(re_spin=True, tag="ccp%d" % (num))
 
-                self.setup_analytical_spin(restart_fname, number=num)
+                self.setup_analytical_spin(number=num)
                 self.run_me()
                 self.clean_up(analytical=True, tag="saa%d" % (num))
 
             # one final spin
             num += 1
-            self.setup_re_spin(restart_fname, number=num)
+            self.setup_re_spin(number=num)
             self.run_me()
             self.clean_up(re_spin=True, tag="ccp%d" % (num))
 
@@ -78,7 +85,7 @@ class RunCable(object):
             self.clean_up(transient=True, tag="transient")
 
         if SIMULATION == True:
-            self.setup_simulation()
+            self.setup_simulation(start_yr, end_yr)
             self.run_me()
             self.clean_up(tag="simulation")
 
@@ -168,12 +175,11 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
-        restart_fname = "%s_cable_rst.nc" % (site)
         replace_dict = {
                         "filename%met": "'%s'" % (self.met_fname),
                         "filename%out": "'%s'" % (out_fname),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s'" % (restart_fname),
+                        "filename%restart_out": "'%s'" % (self.restart_fname),
                         "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
                         "filename%veg": "'%s%s'" % (self.driver_dir, veg_param_fn),
                         "filename%soil": "'%sdef_soil_params.txt'" % (self.driver_dir),
@@ -189,7 +195,7 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
-    def setup_re_spin(self, restart_fname, number=None):
+    def setup_re_spin(self, number=None):
 
         out_log_fname = os.path.join(self.log_dir,
                                      "%s_log_ccp%d.txt" % (site, number))
@@ -203,8 +209,8 @@ class RunCable(object):
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_in": "'%s'" % (restart_fname),
-                        "filename%restart_out": "'%s'" % (restart_fname),
+                        "filename%restart_in": "'%s'" % (self.restart_fname),
+                        "filename%restart_out": "'%s'" % (self.restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
                         "cable_user%POP_out": "'rst'",
@@ -225,7 +231,7 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
-    def setup_analytical_spin(self, restart_fname, number):
+    def setup_analytical_spin(self, number):
 
         out_log_fname = os.path.join(self.log_dir,
                                      "%s_log_analytic_%d.txt" % (site, number))
@@ -235,7 +241,7 @@ class RunCable(object):
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "icycle": "12",
-                        "filename%restart_out": "'%s'" % (restart_fname),
+                        "filename%restart_out": "'%s'" % (self.restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CLIMATE_fromZero": ".F.",
@@ -282,7 +288,7 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
-    def setup_simulation(self):
+    def setup_simulation(self, start_yr, end_yr):
         replace_dict = {
                         "RunType": '"historical"',
         }
@@ -303,8 +309,8 @@ class RunCable(object):
                         "spinup": ".FALSE.",
                         "output%averaging": "'all'",
                         "icycle": "3",
-                        "cable_user%YearStart": "2000",
-                        "cable_user%YearEnd": "2005",
+                        "cable_user%YearStart": "%d" % (start_yr),
+                        "cable_user%YearEnd": "%d" % (end_yr),
                         "casafile%cnpipool": "''",
                         "cable_user%POP_out": "'epi'",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
@@ -402,8 +408,8 @@ if __name__ == "__main__":
     aux_dir = "../../src/CABLE-AUX/"
     verbose = False
 
-    SPIN_UP = False
-    TRANSIENT = False
+    SPIN_UP = True
+    TRANSIENT = True
     SIMULATION = True
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
