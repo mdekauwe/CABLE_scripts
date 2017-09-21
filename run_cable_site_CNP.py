@@ -93,7 +93,10 @@ class RunCable(object):
                            f.variables['time'].units)
 
         start_yr = time[0].year
-        end_yr = time[-1].year
+
+        # PALS met files final year tag only has a single 30 min, so need to
+        # end at the previous year, which is the real file end
+        end_yr = time[-1].year - 1
 
         # length of met record
         nrec = end_yr - start_yr + 1
