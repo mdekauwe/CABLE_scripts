@@ -25,6 +25,7 @@ import glob
 import shutil
 import tempfile
 import netCDF4 as nc
+import math
 
 class RunCable(object):
 
@@ -49,17 +50,14 @@ class RunCable(object):
 
     def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
 
-        f = nc.Dataset(self.met_fname)
-        time = nc.num2date(f.variables['time'][:],
-                           f.variables['time'].units)
-
-        start_yr = time[0].year
-        end_yr = time[-1].year
+        (start_yr, end_yr,
+         start_yr_trans, end_yr_trans,
+         start_yr_spin, end_yr_spin) = self.get_years()
 
         if SPIN_UP == True:
 
             # Initial spin
-            self.setup_ini_spin()
+            self.setup_ini_spin(start_yr_spin, end_yr_spin, start_yr, end_yr)
             self.run_me()
             self.clean_up(ini=True, tag="zero")
 
@@ -80,7 +78,7 @@ class RunCable(object):
             self.clean_up(re_spin=True, tag="ccp%d" % (num))
 
         if TRANSIENT == True:
-            self.setup_transient()
+            self.setup_transient(start_yr_trans, end_yr_trans)
             self.run_me()
             self.clean_up(transient=True, tag="transient")
 
@@ -88,6 +86,33 @@ class RunCable(object):
             self.setup_simulation(start_yr, end_yr)
             self.run_me()
             self.clean_up(tag="simulation")
+
+    def get_years(self):
+        f = nc.Dataset(self.met_fname)
+        time = nc.num2date(f.variables['time'][:],
+                           f.variables['time'].units)
+
+        start_yr = time[0].year
+        end_yr = time[-1].year
+
+        # length of met record
+        nrec = end_yr - start_yr + 1
+
+        # number of times met dat is recycled in transient simulation from ~1850
+        # to yearstart-1
+        nloop_transient = math.ceil((start_yr - 1 - 1850) / nrec) - 1
+
+        # number of times met data is recycled with a 30y spinup run
+        nloop_spin = math.ceil(20 / nrec)
+
+        start_yr_transient = start_yr - 1 - nloop_transient * nrec + 1
+        end_yr_transient = start_yr_transient + nloop_transient * nrec - 1
+
+        end_yr_spin = start_yr_transient - 1
+        start_yr_spin = end_yr_spin - nloop_spin * nrec + 1
+
+        return (start_yr, end_yr, start_yr_transient, end_yr_transient,
+                start_yr_spin, end_yr_spin)
 
     def adjust_nml_file(self, fname, replacements):
         """ adjust CABLE NML file and write over the original.
@@ -143,7 +168,7 @@ class RunCable(object):
 
         return '\n'.join(lines) + '\n'
 
-    def setup_ini_spin(self):
+    def setup_ini_spin(self, start_yr_spin, end_yr_spin, start_yr, end_yr):
         shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
                         self.site_nml_fn)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
@@ -167,8 +192,8 @@ class RunCable(object):
         replace_dict = {
                         "RunType": '"spinup"',
                         "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
-                        "spinstartyear": "2002",
-                        "spinendyear": "2003",
+                        "spinstartyear": "%d" % (start_yr),
+                        "spinendyear": "%d" % (end_yr),
                         "spinCO2": "284.7",
                         "spinNdep": "0.79",
                         "spinPdep": "0.144",
@@ -191,7 +216,10 @@ class RunCable(object):
                         "cable_user%POP_rst": "'./'",
                         "cable_user%POP_fromZero": ".T.",
                         "cable_user%CASA_fromZero": ".T.",
-
+                        "cable_user%YearStart": "%d" % (start_yr_spin),
+                        "cable_user%YearEnd": "%d" % (end_yr_spin),
+                        "cable_user%CASA_SPIN_STARTYEAR": "%d" % (start_yr_spin),
+                        "cable_user%CASA_SPIN_ENDYEAR": "%d" % (end_yr_spin),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
@@ -257,7 +285,7 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
-    def setup_transient(self):
+    def setup_transient(self, start_yr_trans, end_yr_trans):
         replace_dict = {
                         "RunType": '"transient"',
         }
@@ -285,6 +313,8 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "POPLUC": ".T.",
                         "filename%out": "'%s'" % (out_fname),
+                        "cable_user%YearStart": "%d" % (start_yr_trans),
+                        "cable_user%YearEnd": "%d" % (end_yr_trans),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
