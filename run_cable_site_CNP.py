@@ -67,12 +67,10 @@ class RunCable(object):
                 self.clean_up(analytical=True, tag="saa%d" % (num))
 
             # one final spin
-            num = 4
+            num += 1
             self.setup_re_spin(restart_fname, number=num)
             self.run_me()
             self.clean_up(re_spin=True, tag="ccp%d" % (num))
-            for f in glob.glob("c2c_*_dump.nc"):
-                os.remove(f)
 
         if TRANSIENT == True:
             self.setup_transient()
@@ -155,7 +153,7 @@ class RunCable(object):
             os.remove(out_fname)
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_zero" % (site))
+                                     "%s_log_zero.txt" % (site))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -194,7 +192,7 @@ class RunCable(object):
     def setup_re_spin(self, restart_fname, number=None):
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_ccp%d" % (site, number))
+                                     "%s_log_ccp%d.txt" % (site, number))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -230,7 +228,7 @@ class RunCable(object):
     def setup_analytical_spin(self, restart_fname, number):
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_analytic_%d" % (site, number))
+                                     "%s_log_analytic_%d.txt" % (site, number))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -256,12 +254,11 @@ class RunCable(object):
     def setup_transient(self):
         replace_dict = {
                         "RunType": '"transient"',
-                        "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
         }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_transient" % (site))
+                                     "%s_log_transient.txt" % (site))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -292,7 +289,7 @@ class RunCable(object):
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_simulation" % (site))
+                                     "%s_log_simulation.txt" % (site))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -313,10 +310,8 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "filename%out": "'%s'" % (out_fname),
                         "POPLUC": ".F.",
-
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
-
 
     def run_me(self):
         # run the model
@@ -328,7 +323,7 @@ class RunCable(object):
     def clean_up(self, ini=False, re_spin=False, analytical=False,
                   transient=False, tag=None):
 
-        if ini:
+        if ini or re_spin:
             for f in glob.glob("*.out"):
                 os.remove(f)
             os.remove("new_sumbal")
@@ -338,7 +333,6 @@ class RunCable(object):
         if re_spin:
             for f in glob.glob("*.out"):
                 os.remove(f)
-
             os.remove("new_sumbal")
             os.remove("cnpfluxOut.csv")
             os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
