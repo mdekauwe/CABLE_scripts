@@ -330,23 +330,21 @@ class RunCable(object):
         os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
 
         fromx = "pop_%s_ini.nc" % (self.site)
-        fname = "pop_%s_ini_zero.nc" % (self.site)
-        to = os.path.join(self.restart_dir, fname)
+        to = os.path.join(self.restart_dir, "pop_%s_ini_zero.nc" % (self.site))
         shutil.copyfile(fromx, to)
 
         fromx = "%s_climate_rst.nc" % (self.site)
-        fname = "%s_climate_rst_zero.nc" % (self.site)
-        to = os.path.join(self.restart_dir, fname)
+        to = os.path.join(self.restart_dir,
+                          "%s_climate_rst_zero.nc" % (self.site))
         shutil.copyfile(fromx, to)
 
         fromx = "%s_casa_rst.nc" % (self.site)
-        fname = "%s_casa_rst_zero.nc" % (self.site)
-        to = os.path.join(self.restart_dir, fname)
+        to = os.path.join(self.restart_dir, "%s_casa_rst_zero.nc" % (self.site))
         shutil.copyfile(fromx, to)
 
         fromx = "%s_cable_rst.nc" % (self.site)
-        fname = "%s_cable_rst_zero.nc" % (self.site)
-        to = os.path.join(self.restart_dir, fname)
+        to = os.path.join(self.restart_dir,
+                          "%s_cable_rst_zero.nc" % (self.site))
         shutil.copyfile(fromx, to)
 
     def clean_up_re_spin(self, number=None):
