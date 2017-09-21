@@ -45,21 +45,21 @@ class RunCable(object):
         self.aux_dir = aux_dir
         self.verbose = verbose
 
-    def main(self, SPIN_UP=False, TRANSIENT=False, HISTORICAL=False):
+    def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
 
         if SPIN_UP == True:
 
             restart_fname = "%s_cable_rst.nc" % (self.site)
 
             # Initial spin
-            #self.setup_ini_spin()
-            #self.run_me()
-            #self.clean_up(ini=True, tag="zero")
-
-            num=1
-            self.setup_re_spin(restart_fname, number=num)
+            self.setup_ini_spin()
             self.run_me()
-            self.clean_up(re_spin=True, tag="ccp%d" % (num))
+            self.clean_up(ini=True, tag="zero")
+
+            #num=1
+            #self.setup_re_spin(restart_fname, number=num)
+            #self.run_me()
+            #self.clean_up(re_spin=True, tag="ccp%d" % (num))
 
             """
             # 3 sets of spins & analytical spins
@@ -87,10 +87,10 @@ class RunCable(object):
             self.run_me()
             self.clean_up(transient=True, tag="transient")
 
-        if HISTORICAL == True:
+        if SIMULATION == True:
             self.setup_historical()
             self.run_me()
-            self.clean_up(historical=True, tag="historical")
+            self.clean_up(tag="simulation")
 
     def adjust_nml_file(self, fname, replacements):
         """ adjust CABLE NML file and write over the original.
@@ -293,14 +293,14 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
-    def setup_historical(self):
+    def setup_simulation(self):
         replace_dict = {
                         "RunType": '"""',
         }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_historical" % (site))
+                                     "%s_log_simulation" % (site))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -446,8 +446,8 @@ if __name__ == "__main__":
 
     SPIN_UP = True
     TRANSIENT = False
-    HISTORICAL = False
+    SIMULATION = False
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
                  exe, aux_dir, verbose)
-    C.main(SPIN_UP, TRANSIENT, HISTORICAL)
+    C.main(SPIN_UP, TRANSIENT, SIMULATION)
