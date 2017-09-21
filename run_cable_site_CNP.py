@@ -6,8 +6,8 @@ Site run with full CNP (and Pop)
 
 - Model spin-up: using K34 tower info, CO2=284.7; NDEP-0.79 kg N ha-1 yr-1;
                  PDEP=0.144 kg P ha-1 yr-1
-- Transient: 1851-1998, varying CO2 and NDEP, but just recycling the intact
-             16-year met forcing.
+- Transient: 1851-1998, varying CO2 and NDEP, but just recycling the met data
+- Historical: actual met (dates correspond to simulated dates) and actual CO2
 - CNP + POP switched on.
 
 During the spinup, we are recycling in 30 year chunks.
@@ -45,7 +45,7 @@ class RunCable(object):
         self.aux_dir = aux_dir
         self.verbose = verbose
 
-    def main(self, SPIN_UP=False, TRANSIENT=False):
+    def main(self, SPIN_UP=False, TRANSIENT=False, HISTORICAL=False):
 
         if SPIN_UP == True:
 
@@ -56,6 +56,7 @@ class RunCable(object):
             self.run_me()
             self.clean_up_ini_spin()
 
+            """
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.setup_re_spin(restart_fname, number=num)
@@ -73,9 +74,14 @@ class RunCable(object):
 
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
-
+            """
         if TRANSIENT == True:
-            self.setup_transient()
+            #self.setup_transient()
+            #self.run_me()
+            self.clean_up_transient()
+
+        if HISTORICAL == True:
+            self.setup_historical()
             self.run_me()
 
     def adjust_nml_file(self, fname, replacements):
@@ -127,7 +133,8 @@ class RunCable(object):
                 key = row.split("=")[0]
                 val = row.split("=")[1]
                 lines[i] = " ".join((key.rstrip(), "=",
-                                     replacements_dict.get(key.strip(), val.lstrip())))
+                                     replacements_dict.get(key.strip(),
+                                     val.lstrip())))
 
         return '\n'.join(lines) + '\n'
 
@@ -276,6 +283,36 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
+    def setup_historical(self):
+        replace_dict = {
+                        "RunType": '"transient"',
+                        "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
+        }
+        self.adjust_nml_file(self.site_nml_fn, replace_dict)
+
+        out_log_fname = os.path.join(self.log_dir,
+                                     "%s_log_transient" % (site))
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
+
+        out_fname = os.path.join(self.output_dir,
+                                 "%s_out_cable_transient.nc" % (site))
+        if os.path.isfile(out_fname):
+            os.remove(out_fname)
+
+        replace_dict = {
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "output%averaging": "'monthly'",
+                        "icycle": "2",
+                        "cable_user%YearStart": "1852",
+                        "cable_user%YearEnd": "2001",
+                        "casafile%cnpipool": "''",
+                        "cable_user%POP_out": "'epi'",
+                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
+                        "filename%out": "'%s'" % (out_fname),
+        }
+        self.adjust_nml_file(self.nml_fn, replace_dict)
+
 
     def run_me(self):
         # run the model
@@ -286,38 +323,26 @@ class RunCable(object):
 
     def clean_up_ini_spin(self):
 
-        # Fudge till Vanessa fixes truncation issue
-        tag = self.site[:-2]
-        sitex = "TumbaFluxn"
-
         for f in glob.glob("*.out"):
             os.remove(f)
         os.remove("new_sumbal")
         os.remove("cnpfluxOut.csv")
-        os.remove("%s_1822_1851_casa_out.nc" % (tag))
+        os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
 
-        # shouldn't need the inbetween step once vanessa fixes her code
-        # but currently it is truncating the name
-        fromx = "pop_%s_ini.nc" % (tag)
-        from_fixed = "pop_%s_ini.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "pop_%s_ini_zero.nc" % (sitex)
+        fromx = "pop_%s_ini.nc" % (self.site)
+        to = "pop_%s_ini_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
+        shutil.copyfile(fromx, to)
 
-        fromx = "%s_climate_rst.nc" % (tag)
-        from_fixed = "%s_climate_rst.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "%s_climate_rst_zero.nc" % (sitex)
+        fromx = "%s_climate_rst.nc" % (self.site)
+        to = "%s_climate_rst_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
+        shutil.move(fromx, to)
 
-        fromx = "%s_casa_rst.nc" % (tag)
-        from_fixed = "%s_casa_rst.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "%s_casa_rst_zero.nc" % (sitex)
+        fromx = "%s_casa_rst.nc" % (self.site)
+        to = "%s_casa_rst_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
+        shutil.move(fromx, to)
 
     def clean_up_re_spin(self, number=None):
 
@@ -378,6 +403,50 @@ class RunCable(object):
         for f in glob.glob("c2c_*_dump.nc"):
             os.remove(f)
 
+    def clean_up_transient(self):
+
+        # Fudge till Vanessa fixes truncation issue
+        tag = self.site[:-2]
+        sitex = "TumbaFluxn"
+
+        fromx = "pop_%s_ini.nc" % (tag)
+        from_fixed = "pop_%s_ini.nc" % (sitex)
+        os.rename(fromx, from_fixed)
+        to = "pop_%s_ini_transient.nc"
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(from_fixed, to)
+
+        fromx = "%s_climate_rst.nc" % (tag)
+        from_fixed = "%s_climate_rst.nc" % (sitex)
+        os.rename(fromx, from_fixed)
+        to = "%s_climate_rst_transient.nc"
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(from_fixed, to)
+
+        fromx = "%s_casa_rst.nc" % (tag)
+        from_fixed = "%s_casa_rst.nc" % (sitex)
+        os.rename(fromx, from_fixed)
+        to = "%s_casa_rst_transient.nc"
+        to = os.path.join(self.restart_dir, to)
+        shutil.copyfile(from_fixed, to)
+
+        for f in glob.glob("*.out"):
+            os.remove(f)
+
+        for f in glob.glob("*_out.nc"):
+            os.remove(f)
+
+        for f in glob.glob("*_out.nc"):
+            os.remove(f)
+
+        for f in glob.glob("%s_*_pop_rst.nc" % (tag)):
+            os.remove(f)
+
+        os.remove("new_sumbal")
+        os.remove("cnpfluxOut.csv")
+        os.remove("cnpspinlast5.txt")
+
+
 if __name__ == "__main__":
 
     site = "TumbaFluxnet"
@@ -399,11 +468,12 @@ if __name__ == "__main__":
 
     exe = "../../src/CABLE_SLI_JV_ratio/CABLE-trunk_checks_extract_sli_optimise_JVratio_vanessa/offline/cable"
     aux_dir = "../../src/CABLE-AUX/"
-    verbose = True
+    verbose = False
 
     SPIN_UP = True
-    TRANSIENT = True
+    TRANSIENT = False
+    HISTORICAL = False
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
                  exe, aux_dir, verbose)
-    C.main(SPIN_UP, TRANSIENT)
+    C.main(SPIN_UP, TRANSIENT, HISTORICAL)
