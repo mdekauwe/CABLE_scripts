@@ -337,12 +337,17 @@ class RunCable(object):
         fromx = "%s_climate_rst.nc" % (self.site)
         fname = "%s_climate_rst_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, fname)
-        shutil.move(fromx, to)
+        shutil.copyfile(fromx, to)
 
         fromx = "%s_casa_rst.nc" % (self.site)
         fname = "%s_casa_rst_zero.nc" % (self.site)
         to = os.path.join(self.restart_dir, fname)
-        shutil.move(fromx, to)
+        shutil.copyfile(fromx, to)
+
+        fromx = "%s_cable_rst.nc" % (self.site)
+        fname = "%s_cable_rst_zero.nc" % (self.site)
+        to = os.path.join(self.restart_dir, fname)
+        shutil.copyfile(fromx, to)
 
     def clean_up_re_spin(self, number=None):
 
@@ -455,16 +460,26 @@ if __name__ == "__main__":
     driver_dir = "../../driver_files/"
     met_dir = "../../met_data/plumber_met/"
     co2_ndep_dir = "../../met_data/co2_ndep"
+    log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restart_files"
     nml_fn = "cable.nml"
     site_nml_fn = "site.nml"
 
+    if not os.path.exists(restart_dir):
+        os.makedirs(restart_dir)
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
     met_fname = os.path.join(met_dir, '%s.1.4_met.nc' % (site))
     co2_ndep_fname = os.path.join(co2_ndep_dir,
                                   "AmaFACE_co2ndepforcing_1850_2015_AMB.csv")
     veg_param_fn = "def_veg_params_zr_clitt_fixed.txt"
-    log_dir = "logs"
+
 
     exe = "../../src/CABLE_SLI_JV_ratio/CABLE-trunk_checks_extract_sli_optimise_JVratio_vanessa/offline/cable"
     aux_dir = "../../src/CABLE-AUX/"
