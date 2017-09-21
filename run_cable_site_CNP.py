@@ -54,35 +54,36 @@ class RunCable(object):
             # Initial spin
             self.setup_ini_spin()
             self.run_me()
-            self.clean_up_ini_spin()
+            self.clean_up(ini=True, tag="zero")
 
-            """
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.setup_re_spin(restart_fname, number=num)
                 self.run_me()
-                self.clean_up_re_spin(number=num)
+                self.clean_up(re_spin=True, tag="ccp%d" % (number))
 
                 self.setup_analytical_spin(restart_fname, number=num)
                 self.run_me()
-                self.clean_up_anlytical_spin(number=num)
+                self.clean_up(analytical=True, tag="saa%d" % (number))
 
             # one final spin
-            self.setup_re_spin(restart_fname, number=4)
+            num = 4
+            self.setup_re_spin(restart_fname, number=num)
             self.run_me()
-            self.clean_up_re_spin(number=4)
+            self.clean_up(re_spin=True, tag="ccp%d" % (num))
 
             for f in glob.glob("c2c_*_dump.nc"):
                 os.remove(f)
-            """
+
         if TRANSIENT == True:
-            #self.setup_transient()
-            #self.run_me()
-            self.clean_up_transient()
+            self.setup_transient()
+            self.run_me()
+            self.clean_up(transient=True, tag="transient")
 
         if HISTORICAL == True:
             self.setup_historical()
             self.run_me()
+            self.clean_up(historical=True, tag="historical")
 
     def adjust_nml_file(self, fname, replacements):
         """ adjust CABLE NML file and write over the original.
@@ -273,43 +274,47 @@ class RunCable(object):
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "output%averaging": "'monthly'",
+                        "spinup": ".FALSE.",
                         "icycle": "2",
                         "cable_user%YearStart": "1852",
                         "cable_user%YearEnd": "2001",
                         "casafile%cnpipool": "''",
                         "cable_user%POP_out": "'epi'",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
+                        "POPLUC": ".T.",
                         "filename%out": "'%s'" % (out_fname),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_historical(self):
         replace_dict = {
-                        "RunType": '"transient"',
-                        "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
+                        "RunType": '"""',
         }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_transient" % (site))
+                                     "%s_log_historical" % (site))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
         out_fname = os.path.join(self.output_dir,
-                                 "%s_out_cable_transient.nc" % (site))
+                                 "%s_out_cable.nc" % (site))
         if os.path.isfile(out_fname):
             os.remove(out_fname)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
-                        "output%averaging": "'monthly'",
-                        "icycle": "2",
-                        "cable_user%YearStart": "1852",
-                        "cable_user%YearEnd": "2001",
+                        "spinup": ".FALSE.",
+                        "output%averaging": "'all'",
+                        "icycle": "3",
+                        "cable_user%YearStart": "2000",
+                        "cable_user%YearEnd": "2010",
                         "casafile%cnpipool": "''",
                         "cable_user%POP_out": "'epi'",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "filename%out": "'%s'" % (out_fname),
+                        "POPLUC": ".F.",
+
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
@@ -321,56 +326,68 @@ class RunCable(object):
         else:
             os.system("%s 1>&2" % (self.cable_exe))
 
-    def clean_up_ini_spin(self):
+    def clean_up_(self, ini=False, re_spin=False, analytical=False,
+                  transient=False, tag=None):
 
-        for f in glob.glob("*.out"):
-            os.remove(f)
-        os.remove("new_sumbal")
-        os.remove("cnpfluxOut.csv")
-        os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
+        if ini:
+            for f in glob.glob("*.out"):
+                os.remove(f)
+            os.remove("new_sumbal")
+            os.remove("cnpfluxOut.csv")
+            os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
+
+        if re_spin:
+            for f in glob.glob("*.out"):
+                os.remove(f)
+            for f in glob.glob("c2c_*_dump.nc"):
+                os.remove(f)
+
+            os.remove("new_sumbal")
+            os.remove("cnpfluxOut.csv")
+            os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
+
+        if analytical:
+            for f in glob.glob("c2c_*_dump.nc"):
+                os.remove(f)
+
+        if transient:
+            for f in glob.glob("*.out"):
+                os.remove(f)
+
+            for f in glob.glob("*_out.nc"):
+                os.remove(f)
+
+            for f in glob.glob("*_out.nc"):
+                os.remove(f)
+
+            for f in glob.glob("%s_*_pop_rst.nc" % (self.site)):
+                os.remove(f)
+
+            os.remove("new_sumbal")
+            os.remove("cnpfluxOut.csv")
+            os.remove("cnpspinlast5.txt")
 
         fromx = "pop_%s_ini.nc" % (self.site)
-        to = os.path.join(self.restart_dir, "pop_%s_ini_zero.nc" % (self.site))
+        to = os.path.join(self.restart_dir,
+                         "pop_%s_ini_%s.nc" % (self.site, tag))
         shutil.copyfile(fromx, to)
 
         fromx = "%s_climate_rst.nc" % (self.site)
         to = os.path.join(self.restart_dir,
-                          "%s_climate_rst_zero.nc" % (self.site))
+                          "%s_climate_rst_%s.nc" % (self.site, tag))
         shutil.copyfile(fromx, to)
 
         fromx = "%s_casa_rst.nc" % (self.site)
-        to = os.path.join(self.restart_dir, "%s_casa_rst_zero.nc" % (self.site))
+        to = os.path.join(self.restart_dir,
+                          "%s_casa_rst_%s.nc" % (self.site, tag))
         shutil.copyfile(fromx, to)
 
         fromx = "%s_cable_rst.nc" % (self.site)
         to = os.path.join(self.restart_dir,
-                          "%s_cable_rst_zero.nc" % (self.site))
+                          "%s_cable_rst_%s.nc" % (self.site, tag))
         shutil.copyfile(fromx, to)
 
-    def clean_up_re_spin(self, number=None):
-
-        for f in glob.glob("*.out"):
-            os.remove(f)
-        os.remove("new_sumbal")
-        os.remove("cnpfluxOut.csv")
-        os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
-
-        fromx = "pop_%s_ini.nc" % (self.site)
-        to = os.path.join(self.restart_dir,
-                          "pop_%s_ini_ccp%d.nc" % (self.site, number))
-        shutil.copyfile(fromx, to)
-
-        fromx = "%s_climate_rst.nc" % (self.site)
-        to = os.path.join(self.restart_dir,
-                          "%s_climate_rst_ccp%d.nc" % (self.site, number))
-        shutil.copyfile(fromx, to)
-
-        fromx = "%s_casa_rst.nc" % (self.site)
-        to = os.path.join(self.restart_dir,
-                          "%s_casa_rst_ccp%d.nc" % (self.site, number))
-        shutil.copyfile(fromx, to)
-
-    def clean_up_anlytical_spin(self, number=None):
+    def _clean_up_anlytical_spin(self, number=None):
 
         for f in glob.glob("c2c_*_dump.nc"):
             os.remove(f)
@@ -385,34 +402,7 @@ class RunCable(object):
                           "pop_%s_ini_saa%d.nc" % (self.site, number))
         shutil.copyfile(fromx, to)
 
-    def clean_up_transient(self):
 
-        for f in glob.glob("*.out"):
-            os.remove(f)
-
-        for f in glob.glob("*_out.nc"):
-            os.remove(f)
-
-        for f in glob.glob("*_out.nc"):
-            os.remove(f)
-
-        for f in glob.glob("%s_*_pop_rst.nc" % (tag)):
-            os.remove(f)
-
-        os.remove("new_sumbal")
-        os.remove("cnpfluxOut.csv")
-        os.remove("cnpspinlast5.txt")
-        fromx = "pop_%s_ini.nc" % (self.site)
-        to = os.path.join(self.restart_dir, "pop_%s_ini_transient.nc")
-        shutil.copyfile(fromx, to)
-
-        fromx = "%s_climate_rst.nc" % (self.site)
-        to = os.path.join(self.restart_dir, "%s_climate_rst_transient.nc")
-        shutil.copyfile(fromx, to)
-
-        fromx = "%s_casa_rst.nc" % (self.site)
-        to = os.path.join(self.restart_dir, "%s_casa_rst_transient.nc")
-        shutil.copyfile(fromx, to)
 
 if __name__ == "__main__":
 
@@ -448,7 +438,7 @@ if __name__ == "__main__":
     verbose = False
 
     SPIN_UP = True
-    TRANSIENT = False
+    TRANSIENT = True
     HISTORICAL = False
     C = RunCable(site, driver_dir, output_dir, restart_dir, met_fname,
                  co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn, log_dir,
