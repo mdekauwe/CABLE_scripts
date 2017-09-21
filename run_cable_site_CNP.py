@@ -349,89 +349,43 @@ class RunCable(object):
 
     def clean_up_re_spin(self, number=None):
 
-        # Fudge till Vanessa fixes truncation issue
-        tag = self.site[:-2]
-        sitex = "TumbaFluxn"
-
-        fromx = "pop_%s_ini.nc" % (tag)
-        from_fixed = "pop_%s_ini.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "pop_%s_ini_ccp%d.nc" % (sitex, number)
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
-
-        fromx = "%s_climate_rst.nc" % (tag)
-        from_fixed = "%s_climate_rst.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "%s_climate_rst_ccp%d.nc" % (sitex, number)
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
-
-        fromx = "%s_casa_rst.nc" % (tag)
-        from_fixed = "%s_casa_rst.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "%s_casa_rst_ccp%d.nc" % (sitex, number)
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
-
-        os.remove("new_sumbal")
-        os.remove("cnpfluxOut.csv")
-
-        for f in glob.glob("*_casa_out.nc"):
-            os.remove(f)
-
         for f in glob.glob("*.out"):
             os.remove(f)
+        os.remove("new_sumbal")
+        os.remove("cnpfluxOut.csv")
+        os.remove(glob.glob("%s_*_casa_out.nc" % (site))[0])
+
+        fromx = "pop_%s_ini.nc" % (self.site)
+        to = os.path.join(self.restart_dir,
+                          "pop_%s_ini_ccp%d.nc" % (self.site, number))
+        shutil.copyfile(fromx, to)
+
+        fromx = "%s_climate_rst.nc" % (self.site)
+        to = os.path.join(self.restart_dir,
+                          "%s_climate_rst_ccp%d.nc" % (self.site, number))
+        shutil.copyfile(fromx, to)
+
+        fromx = "%s_casa_rst.nc" % (self.site)
+        to = os.path.join(self.restart_dir,
+                          "%s_casa_rst_ccp%d.nc" % (self.site, number))
+        shutil.copyfile(fromx, to)
 
     def clean_up_anlytical_spin(self, number=None):
-
-        # Fudge till Vanessa fixes truncation issue
-        tag = self.site[:-2]
-        sitex = "TumbaFluxn"
-
-        fromx = "%s_casa_rst.nc" % (tag)
-        from_fixed = "%s_casa_rst.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "%s_casa_rst_saa%d.nc" % (sitex, number)
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
-
-        fromx = "pop_%s_ini.nc" % (tag)
-        from_fixed = "pop_%s_ini.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "pop_%s_ini_saa%d.nc" % (sitex, number)
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
 
         for f in glob.glob("c2c_*_dump.nc"):
             os.remove(f)
 
+        fromx = "%s_casa_rst.nc" % (self.site)
+        to = os.path.join(self.restart_dir,
+                          "%s_casa_rst_saa%d.nc" % (self.site, number))
+        shutil.copyfile(fromx, to)
+
+        fromx = "pop_%s_ini.nc" % (self.site)
+        to = os.path.join(self.restart_dir,
+                          "pop_%s_ini_saa%d.nc" % (self.site, number))
+        shutil.copyfile(fromx, to)
+
     def clean_up_transient(self):
-
-        # Fudge till Vanessa fixes truncation issue
-        tag = self.site[:-2]
-        sitex = "TumbaFluxn"
-
-        fromx = "pop_%s_ini.nc" % (tag)
-        from_fixed = "pop_%s_ini.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "pop_%s_ini_transient.nc"
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
-
-        fromx = "%s_climate_rst.nc" % (tag)
-        from_fixed = "%s_climate_rst.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "%s_climate_rst_transient.nc"
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
-
-        fromx = "%s_casa_rst.nc" % (tag)
-        from_fixed = "%s_casa_rst.nc" % (sitex)
-        os.rename(fromx, from_fixed)
-        to = "%s_casa_rst_transient.nc"
-        to = os.path.join(self.restart_dir, to)
-        shutil.copyfile(from_fixed, to)
 
         for f in glob.glob("*.out"):
             os.remove(f)
@@ -448,7 +402,17 @@ class RunCable(object):
         os.remove("new_sumbal")
         os.remove("cnpfluxOut.csv")
         os.remove("cnpspinlast5.txt")
+        fromx = "pop_%s_ini.nc" % (self.site)
+        to = os.path.join(self.restart_dir, "pop_%s_ini_transient.nc")
+        shutil.copyfile(fromx, to)
 
+        fromx = "%s_climate_rst.nc" % (self.site)
+        to = os.path.join(self.restart_dir, "%s_climate_rst_transient.nc")
+        shutil.copyfile(fromx, to)
+
+        fromx = "%s_casa_rst.nc" % (self.site)
+        to = os.path.join(self.restart_dir, "%s_casa_rst_transient.nc")
+        shutil.copyfile(fromx, to)
 
 if __name__ == "__main__":
 
