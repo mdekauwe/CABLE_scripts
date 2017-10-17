@@ -63,10 +63,15 @@ class AdjustCableMetFile(object):
         for v in vars_without_time:
             out.createVariable(v, 'f8', ('y', 'x'))
             out.variables[v][:,:] = ds.variables[v][:,:]
+            ncvar = ds.variables[v]
+            out = self.write_attributes(v, ncvar, out)
 
         for v in nc_vars:
             out.createVariable(v, 'f8', ('time', 'y', 'x'))
             out.variables[v][:,:,:] = ds.variables[v][:,:,:]
+            ncvar = ds.variables[v]
+            out = self.write_attributes(v, ncvar, out)
+
 
         ds.close()
 
@@ -76,7 +81,24 @@ class AdjustCableMetFile(object):
         #            'statistic': u'Mean\nM'})
         #w_nc_fid.variables['air_dep'][:] = departure
 
+    def write_attributes(self, v, ncvar, out):
+        if hasattr(ncvar, 'missing_value'):
+            mval = ncvar.missing_value
+            out.variables[v].setncatts({'missing_value': mval})
+        if hasattr(ncvar, 'units'):
+            uval = ncvar.units
+            out.variables[v].setncatts({'units': uval})
+        if hasattr(ncvar, 'long_name'):
+            ln = ncvar.long_name
+            out.variables[v].setncatts({'long_name': ln})
+        if hasattr(ncvar, 'values'):
+            vx = ncvar.values
+            out.variables[v].setncatts({'values': vx})
+        if hasattr(ncvar, 'CF_name'):
+            cf = ncvar.CF_name
+            out.variables[v].setncatts({'CF_name': cf})
 
+        return out
 
     def setup_ini_spin_met_file(self, start_yr_spin, end_yr_spin, start_met_yr,
                                 end_met_yr):
