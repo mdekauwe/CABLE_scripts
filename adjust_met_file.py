@@ -35,7 +35,7 @@ class AdjustCableMetFile(object):
         nc_dims = [dim for dim in ds.dimensions]
         nc_vars = [var for var in ds.variables]
 
-        # Write dimensions (x, y, z, time)
+        # Write dimensions
         data = {}
         for dim in nc_dims:
             out.createDimension(dim, ds.variables[dim].size)
@@ -44,14 +44,10 @@ class AdjustCableMetFile(object):
             for ncattr in ds.variables[dim].ncattrs():
                 data[dim].setncattr(ncattr, ds.variables[dim].getncattr(ncattr))
 
-        out.variables['time'][:] = ds.variables['time'][:]
-        out.variables['x'][:] = ds.variables['x'][:]
-        out.variables['y'][:] = ds.variables['y'][:]
-        out.variables['z'][:] = ds.variables['z'][:]
-        [nc_vars.remove(i) for i in ["time", "x", "y", "z"]]
+                out.variables[dim][:] = ds.variables[dim][:]
 
         # Write vars
-
+        [nc_vars.remove(i) for i in ["time", "x", "y", "z"]]
         for v in nc_vars:
             out.createVariable(v, ds.variables[v].dtype,
                                ds.variables[v].dimensions)
@@ -63,7 +59,6 @@ class AdjustCableMetFile(object):
                 out.variables[v][:,:,:,:] = ds.variables[v][:,:,:,:]
             ncvar = ds.variables[v]
             out = self.write_attributes(v, ncvar, out)
-            
 
         # write global attributes
         for ncattr in ds.ncattrs():
