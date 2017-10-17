@@ -309,8 +309,6 @@ class RunCable(object):
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
                         "icycle": "2",
-                        "cable_user%YearStart": "1852",
-                        "cable_user%YearEnd": "2001",
                         "casafile%cnpipool": "''",
                         "cable_user%POP_out": "'epi'",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
