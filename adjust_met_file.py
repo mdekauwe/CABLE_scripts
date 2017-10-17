@@ -51,36 +51,19 @@ class AdjustCableMetFile(object):
         [nc_vars.remove(i) for i in ["time", "x", "y", "z"]]
 
         # Write vars
-        vars_without_time = []
-        vars_with_time = []
-        vars_with_time_and_zdim = []
+
         for v in nc_vars:
-            if len(ds.variables[v].dimensions) == 2:
-                vars_without_time.append(v)
-            elif len(ds.variables[v].dimensions) == 3:
-                vars_with_time.append(v)
-            elif len(ds.variables[v].dimensions) == 4:
-                vars_with_time_and_zdim.append(v)
-
-        for v in vars_without_time:
-
-            out.createVariable(v, ds.variables[v].dtype, ('y', 'x'))
-            out.variables[v][:,:] = ds.variables[v][:,:]
-            ncvar = ds.variables[v]
-            out = self.write_attributes(v, ncvar, out)
-
-        for v in vars_with_time:
-            out.createVariable(v, ds.variables[v].dtype, ('time', 'y', 'x'))
-            out.variables[v][:,:,:] = ds.variables[v][:,:,:]
-            ncvar = ds.variables[v]
-            out = self.write_attributes(v, ncvar, out)
-
-        for v in vars_with_time_and_zdim:
             out.createVariable(v, ds.variables[v].dtype,
-                               ('time', 'z', 'y', 'x'))
-            out.variables[v][:,:,:,:] = ds.variables[v][:,:,:,:]
+                               ds.variables[v].dimensions)
+            if len(ds.variables[v].dimensions) == 2:
+                out.variables[v][:,:] = ds.variables[v][:,:]
+            elif len(ds.variables[v].dimensions) == 3:
+                out.variables[v][:,:,:] = ds.variables[v][:,:,:]
+            elif len(ds.variables[v].dimensions) == 4:
+                out.variables[v][:,:,:,:] = ds.variables[v][:,:,:,:]
             ncvar = ds.variables[v]
             out = self.write_attributes(v, ncvar, out)
+            
 
         # write global attributes
         for ncattr in ds.ncattrs():
@@ -99,6 +82,11 @@ class AdjustCableMetFile(object):
 
         #for v in nc_vars:
         #    print(v,  ds1.variables[v].dtype, ds2.variables[v].dtype)
+
+        import matplotlib.pyplot as plt
+        plt.plot(ds2.variables["Tair"][0:250,0,0,0]-273.15)
+        plt.plot(ds1.variables["Tair"][0:250,0,0,0]-273.15, "r.")
+        plt.show()
 
     def write_attributes(self, v, ncvar, out):
 
