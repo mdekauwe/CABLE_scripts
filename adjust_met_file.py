@@ -13,11 +13,9 @@ __email__ = "mdekauwe@gmail.com"
 import os
 import sys
 import glob
-import shutil
-import tempfile
 import netCDF4 as nc
-import math
 import datetime as dt
+import numpy as np
 
 class AdjustCableMetFile(object):
 
@@ -27,11 +25,10 @@ class AdjustCableMetFile(object):
         self.met_fname = met_fname
         self.co2_ndep_fname = co2_ndep_fname
 
-    def write_new_met_file(self):
+    def write_new_met_file(self, ofname):
 
-        out = nc.Dataset('test.nc', 'w', format='NETCDF4')
+        out = nc.Dataset(ofname, 'w', format='NETCDF4')
         ds = nc.Dataset(self.met_fname)
-
         time = nc.num2date(ds.variables['time'][:], ds.variables['time'].units)
 
         nc_attrs = ds.ncattrs()
@@ -55,26 +52,56 @@ class AdjustCableMetFile(object):
 
         # Write vars
         vars_without_time = []
+        vars_with_time = []
+        vars_with_time_and_zdim = []
         for v in nc_vars:
-            if ds.variables[v].size == 1:
+            if len(ds.variables[v].dimensions) == 2:
                 vars_without_time.append(v)
-        [nc_vars.remove(i) for i in vars_without_time]
+            elif len(ds.variables[v].dimensions) == 3:
+                vars_with_time.append(v)
+            elif len(ds.variables[v].dimensions) == 4:
+                vars_with_time_and_zdim.append(v)
 
         for v in vars_without_time:
-            out.createVariable(v, 'f8', ('y', 'x'))
+
+            out.createVariable(v, ds.variables[v].dtype, ('y', 'x'))
             out.variables[v][:,:] = ds.variables[v][:,:]
             ncvar = ds.variables[v]
             out = self.write_attributes(v, ncvar, out)
 
-        for v in nc_vars:
-            out.createVariable(v, 'f8', ('time', 'y', 'x'))
+        for v in vars_with_time:
+            out.createVariable(v, ds.variables[v].dtype, ('time', 'y', 'x'))
             out.variables[v][:,:,:] = ds.variables[v][:,:,:]
             ncvar = ds.variables[v]
             out = self.write_attributes(v, ncvar, out)
 
+        for v in vars_with_time_and_zdim:
+            out.createVariable(v, ds.variables[v].dtype,
+                               ('time', 'z', 'y', 'x'))
+            out.variables[v][:,:,:,:] = ds.variables[v][:,:,:,:]
+            ncvar = ds.variables[v]
+            out = self.write_attributes(v, ncvar, out)
+
+        # write global attributes
+        for ncattr in ds.ncattrs():
+            out.setncattr(ncattr, getattr(ds, ncattr))
+
         ds.close()
 
+    def check_differences(self, ofname):
+        ds1 = nc.Dataset(self.met_fname)
+        ds2 = nc.Dataset(ofname)
+
+        nc_vars = [var for var in ds1.variables]
+        for v in nc_vars:
+            if not np.array_equal(ds1.variables[v], ds2.variables[v]):
+                print(v, "Differ")
+
+        #for v in nc_vars:
+        #    print(v,  ds1.variables[v].dtype, ds2.variables[v].dtype)
+
     def write_attributes(self, v, ncvar, out):
+
         if hasattr(ncvar, 'missing_value'):
             mval = ncvar.missing_value
             out.variables[v].setncatts({'missing_value': mval})
@@ -223,4 +250,6 @@ if __name__ == "__main__":
     end_yr_spin = 1853
     start_met_yr = 2002
     end_met_yr = 2005
-    M.write_new_met_file()
+    ofname = "test.nc"
+    M.write_new_met_file(ofname)
+    M.check_differences(ofname)
