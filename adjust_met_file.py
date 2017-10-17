@@ -1,22 +1,13 @@
 #!/usr/bin/env python
 
 """
-Site run with full CNP (and Pop)
-================================
-
-- Model spin-up: using K34 tower info, CO2=284.7; NDEP-0.79 kg N ha-1 yr-1;
-                 PDEP=0.144 kg P ha-1 yr-1
-- Transient: 1851-1998, varying CO2 and NDEP, but just recycling the met data
-- Historical: actual met (dates correspond to simulated dates) and actual CO2
-- CNP + POP switched on.
-
-During the spinup, we are recycling in 30 year chunks.
+Create netcdf files to force CABLE-CNP for FACE MIP type experiment
 
 That's all folks.
 """
 
 __author__ = "Martin De Kauwe"
-__version__ = "1.0 (19.09.2017)"
+__version__ = "1.0 (17.10.2017)"
 __email__ = "mdekauwe@gmail.com"
 
 import os
