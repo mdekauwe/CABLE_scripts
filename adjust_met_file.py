@@ -72,14 +72,7 @@ class AdjustCableMetFile(object):
             ncvar = ds.variables[v]
             out = self.write_attributes(v, ncvar, out)
 
-
         ds.close()
-
-        #w_nc_var.setncatts({'long_name': u"Latitude",\
-        #            'units': u"degrees_north", 'level_desc': u'Surface',\
-        #            'var_desc': u"Air temperature departure",\
-        #            'statistic': u'Mean\nM'})
-        #w_nc_fid.variables['air_dep'][:] = departure
 
     def write_attributes(self, v, ncvar, out):
         if hasattr(ncvar, 'missing_value'):
