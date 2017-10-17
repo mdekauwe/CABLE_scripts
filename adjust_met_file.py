@@ -63,47 +63,20 @@ class AdjustCableMetFile(object):
         for v in vars_without_time:
             out.createVariable(v, 'f8', ('y', 'x'))
             out.variables[v][:,:] = ds.variables[v][:,:]
-        ds.close()
-        sys.exit()
-
-        for v in vars_without_time:
-            print(v, ds.variables[v].dtype, ds.variables[v].size)
-
-        sys.exit()
-        print("\n")
 
         for v in nc_vars:
-            print(v, ds.variables[v].dtype, ds.variables[v].size)
-        sys.exit()
+            out.createVariable(v, 'f8', ('time', 'y', 'x'))
+            out.variables[v][:,:,:] = ds.variables[v][:,:,:]
 
-        out.createVariable('latitude', 'f8', ('y', 'x'))
-        out.variables['latitude'][:,:] = ds.variables['latitude'][:,:]
+        ds.close()
 
-        out.createVariable('longitude', 'f8', ('y', 'x'))
-        out.variables['longitude'][:,:] = ds.variables['longitude'][:,:]
-
-        out.createVariable('SWdown', 'f8', ('time', 'y', 'x'))
-        out.variables['SWdown'][:,:,:] = ds.variables['SWdown'][:,:]
         #w_nc_var.setncatts({'long_name': u"Latitude",\
         #            'units': u"degrees_north", 'level_desc': u'Surface',\
         #            'var_desc': u"Air temperature departure",\
         #            'statistic': u'Mean\nM'})
         #w_nc_fid.variables['air_dep'][:] = departure
 
-        #nc_vars.remove("time")
-        #nc_vars.remove("x")
-        #nc_vars.remove("y")
-        #nc_vars.remove("z")
 
-
-
-        #print(nc_dims)
-        #print(nc_vars)
-        #print(nc_attrs)
-
-
-        #sys.exit()
-        ds.close()
 
     def setup_ini_spin_met_file(self, start_yr_spin, end_yr_spin, start_met_yr,
                                 end_met_yr):
