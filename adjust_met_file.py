@@ -27,23 +27,15 @@ class AdjustCableMetFile(object):
         self.met_fname = met_fname
         self.co2_ndep_fname = co2_ndep_fname
 
-    def setup_ini_spin_met_file(self, start_yr_spin, end_yr_spin, start_met_yr,
-                                end_met_yr):
+
+
+
+
+    def write_new_met_file(self):
 
         out = nc.Dataset('test.nc', 'w', format='NETCDF4')
         ds = nc.Dataset(self.met_fname)
 
-        total_yrs = end_yr_spin - start_yr_spin
-
-        # Account for offset, first day stars 00:30 to 1.
-        start = dt.datetime(start_met_yr,1,1,0,30)
-        stop = dt.datetime(end_met_yr+1,1,1,0,0)
-        tindex0 = nc.date2index(start, ds.variables['time'], select='nearest')
-        tindex1 = nc.date2index(stop, ds.variables['time'], select='nearest')
-        start_idx = nc.num2date(ds.variables['time'][tindex0],
-                                ds.variables['time'].units)
-        end_idx = nc.num2date(ds.variables['time'][tindex1],
-                              ds.variables['time'].units)
 
         time = nc.num2date(ds.variables['time'][:], ds.variables['time'].units)
 
@@ -52,7 +44,7 @@ class AdjustCableMetFile(object):
         nc_vars = [var for var in ds.variables]
 
         for v in nc_vars:
-            print(v, ds.variables[v].dtype, ds.variables[v].dims)
+            print(v, ds.variables[v].dtype, ds.variables[v].size)
 
         sys.exit()
         data = {}
@@ -95,8 +87,27 @@ class AdjustCableMetFile(object):
 
 
         #sys.exit()
-
         ds.close()
+
+    def setup_ini_spin_met_file(self, start_yr_spin, end_yr_spin, start_met_yr,
+                                end_met_yr):
+
+        out = nc.Dataset('test.nc', 'w', format='NETCDF4')
+        ds = nc.Dataset(self.met_fname)
+
+        total_yrs = end_yr_spin - start_yr_spin
+
+        # Account for offset, first day stars 00:30 to 1.
+        start = dt.datetime(start_met_yr,1,1,0,30)
+        stop = dt.datetime(end_met_yr+1,1,1,0,0)
+        tindex0 = nc.date2index(start, ds.variables['time'], select='nearest')
+        tindex1 = nc.date2index(stop, ds.variables['time'], select='nearest')
+        start_idx = nc.num2date(ds.variables['time'][tindex0],
+                                ds.variables['time'].units)
+        end_idx = nc.num2date(ds.variables['time'][tindex1],
+                              ds.variables['time'].units)
+
+
 
         """
         out.createDimension(dim, nc_fid.variables[dim].size)
@@ -208,5 +219,4 @@ if __name__ == "__main__":
     end_yr_spin = 1853
     start_met_yr = 2002
     end_met_yr = 2005
-    M.setup_ini_spin_met_file(start_yr_spin, end_yr_spin, start_met_yr,
-                              end_met_yr)
+    M.write_new_met_file()
