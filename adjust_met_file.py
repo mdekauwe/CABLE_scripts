@@ -58,10 +58,12 @@ class AdjustCableMetFile(object):
         for v in nc_vars:
             if ds.variables[v].size == 1:
                 vars_without_time.append(v)
-
-        print(vars_without_time)
         [nc_vars.remove(i) for i in vars_without_time]
-        print(nc_vars)
+
+        for v in vars_without_time:
+            out.createVariable(v, 'f8', ('y', 'x'))
+            out.variables[v][:,:] = ds.variables[v][:,:]
+        ds.close()
         sys.exit()
 
         for v in vars_without_time:
