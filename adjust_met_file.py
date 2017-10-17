@@ -27,15 +27,10 @@ class AdjustCableMetFile(object):
         self.met_fname = met_fname
         self.co2_ndep_fname = co2_ndep_fname
 
-
-
-
-
     def write_new_met_file(self):
 
         out = nc.Dataset('test.nc', 'w', format='NETCDF4')
         ds = nc.Dataset(self.met_fname)
-
 
         time = nc.num2date(ds.variables['time'][:], ds.variables['time'].units)
 
@@ -43,10 +38,7 @@ class AdjustCableMetFile(object):
         nc_dims = [dim for dim in ds.dimensions]
         nc_vars = [var for var in ds.variables]
 
-        for v in nc_vars:
-            print(v, ds.variables[v].dtype, ds.variables[v].size)
-
-        sys.exit()
+        # Write dimensions (x, y, z, time)
         data = {}
         for dim in nc_dims:
             out.createDimension(dim, ds.variables[dim].size)
@@ -59,6 +51,28 @@ class AdjustCableMetFile(object):
         out.variables['x'][:] = ds.variables['x'][:]
         out.variables['y'][:] = ds.variables['y'][:]
         out.variables['z'][:] = ds.variables['z'][:]
+        [nc_vars.remove(i) for i in ["time", "x", "y", "z"]]
+
+        # Write vars
+        vars_without_time = []
+        for v in nc_vars:
+            if ds.variables[v].size == 1:
+                vars_without_time.append(v)
+
+        print(vars_without_time)
+        [nc_vars.remove(i) for i in vars_without_time]
+        print(nc_vars)
+        sys.exit()
+
+        for v in vars_without_time:
+            print(v, ds.variables[v].dtype, ds.variables[v].size)
+
+        sys.exit()
+        print("\n")
+
+        for v in nc_vars:
+            print(v, ds.variables[v].dtype, ds.variables[v].size)
+        sys.exit()
 
         out.createVariable('latitude', 'f8', ('y', 'x'))
         out.variables['latitude'][:,:] = ds.variables['latitude'][:,:]
