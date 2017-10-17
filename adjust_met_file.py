@@ -33,32 +33,30 @@ class AdjustCableMetFile(object):
 
         nc_attrs = ds.ncattrs()
         nc_dims = [dim for dim in ds.dimensions]
-        nc_vars = [var for var in ds.variables]
-
-        # Write dimensions
-        data = {}
-        for dim in nc_dims:
-            out.createDimension(dim, ds.variables[dim].size)
-            data[dim] = out.createVariable(dim, ds.variables[dim].dtype,\
-                                          (dim,))
-            for ncattr in ds.variables[dim].ncattrs():
-                data[dim].setncattr(ncattr, ds.variables[dim].getncattr(ncattr))
-
-                out.variables[dim][:] = ds.variables[dim][:]
+        #nc_vars = [var for var in ds.variables]
+        nc_vars = ds.variables.keys()
 
         # Write vars
-        [nc_vars.remove(i) for i in ["time", "x", "y", "z"]]
         for v in nc_vars:
-            out.createVariable(v, ds.variables[v].dtype,
-                               ds.variables[v].dimensions)
-            if len(ds.variables[v].dimensions) == 2:
-                out.variables[v][:,:] = ds.variables[v][:,:]
-            elif len(ds.variables[v].dimensions) == 3:
-                out.variables[v][:,:,:] = ds.variables[v][:,:,:]
-            elif len(ds.variables[v].dimensions) == 4:
-                out.variables[v][:,:,:,:] = ds.variables[v][:,:,:,:]
-            ncvar = ds.variables[v]
-            out = self.write_attributes(v, ncvar, out)
+            if len(ds.variables[v].dimensions) == 1:
+                out.createDimension(v, ds.variables[v].size)
+                out.createVariable(v, ds.variables[v].dtype, (v,))
+                ncvar = ds.variables[v]
+                if hasattr(ncvar, 'units'):
+                    mval = ncvar.units
+                    out.variables[v].setncatts({'units': mval})
+                out.variables[v][:] = ds.variables[v][:]
+            else:
+                out.createVariable(v, ds.variables[v].dtype,
+                                   ds.variables[v].dimensions)
+                if len(ds.variables[v].dimensions) == 2:
+                    out.variables[v][:,:] = ds.variables[v][:,:]
+                elif len(ds.variables[v].dimensions) == 3:
+                    out.variables[v][:,:,:] = ds.variables[v][:,:,:]
+                elif len(ds.variables[v].dimensions) == 4:
+                    out.variables[v][:,:,:,:] = ds.variables[v][:,:,:,:]
+                ncvar = ds.variables[v]
+                out = self.write_attributes(v, ncvar, out)
 
         # write global attributes
         for ncattr in ds.ncattrs():
@@ -85,21 +83,21 @@ class AdjustCableMetFile(object):
 
     def write_attributes(self, v, ncvar, out):
 
-        if hasattr(ncvar, 'missing_value'):
-            mval = ncvar.missing_value
-            out.variables[v].setncatts({'missing_value': mval})
         if hasattr(ncvar, 'units'):
-            uval = ncvar.units
-            out.variables[v].setncatts({'units': uval})
+            val = ncvar.units
+            out.variables[v].setncatts({'units': val})
+        if hasattr(ncvar, 'missing_value'):
+            val = ncvar.missing_value
+            out.variables[v].setncatts({'missing_value': val})
         if hasattr(ncvar, 'long_name'):
-            ln = ncvar.long_name
-            out.variables[v].setncatts({'long_name': ln})
+            val = ncvar.long_name
+            out.variables[v].setncatts({'long_name': val})
         if hasattr(ncvar, 'values'):
-            vx = ncvar.values
-            out.variables[v].setncatts({'values': vx})
+            val = ncvar.values
+            out.variables[v].setncatts({'values': val})
         if hasattr(ncvar, 'CF_name'):
-            cf = ncvar.CF_name
-            out.variables[v].setncatts({'CF_name': cf})
+            val = ncvar.CF_name
+            out.variables[v].setncatts({'CF_name': val})
 
         return out
 
