@@ -64,18 +64,18 @@ class GenerateMetFiles(object):
             out.createVariable(v, 'float32', ('time', 'y', 'x'))
 
         out.variables["CO2air"][:,:,:] = np.ones((out_length,1,1)) * co2_fixed
-        out.variables["CO2air"].setncatts({'units': "umol mol-1"})
+        out.variables["CO2air"].setncatts({'units': "ppm"})
         out.variables["CO2air"].setncatts({'missing_value': "-9999"})
         out.variables["CO2air"].setncatts({'long_name':
                                            "Atmosphereic CO2 concentration"})
 
         out.variables["Ndep"][:,:,:] = np.ones((out_length,1,1)) * ndep_fixed
-        out.variables["Ndep"].setncatts({'units': "kg N ha-1 yr-1"})
+        out.variables["Ndep"].setncatts({'units': "gN m-2 d-1"})
         out.variables["Ndep"].setncatts({'missing_value': "-9999"})
         out.variables["Ndep"].setncatts({'long_name': "N deposition"})
 
         out.variables["Pdep"][:,:,:] = np.ones((out_length,1,1)) * pdep_fixed
-        out.variables["Pdep"].setncatts({'units': "kg N ha-1 yr-1"})
+        out.variables["Pdep"].setncatts({'units': "gP m-2 d-1"})
         out.variables["Pdep"].setncatts({'missing_value': "-9999"})
         out.variables["Pdep"].setncatts({'long_name': "P deposition"})
 
