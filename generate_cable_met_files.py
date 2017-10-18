@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 
 """
-Create netcdf files to force CABLE-CNP for FACE MIP type experiment
+Create netcdf files to force CABLE-CNP for FACE MIP type experiment.
+
+Typically this process involves creating:
+1. a file for the standard 30 year spin to equillibrium at 1850 (fixed CO2,
+   Ndep, Pdep)
+2. A transient met file, i.e. 1850-20XX, with time varying CO2, Ndep & Pdep.
+3. An expermental run file, with whatever treatment added (i.e. eCO2,
+   PPT mainpulation, etc).
 
 That's all folks.
 """
