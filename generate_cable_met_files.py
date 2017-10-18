@@ -26,7 +26,7 @@ class GenerateMetFiles(object):
         self.met_fname = met_fname
         self.co2_ndep_fname = co2_ndep_fname
 
-    def create_met_spin_file(self):
+    def create_met_spin_file(self, ofname, co2_fixed, ndep_fixed, pdep_fixed):
 
         ds = nc.Dataset(self.met_fname)
         out = nc.Dataset(ofname, 'w', format='NETCDF4')
@@ -57,6 +57,27 @@ class GenerateMetFiles(object):
                     out.variables[v][:,:,:,:] = ds.variables[v][:,:,:,:]
                 ncvar = ds.variables[v]
                 out = self.write_attributes(v, ncvar, out)
+
+        # Add CO2, NDEP & PDEP
+        out_length = len(ds.variables["Rainf"][:,:])
+        for v in ["CO2", "Ndep", "Pdep"]:
+            out.createVariable(v, 'float32', ('time', 'y', 'x'))
+
+        out.variables["CO2"][:,:,:] = np.ones((out_length,1,1)) * co2_fixed
+        out.variables["CO2"].setncatts({'units': "umol mol-1"})
+        out.variables["CO2"].setncatts({'missing_value': "-9999"})
+        out.variables["CO2"].setncatts({'long_name':
+                                        "Atmosphereic CO2 concentration"})
+
+        out.variables["Ndep"][:,:,:] = np.ones((out_length,1,1)) * ndep_fixed
+        out.variables["Ndep"].setncatts({'units': "kg N ha-1 yr-1"})
+        out.variables["Ndep"].setncatts({'missing_value': "-9999"})
+        out.variables["Ndep"].setncatts({'long_name': "N deposition"})
+
+        out.variables["Pdep"][:,:,:] = np.ones((out_length,1,1)) * pdep_fixed
+        out.variables["Pdep"].setncatts({'units': "kg N ha-1 yr-1"})
+        out.variables["Pdep"].setncatts({'missing_value': "-9999"})
+        out.variables["Pdep"].setncatts({'long_name': "P deposition"})
 
         # write global attributes
         for ncattr in ds.ncattrs():
@@ -126,7 +147,12 @@ if __name__ == "__main__":
     end_yr_spin = 1853
     start_met_yr = 2002
     end_met_yr = 2005
-    ofname = "test.nc"
 
+    local_met_dir = "met_files"
+    ofname = os.path.join(local_met_dir, "%s_met_spin.nc" % (site))
+
+    co2_fixed = 284.7
+    ndep_fixed = 0.79
+    pdep_fixed = 0.144
+    G.create_met_spin_file(ofname, co2_fixed, ndep_fixed, pdep_fixed)
     #G.check_differences(ofname)
-    G.create_met_spin_file()
