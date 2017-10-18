@@ -16,8 +16,9 @@ import glob
 import netCDF4 as nc
 import datetime as dt
 import numpy as np
+import math
 
-class AdjustCableMetFile(object):
+class GenerateMetFiles(object):
 
     def __init__(self, site,  met_fname, co2_ndep_fname):
 
@@ -25,11 +26,10 @@ class AdjustCableMetFile(object):
         self.met_fname = met_fname
         self.co2_ndep_fname = co2_ndep_fname
 
-    def write_new_met_file(self, ofname):
+    def create_met_spin_file(self):
 
-        out = nc.Dataset(ofname, 'w', format='NETCDF4')
         ds = nc.Dataset(self.met_fname)
-        time = nc.num2date(ds.variables['time'][:], ds.variables['time'].units)
+        out = nc.Dataset(ofname, 'w', format='NETCDF4')
 
         nc_attrs = ds.ncattrs()
         nc_dims = [dim for dim in ds.dimensions]
@@ -63,6 +63,8 @@ class AdjustCableMetFile(object):
             out.setncattr(ncattr, getattr(ds, ncattr))
 
         ds.close()
+
+
 
     def check_differences(self, ofname):
         ds1 = nc.Dataset(self.met_fname)
@@ -101,22 +103,6 @@ class AdjustCableMetFile(object):
 
         return out
 
-    def setup_ini_spin_met_file(self, start_yr_spin, end_yr_spin, start_met_yr,
-                                end_met_yr):
-
-        total_yrs = end_yr_spin - start_yr_spin
-
-        # Account for offset, first day stars 00:30 to 1.
-        start = dt.datetime(start_met_yr,1,1,0,30)
-        stop = dt.datetime(end_met_yr+1,1,1,0,0)
-        tindex0 = nc.date2index(start, ds.variables['time'], select='nearest')
-        tindex1 = nc.date2index(stop, ds.variables['time'], select='nearest')
-        start_idx = nc.num2date(ds.variables['time'][tindex0],
-                                ds.variables['time'].units)
-        end_idx = nc.num2date(ds.variables['time'][tindex1],
-                              ds.variables['time'].units)
-
-        #var = ds.variables[v][tindex0:tindex1]
 
 
 
@@ -133,7 +119,7 @@ if __name__ == "__main__":
     co2_ndep_fname = os.path.join(co2_ndep_dir,
                                   "AmaFACE_co2ndepforcing_1850_2015_AMB.csv")
 
-    M = AdjustCableMetFile(site, met_fname, co2_ndep_fname)
+    G = GenerateMetFiles(site, met_fname, co2_ndep_fname)
 
     # Figured out in run_cable_site_CNP
     start_yr_spin = 1834
@@ -141,5 +127,6 @@ if __name__ == "__main__":
     start_met_yr = 2002
     end_met_yr = 2005
     ofname = "test.nc"
-    M.write_new_met_file(ofname)
-    M.check_differences(ofname)
+
+    #G.check_differences(ofname)
+    G.create_met_spin_file()
