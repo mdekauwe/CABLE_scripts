@@ -143,17 +143,9 @@ if __name__ == "__main__":
     met_fname = os.path.join(met_dir, '%s.1.4_met.nc' % (site))
     co2_ndep_fname = os.path.join(co2_ndep_dir,
                                   "AmaFACE_co2ndepforcing_1850_2015_AMB.csv")
-
-    G = GenerateMetFiles(site, met_fname, co2_ndep_fname)
-
-    # Figured out in run_cable_site_CNP
-    start_yr_spin = 1834
-    end_yr_spin = 1853
-    start_met_yr = 2002
-    end_met_yr = 2005
-
     local_met_dir = "met_files"
     ofname = os.path.join(local_met_dir, "%s_met_spin.nc" % (site))
+    G = GenerateMetFiles(site, met_fname, co2_ndep_fname)
 
     co2_fixed = 284.7
     ndep_fixed = 0.79
