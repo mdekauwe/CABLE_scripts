@@ -32,6 +32,9 @@ class GenerateMetFiles(object):
         self.site = site
         self.met_fname = met_fname
         self.co2_ndep_fname = co2_ndep_fname
+        self.KG_2_G = 1000.0
+        self.HA_2_M2 = 10000.0
+        self.YR_2_DAY = 365.0
 
     def create_spin_file(self, ofname, co2_fixed, ndep_fixed, pdep_fixed):
 
@@ -76,12 +79,16 @@ class GenerateMetFiles(object):
         out.variables["CO2air"].setncatts({'long_name':
                                            "Atmosphereic CO2 concentration"})
 
-        out.variables["Ndep"][:,:,:] = np.ones((out_length,1,1)) * ndep_fixed
+        # kg ha-1 y-1 -> gN m-2 d
+        conv = self.KG_2_G * self.HA_2_M2 * self.YR_2_DAY
+        out.variables["Ndep"][:,:,:] = np.ones((out_length,1,1)) * \
+                                               (ndep_fixed * conv)
         out.variables["Ndep"].setncatts({'units': "gN m-2 d-1"})
         out.variables["Ndep"].setncatts({'missing_value': "-9999"})
         out.variables["Ndep"].setncatts({'long_name': "N deposition"})
 
-        out.variables["Pdep"][:,:,:] = np.ones((out_length,1,1)) * pdep_fixed
+        out.variables["Pdep"][:,:,:] = np.ones((out_length,1,1)) *  \
+                                               (pdep_fixed * conv)
         out.variables["Pdep"].setncatts({'units': "gP m-2 d-1"})
         out.variables["Pdep"].setncatts({'missing_value': "-9999"})
         out.variables["Pdep"].setncatts({'long_name': "P deposition"})
@@ -144,6 +151,7 @@ if __name__ == "__main__":
 
     site = "TumbaFluxnet"
 
+
     met_dir = "../../met_data/plumber_met/"
     co2_ndep_dir = "../../met_data/co2_ndep"
 
@@ -154,9 +162,9 @@ if __name__ == "__main__":
     ofname = os.path.join(local_met_dir, "%s_met_spin.nc" % (site))
     G = GenerateMetFiles(site, met_fname, co2_ndep_fname)
 
-    co2_fixed = 284.7
-    ndep_fixed = 0.79
-    pdep_fixed = 0.144
+    co2_fixed = 284.7  # umol mol-1
+    ndep_fixed = 0.79  # kg N ha-1 yr-1
+    pdep_fixed = 0.144 # kg N ha-1 yr-1
     G.create_spin_file(ofname, co2_fixed, ndep_fixed, pdep_fixed)
     #G.create_transient_file(ofname)
     #G.check_differences(ofname)
