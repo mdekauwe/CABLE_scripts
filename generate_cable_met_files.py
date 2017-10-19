@@ -83,13 +83,13 @@ class GenerateMetFiles(object):
         conv = self.KG_2_G / self.HA_2_M2 / self.YR_2_DAY
         out.variables["Ndep"][:,:,:] = np.ones((out_length,1,1)) * \
                                                (ndep_fixed * conv)
-        out.variables["Ndep"].setncatts({'units': "gN m-2 d-1"})
+        out.variables["Ndep"].setncatts({'units': "gN/m^2/d"})
         out.variables["Ndep"].setncatts({'missing_value': "-9999"})
         out.variables["Ndep"].setncatts({'long_name': "N deposition"})
 
         out.variables["Pdep"][:,:,:] = np.ones((out_length,1,1)) *  \
                                                (pdep_fixed * conv)
-        out.variables["Pdep"].setncatts({'units': "gP m-2 d-1"})
+        out.variables["Pdep"].setncatts({'units': "gP/m^2/d"})
         out.variables["Pdep"].setncatts({'missing_value': "-9999"})
         out.variables["Pdep"].setncatts({'long_name': "P deposition"})
 
