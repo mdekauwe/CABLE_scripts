@@ -79,7 +79,7 @@ class GenerateMetFiles(object):
         out.variables["CO2air"].setncatts({'long_name':
                                            "Atmosphereic CO2 concentration"})
 
-        # kg ha-1 y-1 -> gN m-2 d
+        # kg ha-1 y-1 -> gN m-2 d-1
         conv = self.KG_2_G / self.HA_2_M2 / self.YR_2_DAY
         out.variables["Ndep"][:,:,:] = np.ones((out_length,1,1)) * \
                                                (ndep_fixed * conv)
