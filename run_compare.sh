@@ -126,45 +126,45 @@ then
 fi
 
 # Analyse all outputs
-#for version in "${vers[@]}" ; do
-#    pushd run_$version
-#
-#    for site in "${SITES[@]}" ; do
-#        flux_file=${DATA_DIR}/flux/${site}Fluxnet.1.4_flux.nc
-#        out_file=${site}_cable_${version}.nc
-#
-#        pushd $site
-#
-#         Calculate metrics
-#        cable_testing/scripts/offline_metrics.py calculate $out_file \
-#        $flux_file \
-#            --out=${version}_${site}_metrics.csv --name=$site
-#
-#        popd
-#
-#    done
-#
-#    # Concatenate CSVs, skipping headers
-#    head -n 1 ${SITES[0]}/${version}_${SITES[0]}_metrics.csv >\
-#        ${version}_all_metrics.csv
-#    for site in "${SITES[@]}" ; do
-#        tail -n +2 ${site}/${version}_${site}_metrics.csv >>\
-#            ${version}_all_metrics.csv
-#    done
-#
-#    popd
-#
-#done
-#
-#cable_testing/scripts/offline_metrics.py compare \
-#    Branch run_branch/branch_all_metrics.csv \
-#    Trunk run_trunk/trunk_all_metrics.csv
+for version in "${vers[@]}"
+do
+    pushd run_$version
 
-mkdir -p plots
+    for site in "${SITES[@]}"
+    do
+        flux_file=${DATA_DIR}/flux/${site}Fluxnet.1.4_flux.nc
+        out_file=${site}_cable_${version}.nc
+
+        pushd $site
+
+        # Calculate metrics
+        ../../cable_testing/scripts/offline_metrics.py calculate $out_file \
+        $flux_file \
+            --out=${version}_${site}_metrics.csv --name=$site
+
+        popd
+
+    done
+
+    # Concatenate CSVs, skipping headers
+    head -n 1 ${SITES[0]}/${version}_${SITES[0]}_metrics.csv >\
+        ${version}_all_metrics.csv
+    for site in "${SITES[@]}" ; do
+        tail -n +2 ${site}/${version}_${site}_metrics.csv >>\
+            ${version}_all_metrics.csv
+    done
+
+    popd
+
+done
+
+cable_testing/scripts/offline_metrics.py compare \
+    Branch run_branch/branch_all_metrics.csv \
+    Trunk run_trunk/trunk_all_metrics.csv
 
 # Metrics plot
-#cable_testing/scripts/offline_metrics.py plot normalised_metrics.csv\
-#    normalised_metrics.png
+cable_testing/scripts/offline_metrics.py plot normalised_metrics.csv\
+    plots/normalised_metrics.png
 
 for site in "${SITES[@]}"; do
     # Seasonal cycle plots
@@ -175,8 +175,4 @@ for site in "${SITES[@]}"; do
 done
 
 #cable_testing/scripts/offline_metrics.py xml -u $BUILD_URL \
-#    -o normalised_metrics.xml normalised_metrics.png plots/*
-
-
-
-#chmod g+rw -R ./*
+#    -o normalised_metrics.xml plots/normalised_metrics.png plots/*
