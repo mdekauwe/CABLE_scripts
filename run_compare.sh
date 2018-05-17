@@ -4,42 +4,39 @@
 #
 # It produces some statistics and seasonal plots.
 #
-#
-# TODO: We need to compile the src as part of this...
+# TODO: It would be nice to compile the src directories? W
 #
 
 module load pbs
 
-# To be changed, add cmd line parser?
-trunk_src="/short/x45/vxh599/CABLEbranches/trunk"
-branch_src="/short/x45/vxh599/CABLEbranches/CMIP6-MOSRS"
-project=w35
-
+TRUNK_SRC="/short/x45/vxh599/CABLEbranches/trunk"
+BRANCH_SRC="/short/x45/vxh599/CABLEbranches/CMIP6-MOSRS"
+PROJECT=w35
 DATA_DIR=/g/data1/wd9/cable_jenkins/PALS_datasets
 
 while [ $# -gt 0 ] # Until you run out of parameters...
 do
     case "$1" in
         -t|--TRUNK)
-		      trunk_src="$2"
+		      TRUNK_SRC="$2"
               ;;
         -b|--BRANCH)
-		      branch_src="$2"
+		      BRANCH_SRC="$2"
               ;;
         -p|--PROJECT)
-		      project="$2"
+		      PROJECT="$2"
               ;;
 	    -u|-U|--usage)
 		      echo "Usage: [-t/--TRUNK   link to trunk src]"
               echo "       [-b/--BRANCH  link to testing (branch) src]"
-              echo "       [-p/--PROJECT project code]"
+              echo "       [-p/--PROJECT PROJECT code]"
               echo "       [-h/--help    print this message]"
               exit
               ;;
         -h|-H|--help)
 		      echo "Usage: [-t/--TRUNK   link to trunk src]"
               echo "       [-b/--BRANCH  link to testing (branch) src]"
-              echo "       [-p/--PROJECT project code]"
+              echo "       [-p/--PROJECT PROJECT code]"
               echo "       [-h/--help    print this message]"
               exit
               ;;
@@ -57,13 +54,13 @@ then
     rm -rf cable_branch
 fi
 
-ln -sf $trunk_src cable_trunk
-ln -sf $branch_src cable_branch
+ln -sf $TRUNK_SRC cable_trunk
+ln -sf $BRANCH_SRC cable_branch
 
-SITES=(Amplero Blodgett Bugac ElSaler ElSaler2 Espirra FortPeck Harvard Hesse
-       Howard Howlandm Hyytiala Kruger Loobos Merbleue Mopane Palang Sylvania
-       Tumba UniMich)
-#SITES=(Amplero)
+#SITES=(Amplero Blodgett Bugac ElSaler ElSaler2 Espirra FortPeck Harvard Hesse
+#       Howard Howlandm Hyytiala Kruger Loobos Merbleue Mopane Palang Sylvania
+#       Tumba UniMich)
+SITES=(Amplero)
 
 # Set up and submit all jobs
 i=0
@@ -101,13 +98,13 @@ do
 
         if [ $version == "trunk" ]
         then
-            cable_exe=$trunk_src/offline/cable
+            cable_exe=$TRUNK_SRC/offline/cable
         else
-            cable_exe=$branch_src/offline/cable
+            cable_exe=$BRANCH_SRC/offline/cable
         fi
 
         # Run offline
-        qsub -N cj$i -P $project -q express -l walltime=0:08:00,mem=100MB,wd \
+        qsub -N cj$i -P $PROJECT -q express -l walltime=0:08:00,mem=100MB,wd \
             -W block=true -- $cable_exe &
 
         popd
@@ -129,7 +126,7 @@ then
 fi
 
 # Analyse all outputs
-#for version in trunk branch ; do
+#for version in "${vers[@]}" ; do
 #    pushd run_$version
 #
 #    for site in "${SITES[@]}" ; do
@@ -139,7 +136,7 @@ fi
 #        pushd $site
 #
 #         Calculate metrics
-#        ../../cable_testing/scripts/offline_metrics.py calculate $out_file \
+#        cable_testing/scripts/offline_metrics.py calculate $out_file \
 #        $flux_file \
 #            --out=${version}_${site}_metrics.csv --name=$site
 #
