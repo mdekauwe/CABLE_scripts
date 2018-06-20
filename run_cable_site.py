@@ -131,6 +131,34 @@ class RunCable(object):
 
         return '\n'.join(lines) + '\n'
 
+def add_missing_options_to_nml_file(fname, line_start=60):
+    # Some of the flags we may wish to change are missin from the default
+    # file so we can't adjust them via this script...add them
+
+    f = open(fname, "r")
+    contents = f.readlines()
+    f.close()
+
+    arg = "   cable_user%GS_SWITCH = 'medlyn'\n"
+    contents.insert(line_start, arg)
+    line_start += 1
+
+    arg = "   cable_user%GW_MODEL = .FALSE.\n"
+    contents.insert(line_start, arg)
+    line_start += 1
+
+    arg = "   cable_user%or_evap = .TRUE.\n"
+    contents.insert(line_start, arg)
+    line_start += 1
+
+    tmp_fname = "tmp.nml"
+    f = open(tmp_fname, "w")
+    contents = "".join(contents)
+    f.write(contents)
+    f.close()
+
+    shutil.move(tmp_fname, fname)
+
 if __name__ == "__main__":
 
     cwd = os.getcwd()
@@ -153,8 +181,9 @@ if __name__ == "__main__":
     base_nml_fn = os.path.join(aux_dir, "offline/cable.nml")
     nml_fn = "cable.nml"
     shutil.copy(base_nml_fn, nml_fn)
+    add_missing_options_to_nml_file(nml_fn)
 
-    veg_fn = "def_veg_params_zr_clitt.txt"
+    veg_fn = "def_veg_params_zr_clitt_albedo_fix.txt"
     soil_fn = "def_soil_params.txt"
     base_veg_param_fn = os.path.join(aux_dir, veg_fn)
     shutil.copy(base_nml_fn, nml_fn)
