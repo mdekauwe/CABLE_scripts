@@ -131,9 +131,12 @@ class RunCable(object):
 
         return '\n'.join(lines) + '\n'
 
-def add_missing_options_to_nml_file(fname, line_start=60):
+def add_missing_options_to_nml_file(fname, line_start=None):
     # Some of the flags we may wish to change are missin from the default
     # file so we can't adjust them via this script...add them
+
+    if line_start is None:
+        line_start = sum(1 for line in open(fname)) - 1
 
     f = open(fname, "r")
     contents = f.readlines()
