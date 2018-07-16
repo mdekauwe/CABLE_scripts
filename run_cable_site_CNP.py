@@ -59,10 +59,16 @@ class RunCable(object):
         self.nyear_spinup = nyear_spinup
         if biogeochem == "C":
             self.biogeochem = 1
+            self.vcmax = "Standard"
+            self.vcmax_feeback = ".FALSE."
         elif biogeochem == "CN":
             self.biogeochem = 2
+            self.vcmax = "Walker2014"
+            self.vcmax_feeback = ".TRUE."
         elif biogeochem == "CNP":
             self.biogeochem = 3
+            self.vcmax = "Walker2014"
+            self.vcmax_feeback = ".TRUE."
         else:
             raise ValueError("Unknown biogeochemistry option: C, CN, CNP")
         if pop_on:
@@ -76,12 +82,13 @@ class RunCable(object):
          st_yr_trans, en_yr_trans,
          st_yr_spin, en_yr_spin) = self.get_years()
 
+        self.initial_setup(st_yr_spin, en_yr_spin, st_yr, en_yr)
+
         if SPIN_UP == True:
 
-            # Initial spin
-            self.setup_ini_spin(st_yr_spin, en_yr_spin, st_yr, en_yr)
+            # initial spin
             self.run_me()
-
+            
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.logfile="log_ccp%d" % (num)
@@ -196,7 +203,7 @@ class RunCable(object):
 
         return '\n'.join(lines) + '\n'
 
-    def setup_ini_spin(self, st_yr_spin, en_yr_spin, st_yr, en_yr):
+    def initial_setup(self, st_yr_spin, en_yr_spin, st_yr, en_yr):
         shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
                         self.site_nml_fn)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
@@ -249,6 +256,7 @@ class RunCable(object):
                         "cable_user%POP_fromZero": ".T.",
                         "cable_user%CASA_fromZero": ".T.",
                         "cable_user%CLIMATE_fromZero": ".T.",
+                        "cable_user%vcmax": "'%s'" % (self.vcmax),
                         "cable_user%YearStart": "%d" % (st_yr_spin),
                         "cable_user%YearEnd": "%d" % (en_yr_spin),
                         "cable_user%CASA_SPIN_STARTYEAR": "%d" % (st_yr_spin),
@@ -256,7 +264,9 @@ class RunCable(object):
                         "cable_user%CALL_POP": "%s" % (self.call_pop),
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
+                        "l_vcmaxFeedbk": "%s" % (self.call_pop),
         }
+        print(replace_dict)
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_re_spin(self, number=None):
@@ -466,7 +476,7 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%SOIL_STRUC": "'sli'",
-                        "spincasa": ".FASLE.",
+                        "spincasa": ".FALSE.",
                         "l_laiFeedbk": ".TRUE.",
                         "output%averaging": "'all'",
                         "casafile%out": "'%s'" % (out_fname_CASA),
