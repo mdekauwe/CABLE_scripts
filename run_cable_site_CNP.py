@@ -1,27 +1,27 @@
 #!/usr/bin/env python
 
 """
-Site run with full CNP (and POP)
+CABLE site run with full CNP (and POP)
 ================================
 
-- Model spin-up: using K34 tower info, CO2=284.7; NDEP-0.79 kg N ha-1 yr-1;
-                 PDEP=0.144 kg P ha-1 yr-1
-- Transient: 1851-1998, varying CO2 and NDEP and Pdep, but just recycling the met data
+- Model spin-up: using pre-industrial CO2, NDEP, PDEP. Currently this is using
+                 values from AmazonFACE experiment, i.e. CO2=284.7;
+                 NDEP-0.79 kg N ha-1 yr-1; PDEP=0.144 kg P ha-1 yr-1
+- Transient: 1851-1998, varying CO2 and NDEP and Pdep, but just recycling the
+             met data
 - Historical: actual met (dates correspond to simulated dates) and actual CO2
 - CNP + POP switched on.
 
-During the spinup, we are recycling in 30 year chunks.
+During the spinup, we are recycling in the input meteorological forcing file in
+chunks.
 
 That's all folks.
 
-- VH modified Mar 1 2018 for Cumberland site runs
-- VH tidied up to allow explicit restart filenames for cable, casa, POP,
-  climate and to allow non-ini start
 """
 
-__author__ = "Martin De Kauwe"
+__author__ = "Martin De Kauwe, Vanessa Haverd"
 __version__ = "1.0 (16.07.2018)"
-__email__ = "mdekauwe@gmail.com"
+__email__ = "mdekauwe@gmail.com, Vanessa.Haverd@csiro.au"
 
 import os
 import sys
@@ -81,7 +81,7 @@ class RunCable(object):
             # Initial spin
             self.setup_ini_spin(st_yr_spin, en_yr_spin, st_yr, en_yr)
             self.run_me()
-            
+
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.logfile="log_ccp%d" % (num)
@@ -553,7 +553,7 @@ if __name__ == "__main__":
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
     verbose = False
     nyear_spinup = 5
-    biogeochem = "CN" # C, CN, CNP
+    biogeochem = "C" # C, CN, CNP
     pop_on = False
 
     if not os.path.exists(restart_dir):
