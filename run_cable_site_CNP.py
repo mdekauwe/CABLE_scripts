@@ -88,7 +88,7 @@ class RunCable(object):
 
             # initial spin
             self.run_me()
-            
+
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.logfile="log_ccp%d" % (num)
@@ -264,7 +264,7 @@ class RunCable(object):
                         "cable_user%CALL_POP": "%s" % (self.call_pop),
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
-                        "l_vcmaxFeedbk": "%s" % (self.call_pop),
+                        "l_vcmaxFeedbk": "%s" % (self.vcmax_feeback),
         }
         print(replace_dict)
         self.adjust_nml_file(self.nml_fn, replace_dict)
