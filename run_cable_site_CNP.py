@@ -60,15 +60,15 @@ class RunCable(object):
         if biogeochem == "C":
             self.biogeochem = 1
             self.vcmax = "Standard"
-            self.vcmax_feeback = ".FALSE."
+            self.vcmax_feedback = ".FALSE."
         elif biogeochem == "CN":
             self.biogeochem = 2
             self.vcmax = "Walker2014"
-            self.vcmax_feeback = ".TRUE."
+            self.vcmax_feedback = ".TRUE."
         elif biogeochem == "CNP":
             self.biogeochem = 3
             self.vcmax = "Walker2014"
-            self.vcmax_feeback = ".TRUE."
+            self.vcmax_feedback = ".TRUE."
         else:
             raise ValueError("Unknown biogeochemistry option: C, CN, CNP")
         if pop_on:
@@ -264,9 +264,8 @@ class RunCable(object):
                         "cable_user%CALL_POP": "%s" % (self.call_pop),
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
-                        "l_vcmaxFeedbk": "%s" % (self.vcmax_feeback),
+                        "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
         }
-        print(replace_dict)
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_re_spin(self, number=None):
@@ -285,14 +284,6 @@ class RunCable(object):
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_out": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_out": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "cable_user%cnpepool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
-                        "filename%restart_in": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_in": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_in": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpipool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
                         "cable_user%POP_out": "'ini'",
@@ -324,14 +315,6 @@ class RunCable(object):
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "icycle": "%d" % (self.biogeochem + 10), # Need to add 10 for spinup
-                        "filename%restart_out": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_out": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_out": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpepool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
-                        "filename%restart_in": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_in": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_in": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpipool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CLIMATE_fromZero": ".F.",
@@ -350,10 +333,6 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_transient(self, st_yr_trans, en_yr_trans, st_yr, en_yr):
-        shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
-                        self.site_nml_fn)
-        shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
-                        self.nml_fn)
 
         replace_dict = {
                         "RunType": '"transient"',
@@ -376,17 +355,8 @@ class RunCable(object):
             os.remove(out_fname)
 
         replace_dict = {
-                        "filename%met": "'%s'" % (self.met_fname),
                         "filename%out": "'%s'" % (out_fname),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_out": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_out": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpepool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
-                        "filename%restart_in": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_in": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_in": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpipool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
                         "cable_user%POP_out": "'ini'",
@@ -417,10 +387,6 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_simulation(self, st_yr, en_yr):
-        shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
-                        self.site_nml_fn)
-        shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
-                        self.nml_fn)
 
         replace_dict = {
                         "RunType": '"historical"',
@@ -517,8 +483,10 @@ class RunCable(object):
                 os.remove(f)
             for f in glob.glob("%s_*_pop_rst.nc" % (self.site)):
                 os.remove(f)
-            os.remove("new_sumbal")
-            os.remove("cnpfluxOut.csv")
+            if (os.path.isfile("new_sumbal")):
+                os.remove("new_sumbal")
+            if (os.path.isfile("cnpfluxOut.csv")):
+                os.remove("cnpfluxOut.csv")
 
         fromx = self.restart_dir + self.restart_fname
         to = fromx[:-3] + "_" + tag + ".nc"
