@@ -81,6 +81,7 @@ class RunCable(object):
             # Initial spin
             self.setup_ini_spin(st_yr_spin, en_yr_spin, st_yr, en_yr)
             self.run_me()
+            sys.exit()
 
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
@@ -255,9 +256,10 @@ class RunCable(object):
                         "cable_user%CASA_SPIN_ENDYEAR": "%d" % (en_yr_spin),
                         "cable_user%CALL_POP": "'%s'" % (self.call_pop),
                         "output%averaging": "'monthly'",
+                        "icycle": "%d" % (self.biogeochem),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
-        
+
     def setup_re_spin(self, number=None):
 
         out_log_fname = os.path.join(self.log_dir,
