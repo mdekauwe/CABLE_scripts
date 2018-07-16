@@ -37,7 +37,7 @@ class RunCable(object):
     def __init__(self, site, driver_dir, param_dir, output_dir, restart_dir,
                  dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                  veg_param_fn,log_dir, exe, aux_dir, biogeochem, pop_on,
-                 verbose):
+                 verbose, nspins=4):
 
         self.site = site
         self.driver_dir = driver_dir
@@ -77,6 +77,7 @@ class RunCable(object):
             self.call_pop = ".TRUE."
         else:
             self.call_pop = ".FALSE."
+        self.nspins = nspins
 
     def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
 
@@ -92,7 +93,7 @@ class RunCable(object):
             self.run_me()
 
             # 3 sets of spins & analytical spins
-            for num in range(1, 4):
+            for num in range(1, self.nspins):
                 self.logfile="log_ccp%d" % (num)
                 self.setup_re_spin(number=num)
                 self.run_me()
