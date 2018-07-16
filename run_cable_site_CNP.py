@@ -254,7 +254,7 @@ class RunCable(object):
                         "cable_user%YearEnd": "%d" % (en_yr_spin),
                         "cable_user%CASA_SPIN_STARTYEAR": "%d" % (st_yr_spin),
                         "cable_user%CASA_SPIN_ENDYEAR": "%d" % (en_yr_spin),
-                        "cable_user%CALL_POP": "'%s'" % (self.call_pop),
+                        "cable_user%CALL_POP": "%s" % (self.call_pop),
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
         }
@@ -554,7 +554,7 @@ if __name__ == "__main__":
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
     verbose = False
     nyear_spinup = 5
-    biogeochem = "C" # C, CN, CNP
+    biogeochem = "CN" # C, CN, CNP
     pop_on = False
 
     if not os.path.exists(restart_dir):
