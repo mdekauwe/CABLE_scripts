@@ -204,6 +204,7 @@ class RunCable(object):
         return '\n'.join(lines) + '\n'
 
     def initial_setup(self, st_yr_spin, en_yr_spin, st_yr, en_yr):
+
         shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
                         self.site_nml_fn)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
@@ -287,6 +288,7 @@ class RunCable(object):
                         "filename%restart_in": "'%s%s'" % (self.restart_dir, self.restart_fname),
                         "cable_user%climate_restart_in": "'%s%s'" % (self.restart_dir, self.climate_restart_fname),
                         "cable_user%POP_restart_in": "'%s%s'" % (self.restart_dir, self.pop_restart_fname),
+                        "casafile%cnpipool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
                         "cable_user%POP_rst": "'./'",
@@ -453,9 +455,7 @@ class RunCable(object):
                 os.remove("cnpfluxOut.csv")
         """
         fromx = self.restart_dir + self.restart_fname
-        print(self.restart_dir + self.restart_fname)
         to = fromx[:-3] + "_" + tag + ".nc"
-        print(to)
         shutil.copyfile(fromx, to)
 
         fromx = self.restart_dir + self.casa_restart_fname
