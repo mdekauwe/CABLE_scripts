@@ -237,10 +237,10 @@ class RunCable(object):
                         "filename%out": "'%s'" % (out_fname),
                         "casafile%out": "'%s'" % (out_fname_CASA),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_out": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_out": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpepool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
+                        "filename%restart_out": "'%s%s'" % (self.restart_dir, self.restart_fname),
+                        "cable_user%climate_restart_out": "'%s%s'" % (self.restart_dir, self.climate_restart_fname),
+                        "cable_user%POP_restart_out": "'%s%s'" % (self.restart_dir, self.pop_restart_fname),
+                        "casafile%cnpepool": "'%s%s'" % (self.restart_dir, self.casa_restart_fname),
                         "filename%restart_in": "''" ,
                         "cable_user%climate_restart_in": "''" ,
                         "cable_user%POP_restart_in": "''",
@@ -284,9 +284,11 @@ class RunCable(object):
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
+                        "filename%restart_in": "'%s%s'" % (self.restart_dir, self.restart_fname),
+                        "cable_user%climate_restart_in": "'%s%s'" % (self.restart_dir, self.climate_restart_fname),
+                        "cable_user%POP_restart_in": "'%s%s'" % (self.restart_dir, self.pop_restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
-                        "cable_user%POP_out": "'ini'",
                         "cable_user%POP_rst": "'./'",
                         "cable_user%CLIMATE_fromZero": ".F.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
@@ -315,13 +317,9 @@ class RunCable(object):
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "icycle": "%d" % (self.biogeochem + 10), # Need to add 10 for spinup
-                        "cable_user%POP_fromZero": ".F.",
-                        "cable_user%POP_fromZero": ".F.",
-                        "cable_user%CLIMATE_fromZero": ".F.",
                         "cable_user%CASA_DUMP_READ": ".TRUE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%CASA_NREP": "1",
-                        "cable_user%POP_out": "'ini'",
                         "cable_user%SOIL_STRUC": "'default'",
                         "leaps": ".FALSE.",
                         "spincasa": ".TRUE.",
@@ -357,32 +355,19 @@ class RunCable(object):
         replace_dict = {
                         "filename%out": "'%s'" % (out_fname),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "cable_user%POP_fromZero": ".F.",
-                        "cable_user%CASA_fromZero": ".F.",
-                        "cable_user%POP_out": "'ini'",
-                        "cable_user%POP_rst": "'./'",
-                        "cable_user%CLIMATE_fromZero": ".F.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%CASA_NREP": "0",
                         "cable_user%SOIL_STRUC": "'sli'",
-                        "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
-                        "filename%veg": "'%s%s'" % (self.param_dir, veg_param_fn),
-                        "filename%soil": "'%s%s'" % (self.driver_dir, soil_param_fn),
                         "output%restart": ".TRUE.",
-                        "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
-                        "casafile%cnpbiome": "'%s'" % (os.path.join(self.param_dir, bgc_param_fn)),
-                        "cable_user%RunIden": "'%s'" % (self.site),
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
                         "icycle": "%d" % (self.biogeochem),
-                        "cable_user%POP_out": "'ini'",
-                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "POPLUC": ".T.",
                         "filename%out": "'%s'" % (out_fname),
+                        "casafile%out": "'%s'" % (out_fname_CASA),
                         "cable_user%YearStart": "%d" % (st_yr_trans),
                         "cable_user%YearEnd": "%d" % (en_yr_trans),
-                        "casafile%out": "'%s'" % (out_fname_CASA),
         }
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
@@ -410,39 +395,17 @@ class RunCable(object):
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
-                        "spinup": ".FALSE.",
-                        "filename%restart_out": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_out": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_out": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpepool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
-                        "filename%restart_in": "'%s%s'" % (self.restart_dir,self.restart_fname),
-                        "cable_user%climate_restart_in": "'%s%s'" % (self.restart_dir,self.climate_restart_fname),
-                        "cable_user%POP_restart_in": "'%s%s'" % (self.restart_dir,self.pop_restart_fname),
-                        "casafile%cnpipool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
                         "output%averaging": "'daily'",
                         "icycle": "%d" % (self.biogeochem),
                         "cable_user%YearStart": "%d" % (st_yr),
                         "cable_user%YearEnd": "%d" % (en_yr),
-                        "cable_user%POP_out": "'ini'",
-                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "filename%out": "'%s'" % (out_fname),
                         "POPLUC": ".F.",
-                        "filename%met": "'%s'" % (self.met_fname),
-                        "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
-                        "filename%veg": "'%s%s'" % (self.param_dir, veg_param_fn),
-                        "filename%soil": "'%s%s'" % (self.driver_dir, soil_param_fn),
-                        "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
-                        "casafile%cnpbiome": "'%s'" % (os.path.join(self.param_dir, bgc_param_fn)),
-                        "cable_user%RunIden": "'%s'" % (self.site),
-                        "cable_user%POP_out": "'ini'",
-                        "cable_user%POP_rst": "'./'",
-                        "cable_user%POP_fromZero": ".F.",
-                        "cable_user%CASA_fromZero": ".F.",
-                        "cable_user%CLIMATE_fromZero": ".F.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%SOIL_STRUC": "'sli'",
                         "spincasa": ".FALSE.",
+                        "spinup": ".FALSE.",
                         "l_laiFeedbk": ".TRUE.",
                         "output%averaging": "'all'",
                         "casafile%out": "'%s'" % (out_fname_CASA),
@@ -460,6 +423,7 @@ class RunCable(object):
     def clean_up(self, ini=False, re_spin=False, analytical=False,
                   transient=False, tag=None):
 
+        """
         if ini or re_spin:
             for f in glob.glob("*.out"):
                 if (os.path.isfile(f)):
@@ -487,9 +451,11 @@ class RunCable(object):
                 os.remove("new_sumbal")
             if (os.path.isfile("cnpfluxOut.csv")):
                 os.remove("cnpfluxOut.csv")
-
+        """
         fromx = self.restart_dir + self.restart_fname
+        print(self.restart_dir + self.restart_fname)
         to = fromx[:-3] + "_" + tag + ".nc"
+        print(to)
         shutil.copyfile(fromx, to)
 
         fromx = self.restart_dir + self.casa_restart_fname
@@ -531,8 +497,8 @@ if __name__ == "__main__":
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
     verbose = False
     nyear_spinup = 5
-    biogeochem = "C" # C, CN, CNP
-    pop_on = False
+    biogeochem = "CN" # C, CN, CNP
+    pop_on = True
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
