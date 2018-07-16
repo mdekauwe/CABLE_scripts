@@ -35,14 +35,16 @@ import math
 class RunCable(object):
 
     def __init__(self, site, driver_dir, param_dir, output_dir, restart_dir,
-                 met_fname, co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn,
-                 log_dir, exe, aux_dir, biogeochem, pop_on, verbose):
+                 dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
+                 veg_param_fn,log_dir, exe, aux_dir, biogeochem, pop_on,
+                 verbose):
 
         self.site = site
         self.driver_dir = driver_dir
         self.param_dir = param_dir
         self.output_dir = output_dir
         self.restart_dir = restart_dir
+        self.dump_dir = dump_dir
         self.met_fname = met_fname
         self.co2_ndep_fname = co2_ndep_fname
         self.nml_fn = nml_fn
@@ -94,30 +96,31 @@ class RunCable(object):
                 self.logfile="log_ccp%d" % (num)
                 self.setup_re_spin(number=num)
                 self.run_me()
-                self.clean_up(re_spin=True, tag="ccp%d" % (num))
+                self.clean_up(end=False, tag="ccp%d" % (num))
 
                 self.logfile="log_sa%d" % (num)
                 self.setup_analytical_spin(number=num, st_yr_spin=st_yr_spin,
                                            en_yr_spin=en_yr_spin )
                 self.run_me()
-                self.clean_up(analytical=True, tag="saa%d" % (num))
+                self.clean_up(end=False, tag="saa%d" % (num))
 
             # one final spin
             num += 1
             self.logfile="log_ccp%d" % (num)
             self.setup_re_spin(number=num)
             self.run_me()
-            self.clean_up(re_spin=True, tag="ccp%d" % (num))
+            self.clean_up(end=False, tag="ccp%d" % (num))
 
         if TRANSIENT == True:
             self.setup_transient(st_yr_trans, en_yr_trans, st_yr, en_yr)
             self.run_me()
-            self.clean_up(transient=True, tag="transient")
+            self.clean_up(end=False, tag="transient")
 
         if SIMULATION == True:
             self.setup_simulation(st_yr, en_yr)
             self.run_me()
-            self.clean_up(tag="simulation")
+
+        self.clean_up(end=True)
 
     def get_years(self):
         f = nc.Dataset(self.met_fname)
@@ -246,8 +249,8 @@ class RunCable(object):
                         "cable_user%climate_restart_in": "''" ,
                         "cable_user%POP_restart_in": "''",
                         "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
-                        "filename%veg": "'%s%s'" % (self.param_dir, veg_param_fn),
-                        "filename%soil": "'%s%s'" % (self.driver_dir, soil_param_fn),
+                        "filename%veg": "'%s'" % os.path.join(self.param_dir, veg_param_fn),
+                        "filename%soil": "'%s'" % os.path.join(self.driver_dir, soil_param_fn),
                         "output%restart": ".TRUE.",
                         "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
                         "casafile%cnpbiome": "'%s'" % (os.path.join(self.param_dir, bgc_param_fn)),
@@ -285,10 +288,10 @@ class RunCable(object):
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_in": "'%s%s'" % (self.restart_dir, self.restart_fname),
-                        "cable_user%climate_restart_in": "'%s%s'" % (self.restart_dir, self.climate_restart_fname),
-                        "cable_user%POP_restart_in": "'%s%s'" % (self.restart_dir, self.pop_restart_fname),
-                        "casafile%cnpipool": "'%s%s'" % (self.restart_dir,self.casa_restart_fname),
+                        "filename%restart_in": "'%s'" % os.path.join(self.restart_dir, self.restart_fname),
+                        "cable_user%climate_restart_in": "'%s'" % os.path.join(self.restart_dir, self.climate_restart_fname),
+                        "cable_user%POP_restart_in": "'%s'" % os.path.join(self.restart_dir, self.pop_restart_fname),
+                        "casafile%cnpipool": "'%s'" % os.path.join(self.restart_dir,self.casa_restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
                         "cable_user%POP_rst": "'./'",
@@ -422,69 +425,48 @@ class RunCable(object):
         else:
             os.system("%s 1>&2" % (self.cable_exe))
 
-    def clean_up(self, ini=False, re_spin=False, analytical=False,
-                  transient=False, tag=None):
+    def clean_up(self, end=True, tag=None):
 
-        """
-        if ini or re_spin:
-            for f in glob.glob("*.out"):
-                if (os.path.isfile(f)):
-                    os.remove(f)
-            if (os.path.isfile("new_sumbal")):
-                os.remove("new_sumbal")
-            if (os.path.isfile("cnpfluxOut.csv")):
-                os.remove("cnpfluxOut.csv")
-
-        if analytical:
-            if (os.path.isfile("cnpfluxOut.csv")):
-                os.remove("cnpfluxOut.csv")
-
-        if transient:
-            for f in glob.glob("*.out"):
-                if (os.path.isfile(f)):
-                    os.remove(f)
-            for f in glob.glob("*_out.nc"):
+        if end:
+            for f in glob.glob("c2c_*_dump.nc"):
+                shutil.move(f, os.path.join(self.dump_dir, f))
+            f = "cnpfluxOut.csv"
+            if os.path.isfile(f):
                 os.remove(f)
-            for f in glob.glob("*_out.nc"):
+            f = "new_sumbal"
+            if os.path.isfile(f):
                 os.remove(f)
-            for f in glob.glob("%s_*_pop_rst.nc" % (self.site)):
-                os.remove(f)
-            if (os.path.isfile("new_sumbal")):
-                os.remove("new_sumbal")
-            if (os.path.isfile("cnpfluxOut.csv")):
-                os.remove("cnpfluxOut.csv")
-        """
-        fromx = self.restart_dir + self.restart_fname
-        to = fromx[:-3] + "_" + tag + ".nc"
-        shutil.copyfile(fromx, to)
+        else:
+            fromx = os.path.join(self.restart_dir, self.restart_fname)
+            to = fromx[:-3] + "_" + tag + ".nc"
+            shutil.copyfile(fromx, to)
 
-        fromx = self.restart_dir + self.casa_restart_fname
-        to = fromx[:-3] + "_" + tag + ".nc"
-        shutil.copyfile(fromx, to)
+            fromx = os.path.join(self.restart_dir, self.casa_restart_fname)
+            to = fromx[:-3] + "_" + tag + ".nc"
+            shutil.copyfile(fromx, to)
 
-        fromx = self.restart_dir + self.climate_restart_fname
-        to = fromx[:-3] + "_" + tag + ".nc"
-        shutil.copyfile(fromx, to)
+            fromx = os.path.join(self.restart_dir, self.climate_restart_fname)
+            to = fromx[:-3] + "_" + tag + ".nc"
+            shutil.copyfile(fromx, to)
 
-        fromx = self.restart_dir + self.pop_restart_fname
-        to = fromx[:-3] + "_" + tag + ".nc"
-        shutil.copyfile(fromx, to)
-
-
+            fromx = os.path.join(self.restart_dir, self.pop_restart_fname)
+            to = fromx[:-3] + "_" + tag + ".nc"
+            shutil.copyfile(fromx, to)
 
 if __name__ == "__main__":
 
     site = "Cumberland"
 
     cwd = os.getcwd()
-    driver_dir = "driver_files/"
-    param_dir = "driver_files/"
+    driver_dir = "driver_files"
+    param_dir = "driver_files"
+    dump_dir = "dump"
     met_dir = "met"
     co2_ndep_dir = "met"
     aux_dir = "../../src/NESP2pt9_TRENDYv7/CABLE-AUX/"
-    log_dir = "logs/"
-    output_dir = "outputs/"
-    restart_dir = "restart_files/"
+    log_dir = "logs"
+    output_dir = "outputs"
+    restart_dir = "restart_files"
     nml_fn = "cable.nml"
     site_nml_fn = "site.nml"
     #met_fname = os.path.join(met_dir, '%s.1.4_met.nc' % (site)) # PLUMBER sites
@@ -509,7 +491,11 @@ if __name__ == "__main__":
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
+    if not os.path.exists(dump_dir):
+        os.makedirs(dump_dir)
+
     C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
-                 met_fname, co2_ndep_fname, nml_fn, site_nml_fn, veg_param_fn,
-                 log_dir, exe, aux_dir, biogeochem, pop_on, verbose)
+                 dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
+                 veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
+                 verbose)
     C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
