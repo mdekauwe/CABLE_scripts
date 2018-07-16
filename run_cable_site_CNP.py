@@ -81,8 +81,7 @@ class RunCable(object):
             # Initial spin
             self.setup_ini_spin(st_yr_spin, en_yr_spin, st_yr, en_yr)
             self.run_me()
-            sys.exit()
-
+            
             # 3 sets of spins & analytical spins
             for num in range(1, 4):
                 self.logfile="log_ccp%d" % (num)
