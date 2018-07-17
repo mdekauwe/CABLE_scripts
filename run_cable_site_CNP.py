@@ -34,12 +34,12 @@ import math
 
 class RunCable(object):
 
-    def __init__(self, site, driver_dir, output_dir, restart_dir,
+    def __init__(self, experiment_id, driver_dir, output_dir, restart_dir,
                  dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                  veg_param_fn,log_dir, exe, aux_dir, biogeochem, pop_on,
                  verbose, nspins=4):
 
-        self.site = site
+        self.experiment_id = experiment_id
         self.driver_dir = driver_dir
         self.output_dir = output_dir
         self.restart_dir = restart_dir
@@ -49,10 +49,10 @@ class RunCable(object):
         self.nml_fn = nml_fn
         self.site_nml_fn = site_nml_fn
         self.veg_param_fn = veg_param_fn
-        self.restart_fname = "%s_cable_rst.nc" % (self.site)
-        self.casa_restart_fname = "%s_casa_rst.nc" % (self.site)
-        self.pop_restart_fname = "%s_pop_rst.nc" % (self.site)
-        self.climate_restart_fname = "%s_climate_rst.nc" % (self.site)
+        self.restart_fname = "%s_cable_rst.nc" % (self.experiment_id)
+        self.casa_restart_fname = "%s_casa_rst.nc" % (self.experiment_id)
+        self.pop_restart_fname = "%s_pop_rst.nc" % (self.experiment_id)
+        self.climate_restart_fname = "%s_climate_rst.nc" % (self.experiment_id)
         self.log_dir = log_dir
         self.cable_exe = exe
         self.aux_dir = aux_dir
@@ -61,7 +61,7 @@ class RunCable(object):
         if biogeochem == "C":
             self.biogeochem = 1
             self.vcmax = "standard"
-            self.vcmax_feedback = ".FALSE."
+            self.vcmax_feedback = ".TRUE."
         elif biogeochem == "CN":
             self.biogeochem = 2
             self.vcmax = "Walker2014"
@@ -215,14 +215,14 @@ class RunCable(object):
         #self.add_missing_options_to_nml_file(self.nml_fn)
 
         out_fname = os.path.join(self.output_dir,
-                                 "%s_out_cable_zero.nc" % (site))
+                                 "%s_out_cable_zero.nc" % (self.experiment_id))
         out_fname_CASA = os.path.join(self.output_dir,
-                                 "%s_out_CASA_zero.nc" % (site))
+                                 "%s_out_CASA_zero.nc" % (self.experiment_id))
         if os.path.isfile(out_fname):
             os.remove(out_fname)
 
         out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_zero.txt" % (site))
+                                     "%s_log_zero.txt" % (self.experiment_id))
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -255,7 +255,7 @@ class RunCable(object):
                         "output%restart": ".TRUE.",
                         "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
                         "casafile%cnpbiome": "'%s'" % (os.path.join(self.driver_dir, bgc_param_fn)),
-                        "cable_user%RunIden": "'%s'" % (self.site),
+                        "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%POP_out": "'ini'",
                         "cable_user%POP_rst": "'./'",
                         "cable_user%POP_fromZero": ".T.",
@@ -274,16 +274,17 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_re_spin(self, number=None):
-
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_ccp%d.txt" % (site, number))
+        out_log_fname = "%s_log_ccp%d.txt" % (self.experiment_id, number)
+        out_log_fname = os.path.join(self.log_dir, out_log_fname)
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
-        out_fname = os.path.join(self.output_dir,
-                                 "%s_out_cable_ccp%d.nc" % (site, number))
-        out_fname_CASA = os.path.join(self.output_dir,
-                                 "%s_out_CASA_ccp%d.nc" % (site, number))
+        out_fname = "%s_out_cable_ccp%d.nc" % (self.experiment_id, number)
+        out_fname = os.path.join(self.output_dir, out_fname)
+
+        out_fname_CASA = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, number)
+        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
+
         if os.path.isfile(out_fname):
             os.remove(out_fname)
 
@@ -313,10 +314,12 @@ class RunCable(object):
 
     def setup_analytical_spin(self, number, st_yr_spin, en_yr_spin):
 
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_analytic_%d.txt" % (site, number))
-        out_fname_CASA = os.path.join(self.output_dir,
-                                 "%s_out_CASA_analytic_%d.nc" % (site, number))
+        out_log_fname = "%s_log_analytic_%d.txt" % (self.experiment_id, number)
+        out_log_fname = os.path.join(self.log_dir, out_log_fname)
+
+        out_fname_CASA = "%s_out_CASA_analytic_%d.nc" % \
+                            (self.experiment_id, number)
+        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
@@ -346,15 +349,17 @@ class RunCable(object):
            }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_transient.txt" % (site))
+        out_log_fname = "%s_log_transient.txt" % (self.experiment_id)
+        out_log_fname = os.path.join(self.log_dir, out_log_fname)
+
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
-        out_fname = os.path.join(self.output_dir,
-                                 "%s_out_cable_transient.nc" % (site))
-        out_fname_CASA = os.path.join(self.output_dir,
-                                 "%s_out_casa_transient.nc" % (site))
+        out_fname = "%s_out_cable_transient.nc" % (self.experiment_id)
+        out_fname = os.path.join(self.output_dir, out_fname)
+
+        out_fname_CASA = "%s_out_casa_transient.nc" % (self.experiment_id)
+        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
         if os.path.isfile(out_fname):
             os.remove(out_fname)
 
@@ -387,15 +392,17 @@ class RunCable(object):
         }
         self.adjust_nml_file(self.site_nml_fn, replace_dict)
 
-        out_log_fname = os.path.join(self.log_dir,
-                                     "%s_log_simulation.txt" % (site))
+        out_log_fname = "%s_log_simulation.txt" % (self.experiment_id)
+        out_log_fname = os.path.join(self.log_dir, out_log_fname)
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
-        out_fname = os.path.join(self.output_dir,
-                                 "%s_out_cable.nc" % (site))
-        out_fname_CASA = os.path.join(self.output_dir,
-                                 "%s_out_casa.nc" % (site))
+        out_fname = "%s_out_cable.nc" % (self.experiment_id)
+        out_fname = os.path.join(self.output_dir, out_fname)
+
+        out_fname_CASA = "%s_out_casa.nc" % (self.experiment_id)
+        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
+
         if os.path.isfile(out_fname):
             os.remove(out_fname)
 
@@ -491,7 +498,7 @@ class RunCable(object):
 
 if __name__ == "__main__":
 
-    site = "Cumberland"
+    experiment_id = "Cumberland"
 
     cwd = os.getcwd()
     driver_dir = "driver_files"
@@ -504,7 +511,7 @@ if __name__ == "__main__":
     restart_dir = "restart_files"
     nml_fn = "cable.nml"
     site_nml_fn = "site.nml"
-    #met_fname = os.path.join(met_dir, '%s.1.4_met.nc' % (site)) # PLUMBER sites
+    #met_fname = os.path.join(met_dir, '%s.1.4_met.nc' % (experiment_id))
     met_fname = os.path.join(met_dir, 'AU_Cum_2014_2017_met.nc')
     co2_ndep_fname = os.path.join(co2_ndep_dir,
                                   "AmaFACE_co2npdepforcing_1850_2100_AMB.csv")
@@ -528,7 +535,7 @@ if __name__ == "__main__":
     if not os.path.exists(dump_dir):
         os.makedirs(dump_dir)
 
-    #C = RunCable(site, driver_dir, output_dir, restart_dir,
+    #C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
     #             dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
     #             veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
     #             verbose)
@@ -537,8 +544,8 @@ if __name__ == "__main__":
     #for biogeo in ["C", "CN", "CNP"]:
     for biogeo in ["CN"]:
 
-        site = "Cumberland_%s" % (biogeo)
-        C = RunCable(site, driver_dir, output_dir, restart_dir,
+        experiment_id = "Cumberland_%s" % (biogeo)
+        C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
                      dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                      veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
                      verbose)
