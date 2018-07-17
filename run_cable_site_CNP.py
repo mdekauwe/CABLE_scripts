@@ -242,10 +242,10 @@ class RunCable(object):
                         "filename%out": "'%s'" % (out_fname),
                         "casafile%out": "'%s'" % (out_fname_CASA),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s%s'" % (self.restart_dir, self.restart_fname),
-                        "cable_user%climate_restart_out": "'%s%s'" % (self.restart_dir, self.climate_restart_fname),
-                        "cable_user%POP_restart_out": "'%s%s'" % (self.restart_dir, self.pop_restart_fname),
-                        "casafile%cnpepool": "'%s%s'" % (self.restart_dir, self.casa_restart_fname),
+                        "filename%restart_out": "'%s'" % os.path.join(self.restart_dir, self.restart_fname),
+                        "cable_user%climate_restart_out": "'%s'" % os.path.join(self.restart_dir, self.climate_restart_fname),
+                        "cable_user%POP_restart_out": "'%s'" % os.path.join(self.restart_dir, self.pop_restart_fname),
+                        "casafile%cnpepool": "'%s'" % os.path.join(self.restart_dir, self.casa_restart_fname),
                         "filename%restart_in": "''" ,
                         "cable_user%climate_restart_in": "''" ,
                         "cable_user%POP_restart_in": "''",
@@ -437,6 +437,9 @@ class RunCable(object):
             f = "new_sumbal"
             if os.path.isfile(f):
                 os.remove(f)
+            for f in glob.glob("*.out"):
+                os.remove(f)
+
         else:
             fromx = os.path.join(self.restart_dir, self.restart_fname)
             to = fromx[:-3] + "_" + tag + ".nc"
