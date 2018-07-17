@@ -58,7 +58,7 @@ class RunCable(object):
         self.cable_exe = exe
         self.aux_dir = aux_dir
         self.verbose = verbose
-        self.nyear_spinup = nyear_spinup
+        self.nyear_spinup = 5
         if biogeochem == "C":
             self.biogeochem = 1
             self.vcmax = "Standard"
@@ -142,7 +142,7 @@ class RunCable(object):
         nloop_transient = math.ceil((st_yr - 1 - 1850) / nrec) - 1
 
         # number of times met data is recycled with a spinup run of nyear_spinup
-        nloop_spin = math.ceil( self.nyear_spinup/ nrec)
+        nloop_spin = math.ceil( self.nyear_spinup / nrec)
 
         st_yr_transient = st_yr - 1 - nloop_transient * nrec + 1
         en_yr_transient = st_yr_transient + nloop_transient * nrec - 1
@@ -439,7 +439,8 @@ class RunCable(object):
                 os.remove(f)
             for f in glob.glob("*.out"):
                 os.remove(f)
-
+            for f in glob.glob("restart_*.nc"):
+                os.remove(f)
         else:
             fromx = os.path.join(self.restart_dir, self.restart_fname)
             to = fromx[:-3] + "_" + tag + ".nc"
@@ -481,10 +482,9 @@ if __name__ == "__main__":
     bgc_param_fn = "pftlookup.csv"
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
-    verbose = False
-    nyear_spinup = 5
-    biogeochem = "CN" # C, CN, CNP
+    biogeochem = "C" # C, CN, CNP
     pop_on = True
+    verbose = False
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
