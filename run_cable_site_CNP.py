@@ -61,7 +61,7 @@ class RunCable(object):
         self.nyear_spinup = 5
         if biogeochem == "C":
             self.biogeochem = 1
-            self.vcmax = "Standard"
+            self.vcmax = "standard"
             self.vcmax_feedback = ".FALSE."
         elif biogeochem == "CN":
             self.biogeochem = 2
@@ -213,6 +213,7 @@ class RunCable(object):
                         self.site_nml_fn)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
                         self.nml_fn)
+        self.add_missing_options_to_nml_file(self.nml_fn)
 
         out_fname = os.path.join(self.output_dir,
                                  "%s_out_cable_zero.nc" % (site))
@@ -458,6 +459,37 @@ class RunCable(object):
             to = fromx[:-3] + "_" + tag + ".nc"
             shutil.copyfile(fromx, to)
 
+    def add_missing_options_to_nml_file(self, fname, line_start=None):
+        # Some of the flags we may wish to change are missing from the default
+        # file so we can't adjust them via this script...add them
+
+        if line_start is None:
+            line_start = sum(1 for line in open(fname)) - 1
+
+        f = open(fname, "r")
+        contents = f.readlines()
+        f.close()
+
+        arg = "   cable_user%GW_MODEL = .FALSE.\n"
+        contents.insert(line_start, arg)
+        line_start += 1
+
+        arg = "   cable_user%or_evap = .FALSE.\n"
+        contents.insert(line_start, arg)
+        line_start += 1
+
+        arg = "   filename%gw_elev = 'GSWP3_elevation_slope_stddev.nc'\n"
+        contents.insert(line_start, arg)
+        line_start += 1
+
+        tmp_fname = "tmp.nml"
+        f = open(tmp_fname, "w")
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
+
+        shutil.move(tmp_fname, fname)
+
 if __name__ == "__main__":
 
     site = "Cumberland"
@@ -498,6 +530,22 @@ if __name__ == "__main__":
     if not os.path.exists(dump_dir):
         os.makedirs(dump_dir)
 
+    #C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
+    #             dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
+    #             veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
+    #             verbose)
+    #C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
+
+    biogeochem = "C" # C, CN, CNP
+    site = "Cumberland_C"
+    C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
+                 dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
+                 veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
+                 verbose)
+    C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
+
+    biogeochem = "CN" # C, CN, CNP
+    site = "Cumberland_CN"
     C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
                  dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                  veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
