@@ -536,18 +536,12 @@ if __name__ == "__main__":
     #             verbose)
     #C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
 
-    biogeochem = "C" # C, CN, CNP
-    site = "Cumberland_C"
-    C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
-                 dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
-                 veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
-                 verbose)
-    C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
+    #for biogeo in ["C", "CN", "CNP"]:
+    for biogeo in ["CN"]:
 
-    biogeochem = "CN" # C, CN, CNP
-    site = "Cumberland_CN"
-    C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
-                 dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
-                 veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
-                 verbose)
-    C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
+        site = "Cumberland_%s" % (biogeo)
+        C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
+                     dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
+                     veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
+                     verbose)
+        C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
