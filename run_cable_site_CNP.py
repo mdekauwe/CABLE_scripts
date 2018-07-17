@@ -213,7 +213,7 @@ class RunCable(object):
                         self.site_nml_fn)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
                         self.nml_fn)
-        self.add_missing_options_to_nml_file(self.nml_fn)
+        #self.add_missing_options_to_nml_file(self.nml_fn)
 
         out_fname = os.path.join(self.output_dir,
                                  "%s_out_cable_zero.nc" % (site))
