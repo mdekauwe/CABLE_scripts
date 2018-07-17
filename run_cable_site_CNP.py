@@ -34,14 +34,13 @@ import math
 
 class RunCable(object):
 
-    def __init__(self, site, driver_dir, param_dir, output_dir, restart_dir,
+    def __init__(self, site, driver_dir, output_dir, restart_dir,
                  dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                  veg_param_fn,log_dir, exe, aux_dir, biogeochem, pop_on,
                  verbose, nspins=4):
 
         self.site = site
         self.driver_dir = driver_dir
-        self.param_dir = param_dir
         self.output_dir = output_dir
         self.restart_dir = restart_dir
         self.dump_dir = dump_dir
@@ -251,11 +250,11 @@ class RunCable(object):
                         "cable_user%climate_restart_in": "''" ,
                         "cable_user%POP_restart_in": "''",
                         "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
-                        "filename%veg": "'%s'" % os.path.join(self.param_dir, veg_param_fn),
+                        "filename%veg": "'%s'" % os.path.join(self.driver_dir, veg_param_fn),
                         "filename%soil": "'%s'" % os.path.join(self.driver_dir, soil_param_fn),
                         "output%restart": ".TRUE.",
                         "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
-                        "casafile%cnpbiome": "'%s'" % (os.path.join(self.param_dir, bgc_param_fn)),
+                        "casafile%cnpbiome": "'%s'" % (os.path.join(self.driver_dir, bgc_param_fn)),
                         "cable_user%RunIden": "'%s'" % (self.site),
                         "cable_user%POP_out": "'ini'",
                         "cable_user%POP_rst": "'./'",
@@ -496,7 +495,6 @@ if __name__ == "__main__":
 
     cwd = os.getcwd()
     driver_dir = "driver_files"
-    param_dir = "driver_files"
     dump_dir = "dump"
     met_dir = "met"
     co2_ndep_dir = "met"
@@ -530,7 +528,7 @@ if __name__ == "__main__":
     if not os.path.exists(dump_dir):
         os.makedirs(dump_dir)
 
-    #C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
+    #C = RunCable(site, driver_dir, output_dir, restart_dir,
     #             dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
     #             veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
     #             verbose)
@@ -540,7 +538,7 @@ if __name__ == "__main__":
     for biogeo in ["CN"]:
 
         site = "Cumberland_%s" % (biogeo)
-        C = RunCable(site, driver_dir, param_dir, output_dir, restart_dir,
+        C = RunCable(site, driver_dir, output_dir, restart_dir,
                      dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                      veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
                      verbose)
