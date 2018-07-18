@@ -541,8 +541,8 @@ if __name__ == "__main__":
     #             verbose)
     #C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
 
-    #for biogeo in ["C", "CN", "CNP"]:
-    for biogeo in ["CN"]:
+    for biogeo in ["C", "CN", "CNP"]:
+    #for biogeo in ["CN"]:
 
         experiment_id = "Cumberland_%s" % (biogeo)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
