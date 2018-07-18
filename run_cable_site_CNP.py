@@ -36,7 +36,7 @@ class RunCable(object):
 
     def __init__(self, experiment_id, driver_dir, output_dir, restart_dir,
                  dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
-                 veg_param_fn,log_dir, exe, aux_dir, biogeochem, pop_on,
+                 veg_param_fn,log_dir, exe, aux_dir, biogeochem, call_pop,
                  verbose, nspins=4):
 
         self.experiment_id = experiment_id
@@ -72,10 +72,12 @@ class RunCable(object):
             self.vcmax_feedback = ".TRUE."
         else:
             raise ValueError("Unknown biogeochemistry option: C, CN, CNP")
-        if pop_on:
-            self.call_pop = ".TRUE."
+        self.call_pop = call_pop
+        if self.call_pop:
+            self.pop_flag = ".TRUE."
         else:
-            self.call_pop = ".FALSE."
+            self.pop_flag = ".FALSE."
+
         self.nspins = nspins
 
     def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
@@ -266,7 +268,7 @@ class RunCable(object):
                         "cable_user%YearEnd": "%d" % (en_yr_spin),
                         "cable_user%CASA_SPIN_STARTYEAR": "%d" % (st_yr_spin),
                         "cable_user%CASA_SPIN_ENDYEAR": "%d" % (en_yr_spin),
-                        "cable_user%CALL_POP": "%s" % (self.call_pop),
+                        "cable_user%CALL_POP": "%s" % (self.pop_flag),
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
@@ -461,9 +463,10 @@ class RunCable(object):
             to = fromx[:-3] + "_" + tag + ".nc"
             shutil.copyfile(fromx, to)
 
-            fromx = os.path.join(self.restart_dir, self.pop_restart_fname)
-            to = fromx[:-3] + "_" + tag + ".nc"
-            shutil.copyfile(fromx, to)
+            if self.call_pop:
+                fromx = os.path.join(self.restart_dir, self.pop_restart_fname)
+                to = fromx[:-3] + "_" + tag + ".nc"
+                shutil.copyfile(fromx, to)
 
     def add_missing_options_to_nml_file(self, fname, line_start=None):
         # Some of the flags we may wish to change are missing from the default
@@ -520,7 +523,7 @@ if __name__ == "__main__":
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
     biogeochem = "C" # C, CN, CNP
-    pop_on = True
+    call_pop = True
     verbose = False
 
     if not os.path.exists(restart_dir):
@@ -547,6 +550,6 @@ if __name__ == "__main__":
         experiment_id = "Cumberland_%s" % (biogeo)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
                      dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
-                     veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
+                     veg_param_fn, log_dir, exe, aux_dir, biogeochem, call_pop,
                      verbose)
         C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
