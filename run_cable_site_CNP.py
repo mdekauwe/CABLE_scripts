@@ -92,7 +92,8 @@ class RunCable(object):
 
             # initial spin
             self.run_me()
-
+            self.clean_up(end=False, tag="zero")
+            
             # 3 sets of spins & analytical spins
             for num in range(1, self.nspins):
                 self.logfile="log_ccp%d" % (num)
