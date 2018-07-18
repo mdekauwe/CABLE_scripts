@@ -50,8 +50,10 @@ def main(C_fname, CN_fname, CNP_fname, plot_fname=None):
     vars = ["GPP", "NEE", "Qle", "LAI", "TVeg", "ESoil"]
     for a, v in zip(axes, vars):
         a.plot(df_C.month, df_C[v], c="lightblue", lw=2.0, ls="-", label="C")
-        a.plot(df_CN.month, df_CN[v], c="DodgerBlue", lw=2.0, ls="-", label="CN")
-        a.plot(df_CNP.month, df_CNP[v], c="darkblue", lw=2.0, ls="-", label="CNP")
+        a.plot(df_CN.month, df_CN[v], c="DodgerBlue", lw=2.0, ls="-",
+               label="CN")
+        a.plot(df_CNP.month, df_CNP[v], c="darkblue", lw=2.0, ls="-",
+               label="CNP")
 
     labels = ["GPP (g C m$^{-2}$ d$^{-1}$)", "NEE (g C m$^{-2}$ d$^{-1}$)",\
               "Qle (W m$^{-2}$)", "LAI (m$^{2}$ m$^{-2}$)",\
