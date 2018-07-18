@@ -93,7 +93,7 @@ class RunCable(object):
             # initial spin
             self.run_me()
             self.clean_up(end=False, tag="zero")
-            
+
             # 3 sets of spins & analytical spins
             for num in range(1, self.nspins):
                 self.logfile="log_ccp%d" % (num)
@@ -545,10 +545,10 @@ if __name__ == "__main__":
     #             verbose)
     #C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
 
-    for biogeo in ["C", "CN", "CNP"]:
+    for biogeochem in ["C", "CN", "CNP"]:
     #for biogeo in ["CN"]:
 
-        experiment_id = "Cumberland_%s" % (biogeo)
+        experiment_id = "Cumberland_%s" % (biogeochem)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
                      dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                      veg_param_fn, log_dir, exe, aux_dir, biogeochem, call_pop,
