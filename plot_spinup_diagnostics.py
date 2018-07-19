@@ -18,7 +18,7 @@ from matplotlib.ticker import FixedLocator
 import os
 import xarray as xr
 
-def plot_plant(tag, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
+def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
 
     tol = 1E-02 #5E-03
     fig = plt.figure(figsize=(15,10))
@@ -149,10 +149,10 @@ def plot_plant(tag, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
 
     for i,val in enumerate(cplant[1:]):
         if np.fabs(cplant[i] - val) < tol:
-            print("C plant: steady-state")
+            print("C plant (%s): steady-state" % (cycle))
 
 
-def plot_soil(tag, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
+def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
 
     tol = 1E-02 #5E-03
     fig = plt.figure(figsize=(15,10))
@@ -282,7 +282,7 @@ def plot_soil(tag, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
 
     for i,val in enumerate(csoil[1:]):
         if np.fabs(csoil[i] - val) < tol:
-            print("C soil: steady-state")
+            print("C soil (%s): steady-state" % (cycle))
 
 def open_file(fname):
     return xr.open_dataset(fname)
