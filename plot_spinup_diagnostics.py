@@ -70,7 +70,7 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
     ax1.set_title("Cf")
     ax1.plot(cf, label="Cf")
 
-    ax2.set_title("Cr")
+    ax2.set_title("Cw")
     ax2.plot(cw)
 
     ax3.set_title("Cr")
