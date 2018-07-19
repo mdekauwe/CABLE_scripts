@@ -291,31 +291,17 @@ def open_file(fname):
 
 if __name__ == "__main__":
 
-    biogeoC = False
-    biogeoCN = False
-    biogeoCNP = True
+    for cycle in ["C", "CN", "CNP"]:
 
-    for i in ["C", "CN", "CNP"]:
-        if i == "C":
-            biogeoC = False
-            biogeoCN = False
-            biogeoCNP = True
-        elif i == "CN":
-            biogeoC = False
-            biogeoCN = True
-            biogeoCNP = False
-        elif i == "CNP":
-            biogeoC = False
-            biogeoCN = False
-            biogeoCNP = True
+        print(cycle)
 
-        if biogeoC:
+        if cycle == "C":
             experiment_id = "Cumberland_C"
             tag = "C"
-        elif biogeoCN:
+        elif cycle == "CN":
             experiment_id = "Cumberland_CN"
             tag = "CN"
-        elif biogeoCNP:
+        elif cycle == "CNP":
             experiment_id = "Cumberland_CNP"
             tag = "CNP"
 
@@ -334,5 +320,7 @@ if __name__ == "__main__":
         fname = "outputs/%s_out_casa.nc" % (experiment_id)
         simulation = open_file(fname)
 
-        plot_plant(tag, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation)
-        plot_soil(tag, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation)
+        plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient,
+                   simulation)
+        plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient,
+                  simulation)
