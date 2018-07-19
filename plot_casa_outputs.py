@@ -94,12 +94,10 @@ def plot_nitrogen_fluxes(tag, cycle, ds):
     ax8 = fig.add_subplot(3,3,8)
     ax9 = fig.add_subplot(3,3,9)
 
-
-
-    ax1.set_title("Nitrogen fixation (g N/m^2/year)")
+    ax1.set_title("N fixation (g N/m^2/year)")
     ax1.plot(ds.Nminfix[:,0], label="Cf")
 
-    ax2.set_title("Nitrogen deposition (g N/m^2/year)")
+    ax2.set_title("N deposition (g N/m^2/year)")
     ax2.plot(ds.Nmindep[:,0])
 
     ax3.set_title("N loss")
@@ -125,6 +123,66 @@ def plot_nitrogen_fluxes(tag, cycle, ds):
 
 
     plot_fname = "%s_simulation_nitrogen_fluxes.pdf" % (tag)
+    plot_dir = "plots"
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
+
+    fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
+                pad_inches=0.1)
+
+def plot_phosphorus_fluxes(tag, cycle, ds):
+
+    fig = plt.figure(figsize=(15,10))
+    fig.subplots_adjust(hspace=0.3)
+    fig.subplots_adjust(wspace=0.3)
+    plt.rcParams['text.usetex'] = False
+    plt.rcParams['font.family'] = "sans-serif"
+    plt.rcParams['font.sans-serif'] = "Helvetica"
+    plt.rcParams['axes.labelsize'] = 12
+    plt.rcParams['font.size'] = 12
+    plt.rcParams['legend.fontsize'] = 12
+    plt.rcParams['xtick.labelsize'] = 12
+    plt.rcParams['ytick.labelsize'] = 12
+
+    ax1 = fig.add_subplot(3,3,1)
+    ax2 = fig.add_subplot(3,3,2)
+    ax3 = fig.add_subplot(3,3,3)
+    ax4 = fig.add_subplot(3,3,4)
+    ax5 = fig.add_subplot(3,3,5)
+    ax6 = fig.add_subplot(3,3,6)
+    ax7 = fig.add_subplot(3,3,7)
+    ax8 = fig.add_subplot(3,3,8)
+    ax9 = fig.add_subplot(3,3,9)
+
+    ax1.set_title("P fixation (g N/m^2/year)")
+    ax1.plot(ds.Nminfix[:,0], label="Cf")
+
+    ax2.set_title("P deposition (g N/m^2/year)")
+    ax2.plot(ds.Pdep[:,0])
+
+    ax3.set_title("P loss")
+    ax3.plot(ds.Ploss[:,0])
+
+    ax4.set_title("P leach")
+    ax4.plot(ds.Pleach[:,0])
+
+    ax5.set_title("P uptake")
+    ax5.plot(ds.Pupland[:,0])
+
+    ax6.set_title("P gross mineralisation")
+    ax6.plot(ds.Psmin[:,0])
+
+    ax7.set_title("P net mineralisation")
+    ax7.plot(ds.Psnet[:,0])
+
+    ax8.set_title("P immobilisation")
+    ax8.plot(ds.Psimm[:,0])
+
+    ax9.set_title("Leaf N:P")
+    ax9.plot(ds.nplant[:,0,0]/ds.cplant[:,0,0])
+
+
+    plot_fname = "%s_simulation_phosphorus_fluxes.pdf" % (tag)
     plot_dir = "plots"
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
@@ -159,3 +217,4 @@ if __name__ == "__main__":
 
         plot_carbon_fluxes(tag, cycle, simulation)
         plot_nitrogen_fluxes(tag, cycle, simulation)
+        plot_phosphorus_fluxes(tag, cycle, simulation)
