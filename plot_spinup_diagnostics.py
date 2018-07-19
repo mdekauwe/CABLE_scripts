@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Plot a heap of CASA outputs
+Plot some diagnostics to see if the model has hit steady-state
 
 That's all folks.
 """
