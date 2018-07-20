@@ -144,11 +144,11 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
                 pad_inches=0.1)
 
     cplant = cf + cw + cr
-    cplant = cplant[-50:]
-    #delta = np.diff(cplant)
+    cplant = cplant[-12*5:] # take last 5 years, outputs are monthly
 
-    for i,val in enumerate(cplant[1:]):
-        if np.fabs(cplant[i] - val) < tol:
+    for i in range(1, len(cplant), 12):
+        #print(np.fabs(cplant[i-1] - cplant[i]), tol, cplant[i-1], cplant[i])
+        if np.fabs(cplant[i-1] - cplant[i]) < tol:
             print("C plant (%s): steady-state" % (cycle))
 
 
@@ -277,12 +277,14 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
     fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
                 pad_inches=0.1)
 
-    csoil = cfast+cslow+cpassive
-    csoil = csoil[-50:]
+    csoil = cfast + cslow + cpassive
+    csoil = csoil[-12*5:] # take last 5 years, outputs are monthly
 
-    for i,val in enumerate(csoil[1:]):
-        if np.fabs(csoil[i] - val) < tol:
-            print("C soil (%s): steady-state" % (cycle))
+    for i in range(1, len(csoil), 12):
+        #print(np.fabs(csoil[i-1] - csoil[i]), tol, csoil[i-1], csoil[i])
+        if np.fabs(csoil[i-1] - csoil[i]) < tol:
+            print("C csoil (%s): steady-state" % (cycle))
+
 
 def open_file(fname):
     return xr.open_dataset(fname)
