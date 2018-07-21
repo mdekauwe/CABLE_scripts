@@ -487,7 +487,9 @@ class RunCable(object):
         if self.debug:
             print("\n\n")
             print("***", not_in_equilibrium, num, prev_cplant, new_cplant,
-                         prev_csoil, new_csoil)
+                         prev_csoil, new_csoil, "*cplant",
+                         np.fabs(prev_cplant - new_cplant), "*csoil",
+                         np.fabs(prev_csoil - new_csoil))
             print("\n\n")
 
         return not_in_equilibrium
