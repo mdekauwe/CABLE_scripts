@@ -229,10 +229,13 @@ class RunCable(object):
 
         out_fname = os.path.join(self.output_dir,
                                  "%s_out_cable_zero.nc" % (self.experiment_id))
-        out_fname_CASA = os.path.join(self.output_dir,
-                                 "%s_out_CASA_zero.nc" % (self.experiment_id))
         if os.path.isfile(out_fname):
             os.remove(out_fname)
+
+        out_fname_CASA = os.path.join(self.output_dir,
+                                 "%s_out_CASA_zero.nc" % (self.experiment_id))
+        if os.path.isfile(out_fname_CASA):
+            os.remove(out_fname_CASA)
 
         out_log_fname = os.path.join(self.log_dir,
                                      "%s_log_zero.txt" % (self.experiment_id))
@@ -287,6 +290,7 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_re_spin(self, number=None):
+
         out_log_fname = "%s_log_ccp%d.txt" % (self.experiment_id, number)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
         if os.path.isfile(out_log_fname):
@@ -294,12 +298,13 @@ class RunCable(object):
 
         out_fname = "%s_out_cable_ccp%d.nc" % (self.experiment_id, number)
         out_fname = os.path.join(self.output_dir, out_fname)
+        if os.path.isfile(out_fname):
+            os.remove(out_fname)
 
         out_fname_CASA = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, number)
         out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
-
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        if os.path.isfile(out_fname_CASA):
+            os.remove(out_fname_CASA)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
@@ -329,12 +334,14 @@ class RunCable(object):
 
         out_log_fname = "%s_log_analytic_%d.txt" % (self.experiment_id, number)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
+        if os.path.isfile(out_log_fname):
+            os.remove(out_log_fname)
 
         out_fname_CASA = "%s_out_CASA_analytic_%d.nc" % \
                             (self.experiment_id, number)
         out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
-        if os.path.isfile(out_log_fname):
-            os.remove(out_log_fname)
+        if os.path.isfile(out_fname_CASA):
+            os.remove(out_fname_CASA)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
@@ -364,17 +371,18 @@ class RunCable(object):
 
         out_log_fname = "%s_log_transient.txt" % (self.experiment_id)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
-
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
         out_fname = "%s_out_cable_transient.nc" % (self.experiment_id)
         out_fname = os.path.join(self.output_dir, out_fname)
+        if os.path.isfile(out_fname):
+            os.remove(out_fname)
 
         out_fname_CASA = "%s_out_casa_transient.nc" % (self.experiment_id)
         out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        if os.path.isfile(out_fname_CASA):
+            os.remove(out_fname_CASA)
 
         replace_dict = {
                         "filename%out": "'%s'" % (out_fname),
