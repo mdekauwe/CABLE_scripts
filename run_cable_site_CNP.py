@@ -86,7 +86,7 @@ class RunCable(object):
         (st_yr, en_yr,
          st_yr_trans, en_yr_trans,
          st_yr_spin, en_yr_spin) = self.get_years()
-        
+
         self.initial_setup(st_yr_spin, en_yr_spin, st_yr, en_yr)
 
         if SPIN_UP == True:
@@ -140,6 +140,7 @@ class RunCable(object):
         ds = xr.open_dataset(self.met_fname)
 
         st_yr = pd.to_datetime(ds.time[0].values).year
+
         # PALS met files final year tag only has a single 30 min, so need to
         # end at the previous year, which is the real file end
         en_yr = pd.to_datetime(ds.time[-1].values).year - 1
