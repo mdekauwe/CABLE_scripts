@@ -169,7 +169,9 @@ class RunCable(object):
                 st_yr_spin, en_yr_spin)
 
     def adjust_nml_file(self, fname, replacements):
-        """ adjust CABLE NML file and write over the original.
+        """
+        Adjust the params/flags in the CABLE namelise file. Note this writes
+        over whatever file it is given!
 
         Parameters:
         ----------
@@ -179,9 +181,9 @@ class RunCable(object):
             dictionary of replacement values.
 
         """
-        fin = open(fname, 'r')
-        param_str = fin.read()
-        fin.close()
+        f = open(fname, 'r')
+        param_str = f.read()
+        f.close()
         new_str = self.replace_keys(param_str, replacements)
         fd, path = tempfile.mkstemp()
         os.write(fd, str.encode(new_str))
