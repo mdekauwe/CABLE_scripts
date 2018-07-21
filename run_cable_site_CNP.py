@@ -463,20 +463,23 @@ class RunCable(object):
             prev_cplant = 99999.9
             prev_csoil = 99999.9
         else:
-            prev_cplant = ds.cplant[:,0,0].values[-13] + \
-                          ds.cplant[:,1,0].values[-13] + \
-                          ds.cplant[:,2,0].values[-13]
-            prev_csoil = ds.csoil[:,0,0].values[-13] + \
-                         ds.csoil[:,1,0].values[-13] + \
-                         ds.csoil[:,2,0].values[-13]
-
-
-        new_cplant = ds.cplant[:,0,0].values[-1] + \
-                     ds.cplant[:,1,0].values[-1] + \
-                     ds.cplant[:,2,0].values[-1]
-        new_csoil = ds.csoil[:,0,0].values[-1] + \
-                    ds.csoil[:,1,0].values[-1] + \
-                    ds.csoil[:,2,0].values[-1]
+            prev_cplant = ds.cplant[:,:,0].values[-13].sum()
+            prev_csoil = ds.csoil[:,:,0].values[-13].sum()
+            #prev_cplant = ds.cplant[:,0,0].values[-13] + \
+            #              ds.cplant[:,1,0].values[-13] + \
+            #              ds.cplant[:,2,0].values[-13]
+            #prev_csoil = ds.csoil[:,0,0].values[-13] + \
+            #             ds.csoil[:,1,0].values[-13] + \
+            #             ds.csoil[:,2,0].values[-13]
+            
+        new_cplant = ds.cplant[:,:,0].values[-1].sum()
+        new_csoil = ds.csoil[:,:,0].values[-1].sum()
+        #new_cplant = ds.cplant[:,0,0].values[-1] + \
+        #             ds.cplant[:,1,0].values[-1] + \
+        #             ds.cplant[:,2,0].values[-1]
+        #new_csoil = ds.csoil[:,0,0].values[-1] + \
+        #            ds.csoil[:,1,0].values[-1] + \
+        #            ds.csoil[:,2,0].values[-1]
 
         if ( np.fabs(prev_cplant - new_cplant) < tol and
              np.fabs(prev_csoil - new_csoil) < tol ):
