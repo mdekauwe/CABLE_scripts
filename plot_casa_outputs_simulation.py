@@ -198,7 +198,8 @@ def open_file(fname):
 
 if __name__ == "__main__":
 
-    for cycle in ["C", "CN", "CNP"]:
+    #for cycle in ["C", "CN", "CNP"]:
+    for cycle in ["CN"]:
 
         print(cycle)
 
@@ -212,7 +213,7 @@ if __name__ == "__main__":
             experiment_id = "Cumberland_CNP"
             tag = "CNP"
 
-        fname = "outputs/%s_out_cable.nc" % (experiment_id)
+        fname = "outputs/%s_out_casa.nc" % (experiment_id)
         simulation = open_file(fname)
 
         plot_carbon_fluxes(tag, cycle, simulation)
