@@ -18,7 +18,7 @@ from matplotlib.ticker import FixedLocator
 import os
 import xarray as xr
 
-def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
+def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
 
     tol = 1E-02 #5E-03
     fig = plt.figure(figsize=(15,10))
@@ -48,8 +48,6 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
     ax11 = fig.add_subplot(3,4,11)
     ax12 = fig.add_subplot(3,4,12)
 
-
-    zero, ccp1, ccp2, ccp3, ccp4, transient, simulation
 
     cf = np.hstack((zero.cplant[:,0,0].values,
                     ccp1.cplant[:,0,0].values,
@@ -144,15 +142,15 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
                 pad_inches=0.1)
 
     cplant = cf + cw + cr
-    cplant = cplant[-12*5:] # take last 5 years, outputs are monthly
+    cplant = cplant[-50:]
+    #delta = np.diff(cplant)
 
-    for i in range(1, len(cplant), 12):
-        #print(np.fabs(cplant[i-1] - cplant[i]), tol, cplant[i-1], cplant[i])
-        if np.fabs(cplant[i-1] - cplant[i]) < tol:
+    for i,val in enumerate(cplant[1:]):
+        if np.fabs(cplant[i] - val) < tol:
             print("C plant (%s): steady-state" % (cycle))
 
 
-def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
+def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
 
     tol = 1E-02 #5E-03
     fig = plt.figure(figsize=(15,10))
@@ -183,8 +181,6 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
     ax12 = fig.add_subplot(3,4,12)
 
 
-    zero, ccp1, ccp2, ccp3, ccp4, transient, simulation
-
     cfast = np.hstack((zero.csoil[:,0,0].values,
                       ccp1.csoil[:,0,0].values,
                       ccp2.csoil[:,0,0].values,
@@ -210,7 +206,7 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
     ax3.set_title("C passive")
     ax3.plot(cpassive)
 
-    ax4.set_title("Cplant")
+    ax4.set_title("C soil")
     ax4.plot(cfast+cslow+cpassive)
 
     nfast = np.hstack((zero.nsoil[:,0,0].values,
@@ -277,14 +273,12 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient, simulation):
     fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
                 pad_inches=0.1)
 
-    csoil = cfast + cslow + cpassive
-    csoil = csoil[-12*5:] # take last 5 years, outputs are monthly
+    csoil = cfast+cslow+cpassive
+    csoil = csoil[-50:]
 
-    for i in range(1, len(csoil), 12):
-        #print(np.fabs(csoil[i-1] - csoil[i]), tol, csoil[i-1], csoil[i])
-        if np.fabs(csoil[i-1] - csoil[i]) < tol:
-            print("C csoil (%s): steady-state" % (cycle))
-
+    for i,val in enumerate(csoil[1:]):
+        if np.fabs(csoil[i] - val) < tol:
+            print("C soil (%s): steady-state" % (cycle))
 
 def open_file(fname):
     return xr.open_dataset(fname)
@@ -317,12 +311,7 @@ if __name__ == "__main__":
         ccp3 = open_file(fname)
         fname = "outputs/%s_out_CASA_ccp4.nc" % (experiment_id)
         ccp4 = open_file(fname)
-        fname = "outputs/%s_out_casa_transient.nc" % (experiment_id)
-        transient = open_file(fname)
-        fname = "outputs/%s_out_casa.nc" % (experiment_id)
-        simulation = open_file(fname)
 
-        plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient,
-                   simulation)
-        plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4, transient,
-                  simulation)
+
+        plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4)
+        plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4)
