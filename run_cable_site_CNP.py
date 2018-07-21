@@ -192,7 +192,7 @@ class RunCable(object):
         os.remove(path)
 
     def replace_keys(self, text, replacements_dict):
-        """ Function expects to find GDAY input file formatted key = value.
+        """ Function expects to find CABLE namelist file formatted key = value.
 
         Parameters:
         ----------
