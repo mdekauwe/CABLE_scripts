@@ -485,12 +485,10 @@ class RunCable(object):
             not_in_equilibrium = True
 
         if self.debug:
-            print("\n\n")
-            print("***", not_in_equilibrium, num, prev_cplant, new_cplant,
-                         prev_csoil, new_csoil, "*cplant",
-                         np.fabs(prev_cplant - new_cplant), "*csoil",
-                         np.fabs(prev_csoil - new_csoil))
-            print("\n\n")
+            print("*", num, not_in_equilibrium, prev_cplant, new_cplant,
+                  prev_csoil, new_csoil, "*cplant",
+                  np.fabs(prev_cplant - new_cplant), "*csoil",
+                  np.fabs(prev_csoil - new_csoil))
 
         return not_in_equilibrium
 
