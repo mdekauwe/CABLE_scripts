@@ -30,14 +30,15 @@ import shutil
 import tempfile
 import netCDF4 as nc
 import math
-
+import xarray as xr
+import numpy as np
 
 class RunCable(object):
 
     def __init__(self, experiment_id, driver_dir, output_dir, restart_dir,
                  dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
                  veg_param_fn,log_dir, exe, aux_dir, biogeochem, call_pop,
-                 verbose, nspins=4):
+                 verbose):
 
         self.experiment_id = experiment_id
         self.driver_dir = driver_dir
@@ -57,10 +58,11 @@ class RunCable(object):
         self.cable_exe = exe
         self.aux_dir = aux_dir
         self.verbose = verbose
-        self.nyear_spinup = 5
+        self.nyear_spinup = 20
         if biogeochem == "C":
             self.biogeochem = 1
-            self.vcmax = "standard"
+            #self.vcmax = "standard"
+            self.vcmax = "Walker2014"
             self.vcmax_feedback = ".TRUE."
         elif biogeochem == "CN":
             self.biogeochem = 2
@@ -77,10 +79,12 @@ class RunCable(object):
             self.pop_flag = ".TRUE."
         else:
             self.pop_flag = ".FALSE."
-
-        self.nspins = nspins
-
+        self.debug = True
+        
     def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
+
+        num = 1
+        not_in_equilibrium = True
 
         (st_yr, en_yr,
          st_yr_trans, en_yr_trans,
@@ -94,8 +98,8 @@ class RunCable(object):
             self.run_me()
             self.clean_up(end=False, tag="zero")
 
-            # 3 sets of spins & analytical spins
-            for num in range(1, self.nspins):
+            while not_in_equilibrium:
+
                 self.logfile="log_ccp%d" % (num)
                 self.setup_re_spin(number=num)
                 self.run_me()
@@ -106,6 +110,10 @@ class RunCable(object):
                                            en_yr_spin=en_yr_spin )
                 self.run_me()
                 self.clean_up(end=False, tag="saa%d" % (num))
+
+                not_in_equilibrium = self.check_steady_state(num)
+
+                num += 1
 
             # one final spin
             num += 1
@@ -124,6 +132,8 @@ class RunCable(object):
             self.run_me()
 
         self.clean_up(end=True)
+
+        print(num-1)
 
     def get_years(self):
         f = nc.Dataset(self.met_fname)
@@ -429,15 +439,66 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def run_me(self):
-        # run the model
+
         if self.verbose:
-            os.system("%s > log" % (self.cable_exe ))
-            os.system("mv log $s" % (self.logfile))
+            os.system("%s" % (self.cable_exe))
         else:
-            os.system("%s 1>&2" % (self.cable_exe))
+            # No outputs to the screen, stout and stderr to dev/null
+            os.system("%s > /dev/null 2>&1" % (self.cable_exe))
+
+    def check_steady_state(self, num):
+        """
+        Check whether the plant (leaves, wood and roots) and soil
+        (fast, slow and active) carbon pools have reached equilibrium. To do
+        this we are checking the average of the last year of the previous spin
+        cycle and the last year of the current spin cycle to some tolerance
+        threshold.
+        """
+        tol = 0.05 # This is quite high, I use 0.005 in GDAY
+
+        if num == 1:
+            prev_cplant = 99999.9
+            prev_csoil = 99999.9
+        else:
+            fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num-1)
+            fname = os.path.join(self.output_dir, fname)
+            ds_prev = xr.open_dataset(fname)
+            prev_cplant = np.mean(ds_prev.cplant[:,0,0].values[-12:]) + \
+                          np.mean(ds_prev.cplant[:,1,0].values[-12:]) + \
+                          np.mean(ds_prev.cplant[:,2,0].values[-12:])
+            prev_csoil = np.mean(ds_prev.csoil[:,0,0].values[-12:]) + \
+                         np.mean(ds_prev.csoil[:,1,0].values[-12:]) + \
+                         np.mean(ds_prev.csoil[:,2,0].values[-12:])
+
+        fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num)
+        fname = os.path.join(self.output_dir, fname)
+        ds_new = xr.open_dataset(fname)
+        new_cplant = np.mean(ds_new.cplant[:,0,0].values[-12:]) + \
+                     np.mean(ds_new.cplant[:,1,0].values[-12:]) + \
+                     np.mean(ds_new.cplant[:,2,0].values[-12:])
+        new_csoil = np.mean(ds_new.csoil[:,0,0].values[-12:]) + \
+                    np.mean(ds_new.csoil[:,1,0].values[-12:]) + \
+                    np.mean(ds_new.csoil[:,2,0].values[-12:])
+
+        if ( np.fabs(prev_cplant - new_cplant) < tol and
+             np.fabs(prev_csoil - new_csoil) < tol ):
+            not_in_equilibrium = False
+        else:
+            not_in_equilibrium = True
+
+        if self.debug:
+            print("\n\n")
+            print("***", not_in_equilibrium, num, prev_cplant, new_cplant,
+                         prev_csoil, new_csoil)
+            print("\n\n")
+
+        return not_in_equilibrium
 
     def clean_up(self, end=True, tag=None):
-
+        """
+        Move restart files to a directory and delete various files we no longer
+        need that CABLE spits out as it spins up.
+        """
         if end:
             for f in glob.glob("c2c_*_dump.nc"):
                 shutil.move(f, os.path.join(self.dump_dir, f))
@@ -470,9 +531,10 @@ class RunCable(object):
                 shutil.copyfile(fromx, to)
 
     def add_missing_options_to_nml_file(self, fname, line_start=None):
-        # Some of the flags we may wish to change are missing from the default
-        # file so we can't adjust them via this script...add them
-
+        """
+        Some of the flags we may wish to change are missing from the default
+        file so we can't adjust them via this script...add them
+        """
         if line_start is None:
             line_start = sum(1 for line in open(fname)) - 1
 
@@ -523,9 +585,8 @@ if __name__ == "__main__":
     bgc_param_fn = "pftlookup.csv"
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
-    biogeochem = "C" # C, CN, CNP
-    call_pop = True
-    verbose = False
+    call_pop = False
+    verbose = True
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
@@ -539,14 +600,8 @@ if __name__ == "__main__":
     if not os.path.exists(dump_dir):
         os.makedirs(dump_dir)
 
-    #C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
-    #             dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
-    #             veg_param_fn, log_dir, exe, aux_dir, biogeochem, pop_on,
-    #             verbose)
-    #C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
-
-    for biogeochem in ["C", "CN", "CNP"]:
-    #for biogeo in ["CN"]:
+    #for biogeochem in ["C", "CN", "CNP"]:
+    for biogeochem in ["C"]:
 
         experiment_id = "Cumberland_%s" % (biogeochem)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
