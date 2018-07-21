@@ -148,8 +148,7 @@ class RunCable(object):
         # length of met record
         nrec = en_yr - st_yr + 1
 
-        # number of times met dat is recycled in transient simulation from ~1850
-        # to yearstart-1
+        # number of times met data is recycled during transient simulation 
         nloop_transient = math.ceil((st_yr - 1 - 1850) / nrec) - 1
 
         # number of times met data is recycled with a spinup run of nyear_spinup
