@@ -113,7 +113,6 @@ class RunCable(object):
                 num += 1
 
             # one final spin
-            num += 1
             self.logfile="log_ccp%d" % (num)
             self.setup_re_spin(number=num)
             self.run_me()
@@ -559,6 +558,7 @@ class RunCable(object):
 
         shutil.move(tmp_fname, fname)
 
+
 if __name__ == "__main__":
 
     experiment_id = "Cumberland"
@@ -582,7 +582,7 @@ if __name__ == "__main__":
     bgc_param_fn = "pftlookup.csv"
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
-    call_pop = True
+    call_pop = False
     verbose = False
 
     if not os.path.exists(restart_dir):
@@ -598,7 +598,7 @@ if __name__ == "__main__":
         os.makedirs(dump_dir)
 
     #for biogeochem in ["C", "CN", "CNP"]:
-    for biogeochem in ["C"]:
+    for biogeochem in ["CN"]:
 
         experiment_id = "Cumberland_%s" % (biogeochem)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
