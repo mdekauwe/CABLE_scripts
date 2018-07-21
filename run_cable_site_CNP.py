@@ -129,8 +129,6 @@ class RunCable(object):
 
         self.clean_up(end=True)
 
-        print(num-1)
-
     def get_years(self):
         f = nc.Dataset(self.met_fname)
         time = nc.num2date(f.variables['time'][:],
@@ -483,10 +481,9 @@ class RunCable(object):
             not_in_equilibrium = True
 
         if self.debug:
-            print("*", num, not_in_equilibrium, prev_cplant, new_cplant,
-                  prev_csoil, new_csoil, "*cplant",
-                  np.fabs(prev_cplant - new_cplant), "*csoil",
-                  np.fabs(prev_csoil - new_csoil))
+            print("*", num, not_in_equilibrium,
+                  "*cplant", np.fabs(prev_cplant - new_cplant),
+                  "*csoil", np.fabs(prev_csoil - new_csoil))
 
         return not_in_equilibrium
 
