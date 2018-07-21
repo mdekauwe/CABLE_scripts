@@ -25,7 +25,7 @@ import sys
 import glob
 import shutil
 import tempfile
-import netCDF4 as nc
+import pandas as pd
 import math
 import xarray as xr
 import numpy as np
@@ -86,7 +86,7 @@ class RunCable(object):
         (st_yr, en_yr,
          st_yr_trans, en_yr_trans,
          st_yr_spin, en_yr_spin) = self.get_years()
-
+        
         self.initial_setup(st_yr_spin, en_yr_spin, st_yr, en_yr)
 
         if SPIN_UP == True:
@@ -121,7 +121,7 @@ class RunCable(object):
             self.clean_up(end=False, tag="ccp%d" % (num))
 
         if TRANSIENT == True:
-            print("Transient run")
+            print("Transient")
 
             self.setup_transient(st_yr_trans, en_yr_trans, st_yr, en_yr)
             self.run_me()
@@ -136,15 +136,13 @@ class RunCable(object):
         self.clean_up(end=True)
 
     def get_years(self):
-        f = nc.Dataset(self.met_fname)
-        time = nc.num2date(f.variables['time'][:],
-                           f.variables['time'].units)
 
-        st_yr = time[0].year
+        ds = xr.open_dataset(self.met_fname)
 
+        st_yr = pd.to_datetime(ds.time[0].values).year
         # PALS met files final year tag only has a single 30 min, so need to
         # end at the previous year, which is the real file end
-        en_yr = time[-1].year - 1
+        en_yr = pd.to_datetime(ds.time[-1].values).year - 1
 
         # length of met record
         nrec = en_yr - st_yr + 1
