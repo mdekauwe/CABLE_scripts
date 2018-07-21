@@ -450,35 +450,33 @@ class RunCable(object):
         """
         Check whether the plant (leaves, wood and roots) and soil
         (fast, slow and active) carbon pools have reached equilibrium. To do
-        this we are checking the average of the last year of the previous spin
-        cycle and the last year of the current spin cycle to some tolerance
-        threshold.
+        this we are checking the state of the last year compared to the
+        state the year before in the current spin cycle.
         """
         tol = 0.05 # This is quite high, I use 0.005 in GDAY
+
+        fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num)
+        fname = os.path.join(self.output_dir, fname)
+        ds = xr.open_dataset(fname)
 
         if num == 1:
             prev_cplant = 99999.9
             prev_csoil = 99999.9
         else:
-            fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num-1)
-            fname = os.path.join(self.output_dir, fname)
-            ds_prev = xr.open_dataset(fname)
-            prev_cplant = np.mean(ds_prev.cplant[:,0,0].values[-12:]) + \
-                          np.mean(ds_prev.cplant[:,1,0].values[-12:]) + \
-                          np.mean(ds_prev.cplant[:,2,0].values[-12:])
-            prev_csoil = np.mean(ds_prev.csoil[:,0,0].values[-12:]) + \
-                         np.mean(ds_prev.csoil[:,1,0].values[-12:]) + \
-                         np.mean(ds_prev.csoil[:,2,0].values[-12:])
+            prev_cplant = ds.cplant[:,0,0].values[-13:][0] + \
+                          ds.cplant[:,1,0].values[-13:][0] + \
+                          ds.cplant[:,2,0].values[-13:][0]
+            prev_csoil = ds.csoil[:,0,0].values[-13:][0] + \
+                         ds.csoil[:,1,0].values[-13:][0] + \
+                         ds.csoil[:,2,0].values[-13:][0]
 
-        fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num)
-        fname = os.path.join(self.output_dir, fname)
-        ds_new = xr.open_dataset(fname)
-        new_cplant = np.mean(ds_new.cplant[:,0,0].values[-12:]) + \
-                     np.mean(ds_new.cplant[:,1,0].values[-12:]) + \
-                     np.mean(ds_new.cplant[:,2,0].values[-12:])
-        new_csoil = np.mean(ds_new.csoil[:,0,0].values[-12:]) + \
-                    np.mean(ds_new.csoil[:,1,0].values[-12:]) + \
-                    np.mean(ds_new.csoil[:,2,0].values[-12:])
+
+        new_cplant = ds.cplant[:,0,0].values[-1:] + \
+                     ds.cplant[:,1,0].values[-1:] + \
+                     ds.cplant[:,2,0].values[-1:]
+        new_csoil = ds.csoil[:,0,0].values[-1:] + \
+                    ds.csoil[:,1,0].values[-1:] + \
+                    ds.csoil[:,2,0].values[-1:]
 
         if ( np.fabs(prev_cplant - new_cplant) < tol and
              np.fabs(prev_csoil - new_csoil) < tol ):
@@ -586,7 +584,7 @@ if __name__ == "__main__":
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
     call_pop = True
-    verbose = True
+    verbose = False
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
@@ -600,8 +598,8 @@ if __name__ == "__main__":
     if not os.path.exists(dump_dir):
         os.makedirs(dump_dir)
 
-    for biogeochem in ["C", "CN", "CNP"]:
-    #for biogeochem in ["C"]:
+    #for biogeochem in ["C", "CN", "CNP"]:
+    for biogeochem in ["CN"]:
 
         experiment_id = "Cumberland_%s" % (biogeochem)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
