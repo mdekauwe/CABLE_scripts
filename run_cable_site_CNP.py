@@ -225,7 +225,9 @@ class RunCable(object):
         return '\n'.join(lines) + '\n'
 
     def initial_setup(self, st_yr_spin, en_yr_spin, st_yr, en_yr):
-
+        """
+        Setup CABLE namelist file for spinup from zero
+        """
         shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
                         self.site_nml_fn)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
@@ -295,7 +297,9 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_re_spin(self, number=None):
-
+        """
+        Adjust the CABLE namelist file with the various flags for another spin
+        """
         out_log_fname = "%s_log_ccp%d.txt" % (self.experiment_id, number)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
         if os.path.isfile(out_log_fname):
@@ -336,7 +340,10 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_analytical_spin(self, number, st_yr_spin, en_yr_spin):
-
+        """
+        Adjust the CABLE namelist file with the various flags for the
+        analytical spin step
+        """
         out_log_fname = "%s_log_analytic_%d.txt" % (self.experiment_id, number)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
         if os.path.isfile(out_log_fname):
@@ -365,7 +372,9 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_transient(self, st_yr_trans, en_yr_trans, st_yr, en_yr):
-
+        """
+        Adjust the CABLE namelist file for the transient run, i.e. 1850 to XXXX
+        """
         replace_dict = {
                         "RunType": '"transient"',
                         "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
@@ -409,7 +418,9 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_simulation(self, st_yr, en_yr):
-
+        """
+        Adjust the CABLE namelist file for the experiment years
+        """
         replace_dict = {
                         "RunType": '"historical"',
                         "CO2NDepFile": "'%s'" % (self.co2_ndep_fname),
@@ -452,7 +463,6 @@ class RunCable(object):
         self.adjust_nml_file(self.nml_fn, replace_dict)
 
     def run_me(self):
-
         if self.verbose:
             os.system("%s" % (self.cable_exe))
         else:
