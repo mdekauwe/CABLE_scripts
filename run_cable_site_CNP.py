@@ -451,7 +451,7 @@ class RunCable(object):
         Check whether the plant (leaves, wood and roots) and soil
         (fast, slow and active) carbon pools have reached equilibrium. To do
         this we are checking the state of the last year compared to the
-        state the year before in the current spin cycle.
+        state in the previous year in the current spin cycle.
         """
         tol = 0.05 # This is quite high, I use 0.005 in GDAY
 
@@ -468,7 +468,7 @@ class RunCable(object):
 
         new_cplant = ds.cplant[:,:,0].values[-1].sum()
         new_csoil = ds.csoil[:,:,0].values[-1].sum()
-        
+
         if ( np.fabs(prev_cplant - new_cplant) < tol and
              np.fabs(prev_csoil - new_csoil) < tol ):
             not_in_equilibrium = False
