@@ -17,10 +17,10 @@ import numpy as np
 from matplotlib.ticker import FixedLocator
 import os
 import xarray as xr
+import glob
 
-def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
+def plot_plant(tag, cycle, cf, cw, cr, nf, nw, nr, pf, pw, pr):
 
-    tol = 1E-02 #5E-03
     fig = plt.figure(figsize=(15,10))
     fig.subplots_adjust(hspace=0.3)
     fig.subplots_adjust(wspace=0.3)
@@ -48,23 +48,6 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
     ax11 = fig.add_subplot(3,4,11)
     ax12 = fig.add_subplot(3,4,12)
 
-
-    cf = np.hstack((zero.cplant[:,0,0].values,
-                    ccp1.cplant[:,0,0].values,
-                    ccp2.cplant[:,0,0].values,
-                    ccp3.cplant[:,0,0].values,
-                    ccp4.cplant[:,0,0].values))
-    cw = np.hstack((zero.cplant[:,1,0].values,
-                    ccp1.cplant[:,1,0].values,
-                    ccp2.cplant[:,1,0].values,
-                    ccp3.cplant[:,1,0].values,
-                    ccp4.cplant[:,1,0].values))
-    cr = np.hstack((zero.cplant[:,2,0].values,
-                    ccp1.cplant[:,2,0].values,
-                    ccp2.cplant[:,2,0].values,
-                    ccp3.cplant[:,2,0].values,
-                    ccp4.cplant[:,2,0].values))
-
     ax1.set_title("Cf")
     ax1.plot(cf, label="Cf")
 
@@ -75,23 +58,7 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
     ax3.plot(cr)
 
     ax4.set_title("Cplant")
-    ax4.plot(cf+cw+cr)
-
-    nf = np.hstack((zero.nplant[:,0,0].values,
-                    ccp1.nplant[:,0,0].values,
-                    ccp2.nplant[:,0,0].values,
-                    ccp3.nplant[:,0,0].values,
-                    ccp4.nplant[:,0,0].values))
-    nw = np.hstack((zero.nplant[:,1,0].values,
-                    ccp1.nplant[:,1,0].values,
-                    ccp2.nplant[:,1,0].values,
-                    ccp3.nplant[:,1,0].values,
-                    ccp4.nplant[:,1,0].values))
-    nr = np.hstack((zero.nplant[:,2,0].values,
-                    ccp1.nplant[:,2,0].values,
-                    ccp2.nplant[:,2,0].values,
-                    ccp3.nplant[:,2,0].values,
-                    ccp4.nplant[:,2,0].values))
+    ax4.plot(cf + cw + cr)
 
     ax5.set_title("Nf")
     ax5.plot(nf, label="nf")
@@ -105,22 +72,6 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
     ax8.set_title("Nplant")
     ax8.plot(nf+nw+nr)
 
-    pf = np.hstack((zero.pplant[:,0,0].values,
-                    ccp1.pplant[:,0,0].values,
-                    ccp2.pplant[:,0,0].values,
-                    ccp3.pplant[:,0,0].values,
-                    ccp4.pplant[:,0,0].values))
-    pw = np.hstack((zero.pplant[:,1,0].values,
-                    ccp1.pplant[:,1,0].values,
-                    ccp2.pplant[:,1,0].values,
-                    ccp3.pplant[:,1,0].values,
-                    ccp4.pplant[:,1,0].values))
-    pr = np.hstack((zero.pplant[:,2,0].values,
-                    ccp1.pplant[:,2,0].values,
-                    ccp2.pplant[:,2,0].values,
-                    ccp3.pplant[:,2,0].values,
-                    ccp4.pplant[:,2,0].values))
-
     ax9.set_title("Pf")
     ax9.plot(pf, label="pf")
 
@@ -131,7 +82,7 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
     ax11.plot(pr)
 
     ax12.set_title("Pplant")
-    ax12.plot(pf+pw+pr)
+    ax12.plot(pf + pw + pr)
 
     plot_fname = "%s_spinup_plant.pdf" % (tag)
     plot_dir = "plots"
@@ -141,18 +92,9 @@ def plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
     fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
                 pad_inches=0.1)
 
-    cplant = cf + cw + cr
-    cplant = cplant[-50:]
-    #delta = np.diff(cplant)
+def plot_soil(tag, cycle, cfast, cslow, cpassive, nfast, nslow, npassive,
+              pfast, pslow, ppassive):
 
-    for i,val in enumerate(cplant[1:]):
-        if np.fabs(cplant[i] - val) < tol:
-            print("C plant (%s): steady-state" % (cycle))
-
-
-def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
-
-    tol = 1E-02 #5E-03
     fig = plt.figure(figsize=(15,10))
     fig.subplots_adjust(hspace=0.3)
     fig.subplots_adjust(wspace=0.3)
@@ -180,23 +122,6 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
     ax11 = fig.add_subplot(3,4,11)
     ax12 = fig.add_subplot(3,4,12)
 
-
-    cfast = np.hstack((zero.csoil[:,0,0].values,
-                      ccp1.csoil[:,0,0].values,
-                      ccp2.csoil[:,0,0].values,
-                      ccp3.csoil[:,0,0].values,
-                      ccp4.csoil[:,0,0].values))
-    cslow = np.hstack((zero.csoil[:,1,0].values,
-                      ccp1.csoil[:,1,0].values,
-                      ccp2.csoil[:,1,0].values,
-                      ccp3.csoil[:,1,0].values,
-                      ccp4.csoil[:,1,0].values))
-    cpassive = np.hstack((zero.csoil[:,2,0].values,
-                         ccp1.csoil[:,2,0].values,
-                         ccp2.csoil[:,2,0].values,
-                         ccp3.csoil[:,2,0].values,
-                         ccp4.csoil[:,2,0].values))
-
     ax1.set_title("C fast")
     ax1.plot(cfast, label="cfast")
 
@@ -207,23 +132,7 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
     ax3.plot(cpassive)
 
     ax4.set_title("C soil")
-    ax4.plot(cfast+cslow+cpassive)
-
-    nfast = np.hstack((zero.nsoil[:,0,0].values,
-                       ccp1.nsoil[:,0,0].values,
-                       ccp2.nsoil[:,0,0].values,
-                       ccp3.nsoil[:,0,0].values,
-                       ccp4.nsoil[:,0,0].values))
-    nslow = np.hstack((zero.nsoil[:,1,0].values,
-                       ccp1.nsoil[:,1,0].values,
-                       ccp2.nsoil[:,1,0].values,
-                       ccp3.nsoil[:,1,0].values,
-                       ccp4.nsoil[:,1,0].values))
-    npassive = np.hstack((zero.nsoil[:,2,0].values,
-                          ccp1.nsoil[:,2,0].values,
-                          ccp2.nsoil[:,2,0].values,
-                          ccp3.nsoil[:,2,0].values,
-                          ccp4.nsoil[:,2,0].values))
+    ax4.plot(cfast + cslow + cpassive)
 
     ax5.set_title("N fast")
     ax5.plot(nfast)
@@ -236,22 +145,6 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
 
     ax8.set_title("N plant")
     ax8.plot(nfast+nslow+npassive)
-
-    pfast = np.hstack((zero.psoil[:,0,0].values,
-                       ccp1.psoil[:,0,0].values,
-                       ccp2.psoil[:,0,0].values,
-                       ccp3.psoil[:,0,0].values,
-                       ccp4.psoil[:,0,0].values))
-    pslow = np.hstack((zero.psoil[:,1,0].values,
-                       ccp1.psoil[:,1,0].values,
-                       ccp2.psoil[:,1,0].values,
-                       ccp3.psoil[:,1,0].values,
-                       ccp4.psoil[:,1,0].values))
-    ppassive = np.hstack((zero.psoil[:,2,0].values,
-                          ccp1.psoil[:,2,0].values,
-                          ccp2.psoil[:,2,0].values,
-                          ccp3.psoil[:,2,0].values,
-                          ccp4.psoil[:,2,0].values))
 
     ax9.set_title("P fast")
     ax9.plot(pfast, label="pfast")
@@ -272,13 +165,6 @@ def plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4):
 
     fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
                 pad_inches=0.1)
-
-    csoil = cfast+cslow+cpassive
-    csoil = csoil[-50:]
-
-    for i,val in enumerate(csoil[1:]):
-        if np.fabs(csoil[i] - val) < tol:
-            print("C soil (%s): steady-state" % (cycle))
 
 def open_file(fname):
     return xr.open_dataset(fname)
@@ -303,15 +189,59 @@ if __name__ == "__main__":
 
         fname = "outputs/%s_out_CASA_zero.nc" % (experiment_id)
         zero = open_file(fname)
-        fname = "outputs/%s_out_CASA_ccp1.nc" % (experiment_id)
-        ccp1 = open_file(fname)
-        fname = "outputs/%s_out_CASA_ccp2.nc" % (experiment_id)
-        ccp2 = open_file(fname)
-        fname = "outputs/%s_out_CASA_ccp3.nc" % (experiment_id)
-        ccp3 = open_file(fname)
-        fname = "outputs/%s_out_CASA_ccp4.nc" % (experiment_id)
-        ccp4 = open_file(fname)
 
+        cf = zero.cplant[:,0,0].values
+        cw = zero.cplant[:,1,0].values
+        cr = zero.cplant[:,2,0].values
 
-        plot_plant(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4)
-        plot_soil(tag, cycle, zero, ccp1, ccp2, ccp3, ccp4)
+        nf = zero.nplant[:,0,0].values
+        nw = zero.nplant[:,1,0].values
+        nr = zero.nplant[:,2,0].values
+
+        pf = zero.pplant[:,0,0].values
+        pw = zero.pplant[:,1,0].values
+        pr = zero.pplant[:,2,0].values
+
+        cfast = zero.csoil[:,0,0].values
+        cslow = zero.csoil[:,1,0].values
+        cpassive = zero.csoil[:,2,0].values
+
+        nfast = zero.nsoil[:,0,0].values
+        nslow = zero.nsoil[:,1,0].values
+        npassive = zero.nsoil[:,2,0].values
+
+        pfast = zero.psoil[:,0,0].values
+        pslow = zero.psoil[:,1,0].values
+        ppassive = zero.psoil[:,2,0].values
+
+        files = glob.glob("outputs/%s_out_CASA_ccp*.nc" % (experiment_id))
+        for fname in sorted(files):
+            ds = open_file(fname)
+
+            cf = np.append(cf, ds.cplant[:,0,0].values)
+            cw = np.append(cw, ds.cplant[:,1,0].values)
+            cr = np.append(cr, ds.cplant[:,2,0].values)
+
+            nf = np.append(nf, ds.nplant[:,0,0].values)
+            nw = np.append(nw, ds.nplant[:,1,0].values)
+            nr = np.append(nr, ds.nplant[:,2,0].values)
+
+            pf = np.append(pf, ds.pplant[:,0,0].values)
+            pw = np.append(pw, ds.pplant[:,1,0].values)
+            pr = np.append(pr, ds.pplant[:,2,0].values)
+
+            cfast = np.append(cfast, ds.csoil[:,0,0].values)
+            cslow = np.append(cslow, ds.csoil[:,1,0].values)
+            cpassive = np.append(cpassive, ds.csoil[:,2,0].values)
+
+            nfast = np.append(nfast, ds.nsoil[:,0,0].values)
+            nslow = np.append(nslow, ds.nsoil[:,1,0].values)
+            npassive = np.append(npassive, ds.nsoil[:,2,0].values)
+
+            pfast = np.append(pfast, ds.psoil[:,0,0].values)
+            pslow = np.append(pslow, ds.psoil[:,1,0].values)
+            ppassive = np.append(ppassive, ds.psoil[:,2,0].values)
+
+        plot_plant(tag, cycle, cf, cw, cr, nf, nw, nr, pf, pw, pr)
+        plot_soil(tag, cycle, cfast, cslow, cpassive, nfast, nslow, npassive,
+                  pfast, pslow, ppassive)
