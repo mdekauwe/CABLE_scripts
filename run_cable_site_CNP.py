@@ -1,26 +1,23 @@
 #!/usr/bin/env python
 
 """
-CABLE site run with full CNP (and POP)
-================================
+CABLE site run with full biogeochemistry (CNP) and POP
+=======================================================
 
-- Model spin-up: using pre-industrial CO2, NDEP, PDEP. Currently this is using
-                 values from AmazonFACE experiment, i.e. CO2=284.7;
-                 NDEP-0.79 kg N ha-1 yr-1; PDEP=0.144 kg P ha-1 yr-1
-- Transient: 1851-1998, varying CO2 and NDEP and Pdep, but just recycling the
-             met data
-- Historical: actual met (dates correspond to simulated dates) and actual CO2
-- CNP + POP switched on.
+- Spin-up: using pre-industrial CO2, NDEP, PDEP. Currently this is using
+           values from AmazonFACE experiment, i.e. CO2=284.7;
+           NDEP-0.79 kg N ha-1 yr-1; PDEP=0.144 kg P ha-1 yr-1
+- Transient: 1851-1998, varying CO2, NDEP and PDEP with recycled met data
+- Simulation: actual experiment CO2, NDEP/PDEP & met
 
-During the spinup, we are recycling in the input meteorological forcing file in
-chunks.
+Options to turn use C/CN/CNP with POP on/off
 
 That's all folks.
 
 """
 
 __author__ = "Martin De Kauwe, Vanessa Haverd"
-__version__ = "1.0 (16.07.2018)"
+__version__ = "1.0 (21.07.2018)"
 __email__ = "mdekauwe@gmail.com, Vanessa.Haverd@csiro.au"
 
 import os
