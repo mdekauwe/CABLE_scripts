@@ -50,7 +50,7 @@ class RunCable(object):
         self.nml_fn = nml_fn
         self.site_nml_fn = site_nml_fn
         self.veg_param_fn = veg_param_fn
-        self.restart_fname = "%s_cable_rst.nc" % (self.experiment_id)
+        self.cable_restart_fname = "%s_cable_rst.nc" % (self.experiment_id)
         self.casa_restart_fname = "%s_casa_rst.nc" % (self.experiment_id)
         self.pop_restart_fname = "%s_pop_rst.nc" % (self.experiment_id)
         self.climate_restart_fname = "%s_climate_rst.nc" % (self.experiment_id)
@@ -255,7 +255,7 @@ class RunCable(object):
                         "filename%out": "'%s'" % (out_fname),
                         "casafile%out": "'%s'" % (out_fname_CASA),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s'" % os.path.join(self.restart_dir, self.restart_fname),
+                        "filename%restart_out": "'%s'" % os.path.join(self.restart_dir, self.cable_restart_fname),
                         "cable_user%climate_restart_out": "'%s'" % os.path.join(self.restart_dir, self.climate_restart_fname),
                         "cable_user%POP_restart_out": "'%s'" % os.path.join(self.restart_dir, self.pop_restart_fname),
                         "casafile%cnpepool": "'%s'" % os.path.join(self.restart_dir, self.casa_restart_fname),
@@ -303,7 +303,7 @@ class RunCable(object):
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_in": "'%s'" % os.path.join(self.restart_dir, self.restart_fname),
+                        "filename%restart_in": "'%s'" % os.path.join(self.restart_dir, self.cable_restart_fname),
                         "cable_user%climate_restart_in": "'%s'" % os.path.join(self.restart_dir, self.climate_restart_fname),
                         "cable_user%POP_restart_in": "'%s'" % os.path.join(self.restart_dir, self.pop_restart_fname),
                         "casafile%cnpipool": "'%s'" % os.path.join(self.restart_dir,self.casa_restart_fname),
@@ -454,6 +454,7 @@ class RunCable(object):
         cycle to the state in the final year of the current spin cycle.
         """
         tol = 0.05 # This is quite high, I use 0.005 in GDAY
+        g_2_kg = 0.001
 
         if num == 1:
             prev_cplant = 99999.9
@@ -462,14 +463,14 @@ class RunCable(object):
             fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num-1)
             fname = os.path.join(self.output_dir, fname)
             ds = xr.open_dataset(fname)
-            prev_cplant = ds.cplant[:,:,0].values[-1].sum()
-            prev_csoil = ds.csoil[:,:,0].values[-1].sum()
+            prev_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
+            prev_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
 
         fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num)
         fname = os.path.join(self.output_dir, fname)
         ds = xr.open_dataset(fname)
-        new_cplant = ds.cplant[:,:,0].values[-1].sum()
-        new_csoil = ds.csoil[:,:,0].values[-1].sum()
+        new_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
+        new_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
 
         if ( np.fabs(prev_cplant - new_cplant) < tol and
              np.fabs(prev_csoil - new_csoil) < tol ):
@@ -504,22 +505,22 @@ class RunCable(object):
             for f in glob.glob("restart_*.nc"):
                 os.remove(f)
         else:
-            fromx = os.path.join(self.restart_dir, self.restart_fname)
-            to = fromx[:-3] + "_" + tag + ".nc"
+            old = os.path.join(self.restart_dir, self.cable_restart_fname)
+            new = "%s_%s.nc" % (old[:-3], tag)
             shutil.copyfile(fromx, to)
 
-            fromx = os.path.join(self.restart_dir, self.casa_restart_fname)
-            to = fromx[:-3] + "_" + tag + ".nc"
-            shutil.copyfile(fromx, to)
+            old = os.path.join(self.restart_dir, self.casa_restart_fname)
+            new = "%s_%s.nc" % (old[:-3], tag)
+            shutil.copyfile(old, new)
 
-            fromx = os.path.join(self.restart_dir, self.climate_restart_fname)
-            to = fromx[:-3] + "_" + tag + ".nc"
-            shutil.copyfile(fromx, to)
+            old = os.path.join(self.restart_dir, self.climate_restart_fname)
+            new = "%s_%s.nc" % (old[:-3], tag)
+            shutil.copyfile(old, new)
 
             if self.call_pop:
-                fromx = os.path.join(self.restart_dir, self.pop_restart_fname)
-                to = fromx[:-3] + "_" + tag + ".nc"
-                shutil.copyfile(fromx, to)
+                old = os.path.join(self.restart_dir, self.pop_restart_fname)
+                new = "%s_%s.nc" % (old[:-3], tag)
+                shutil.copyfile(old, new)
 
     def add_missing_options_to_nml_file(self, fname, line_start=None):
         """
@@ -592,7 +593,7 @@ if __name__ == "__main__":
         os.makedirs(dump_dir)
 
     #for biogeochem in ["C", "CN", "CNP"]:
-    for biogeochem in ["CN"]:
+    for biogeochem in ["C"]:
 
         experiment_id = "Cumberland_%s" % (biogeochem)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
