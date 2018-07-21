@@ -18,7 +18,7 @@ import numpy as np
 from matplotlib.ticker import FixedLocator
 import os
 
-def main(C_fname, CN_fname, CNP_fname, plot_fname=None):
+def main(C_fname, CN_fname, CNP_fname):
 
     df_C = read_cable_file(C_fname)
     df_C = resample_to_seasonal_cycle(df_C)
@@ -73,15 +73,13 @@ def main(C_fname, CN_fname, CNP_fname, plot_fname=None):
     ax1.legend(numpoints=1, loc="best")
 
 
-    if plot_fname is None:
-        plt.show()
-    else:
-        plot_dir = "plots"
-        if not os.path.exists(plot_dir):
-            os.makedirs(plot_dir)
+    plot_fname = "seasonal_plot_C_vs_CN_vs_CNP.pdf"
+    plot_dir = "plots"
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
 
-        fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
-                    pad_inches=0.1)
+    fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
+                pad_inches=0.1)
 
 
 def read_cable_file(fname):
