@@ -450,22 +450,24 @@ class RunCable(object):
         """
         Check whether the plant (leaves, wood and roots) and soil
         (fast, slow and active) carbon pools have reached equilibrium. To do
-        this we are checking the state of the last year compared to the
-        state in the previous year in the current spin cycle.
+        this we are checking the state of the last year in the previous spin
+        cycle to the state in the final year of the current spin cycle.
         """
         tol = 0.05 # This is quite high, I use 0.005 in GDAY
-
-        fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num)
-        fname = os.path.join(self.output_dir, fname)
-        ds = xr.open_dataset(fname)
 
         if num == 1:
             prev_cplant = 99999.9
             prev_csoil = 99999.9
         else:
-            prev_cplant = ds.cplant[:,:,0].values[-13].sum()
-            prev_csoil = ds.csoil[:,:,0].values[-13].sum()
+            fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num-1)
+            fname = os.path.join(self.output_dir, fname)
+            ds = xr.open_dataset(fname)
+            prev_cplant = ds.cplant[:,:,0].values[-1].sum()
+            prev_csoil = ds.csoil[:,:,0].values[-1].sum()
 
+        fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num)
+        fname = os.path.join(self.output_dir, fname)
+        ds = xr.open_dataset(fname)
         new_cplant = ds.cplant[:,:,0].values[-1].sum()
         new_csoil = ds.csoil[:,:,0].values[-1].sum()
 
