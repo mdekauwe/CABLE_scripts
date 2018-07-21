@@ -26,7 +26,6 @@ import glob
 import shutil
 import tempfile
 import pandas as pd
-import math
 import xarray as xr
 import numpy as np
 
@@ -136,6 +135,12 @@ class RunCable(object):
         self.clean_up(end=True)
 
     def get_years(self):
+        """
+        Figure out the start and end of the met file, the number of times we
+        need to recycle the met data to cover the transient period and the
+        start and end of the transient period.
+        """
+        pre_indust = 1850
 
         ds = xr.open_dataset(self.met_fname)
 
@@ -148,11 +153,11 @@ class RunCable(object):
         # length of met record
         nrec = en_yr - st_yr + 1
 
-        # number of times met data is recycled during transient simulation 
-        nloop_transient = math.ceil((st_yr - 1 - 1850) / nrec) - 1
+        # number of times met data is recycled during transient simulation
+        nloop_transient = np.ceil((st_yr - 1 - pre_indust) / nrec) - 1
 
         # number of times met data is recycled with a spinup run of nyear_spinup
-        nloop_spin = math.ceil( self.nyear_spinup / nrec)
+        nloop_spin = np.ceil( self.nyear_spinup / nrec)
 
         st_yr_transient = st_yr - 1 - nloop_transient * nrec + 1
         en_yr_transient = st_yr_transient + nloop_transient * nrec - 1
