@@ -515,7 +515,7 @@ class RunCable(object):
         else:
             old = os.path.join(self.restart_dir, self.cable_restart_fname)
             new = "%s_%s.nc" % (old[:-3], tag)
-            shutil.copyfile(fromx, to)
+            shutil.copyfile(old, new)
 
             old = os.path.join(self.restart_dir, self.casa_restart_fname)
             new = "%s_%s.nc" % (old[:-3], tag)
