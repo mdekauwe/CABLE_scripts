@@ -92,6 +92,8 @@ class RunCable(object):
         if SPIN_UP == True:
 
             # initial spin
+            print("Spinup")
+
             self.run_me()
             self.clean_up(end=False, tag="zero")
 
@@ -119,11 +121,15 @@ class RunCable(object):
             self.clean_up(end=False, tag="ccp%d" % (num))
 
         if TRANSIENT == True:
+            print("Transient run")
+
             self.setup_transient(st_yr_trans, en_yr_trans, st_yr, en_yr)
             self.run_me()
             self.clean_up(end=False, tag="transient")
 
         if SIMULATION == True:
+            print("Simulation")
+
             self.setup_simulation(st_yr, en_yr)
             self.run_me()
 
