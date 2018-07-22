@@ -54,7 +54,7 @@ class RunCable(object):
         self.cable_exe = exe
         self.aux_dir = aux_dir
         self.verbose = verbose
-        self.nyear_spinup = 20
+        self.nyear_spinup = 30
         if biogeochem == "C":
             self.biogeochem = 1
             #self.vcmax = "standard"
@@ -600,7 +600,7 @@ if __name__ == "__main__":
     bgc_param_fn = "pftlookup.csv"
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
-    call_pop = False
+    call_pop = True
     verbose = False
 
     if not os.path.exists(restart_dir):
@@ -616,7 +616,7 @@ if __name__ == "__main__":
         os.makedirs(dump_dir)
 
     #for biogeochem in ["C", "CN", "CNP"]:
-    for biogeochem in ["CN"]:
+    for biogeochem in ["C"]:
 
         experiment_id = "Cumberland_%s" % (biogeochem)
         C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
