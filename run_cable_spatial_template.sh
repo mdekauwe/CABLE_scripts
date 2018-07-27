@@ -20,12 +20,6 @@
 module load intel-mpi/4.1.1.036
 module load netcdf/4.2.1.1
 
-# Stuff read from cmd line
-cable_aux_path=$cable_aux_path
-met_path=$met_path
-co2_fname=$co2_fname
-gw=$gw
-average=$avg
 start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
@@ -56,7 +50,7 @@ do
 
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
 
-    python ./create_spatial_nml.py -y $year -e "false" -g $gw -a $average \
+    python ./create_spatial_nml.py -y $year -e -g $gw -a $average \
                                    -l $logfile -o $outfile -i $restart_in \
                                    -r $restart_out -c $co2_conc
     mpirun -n $cpus $exe
