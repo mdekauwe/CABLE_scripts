@@ -31,11 +31,11 @@ end_yr=1951
 
 # Set output stuff
 outdir=$outdir
-logfile=$outdir"/cable_log_${year}.txt"
-outfile=$outdir"/cable_out_${year}.nc"
-restart_in=$outdir"/restart_${prev_year}.nc"
-restart_out=$outdir"/restart_${year}.nc"
-namelist=$outdir"/cable_${year}.nml"
+logfile=$outdir"/cable_log_$year.txt"
+outfile=$outdir"/cable_out_$year.nc"
+restart_in=$outdir"/restart_$prev_year.nc"
+restart_out=$outdir"/restart_$year.nc"
+namelist=$outdir"/cable_$year.nml"
 cpus=28
 exe="./cable-mpi"
 
