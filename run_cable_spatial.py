@@ -101,6 +101,23 @@ class RunCable(object):
         shutil.copy(path, self.nml_fn)
         os.remove(path)
 
+def cmd_line_parser():
+
+    p = optparse.OptionParser()
+    p.add_option('--person', '-p', default="world")
+    p.add_option("-s", action="store_true", default=False,
+                   help="Setup namelist file")
+    p.add_option("-a", action="store_true", default=False,
+                   help="Adjust namelist file")
+    p.add_option("-y", default="0", help="year")
+    p.add_option("-l", default="", help="log filename")
+    p.add_option("-o", default="", help="out filename")
+    p.add_option("-i", default="", help="restart in filename")
+    p.add_option("-r", default="", help="restart out filename")
+    p.add_option("-c", default="400.0", help="CO2 concentration")
+
+    return p.parse_args()
+
 if __name__ == "__main__":
 
     met_path = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
@@ -121,21 +138,8 @@ if __name__ == "__main__":
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    p = optparse.OptionParser()
-    p.add_option('--person', '-p', default="world")
-    p.add_option("-s", action="store_true", default=False,
-                   help="Setup namelist file")
-    p.add_option("-a", action="store_true", default=False,
-                   help="Adjust namelist file")
-    p.add_option("-y", default="0", help="year")
-    p.add_option("-l", default="", help="log filename")
-    p.add_option("-o", default="", help="out filename")
-    p.add_option("-i", default="", help="restart in filename")
-    p.add_option("-r", default="", help="restart out filename")
-    p.add_option("-c", default="400.0", help="CO2 concentration")
 
-    default=""
-    options, arguments = p.parse_args()
+    options, args = p.cmd_line_parser()
 
     C = RunCable(met_path, log_dir, output_dir, aux_dir, soil_fname,
                  veg_fname, co2_fname, grid_fname)
