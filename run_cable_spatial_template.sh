@@ -20,14 +20,15 @@
 module load intel-mpi/4.1.1.036
 module load netcdf/4.2.1.1
 
-cable_aux_path="/g/data1/w35/mrd561//CABLE/CABLE_AUX-dev/offline"
-met_path="/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
-co2_file="Annual_CO2_concentration_until_2010.txt"
+# Stuff read from cmd line
+cable_aux_path=$cable_aux_path
+met_path=$met_path
+co2_fname=$co2_fname
 gw=$gw           #"TRUE"
 average=$avg     #"monthly"
-start_yr=1950
+start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
-end_yr=1951
+end_yr=$end_yr
 
 # Set output stuff
 outdir=$outdir
