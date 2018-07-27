@@ -54,13 +54,11 @@ year=$start_yr
 while [ $year -le $end_yr ]
 do
 
-    #Read CO2 concentration
-    #set co2_file=`cat Annual_CO2_concentration_until_2010.txt`
-    #set co2=$co2_file[$year]
+    co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
 
     python ./create_spatial_nml.py -y $year -e "false" -g $gw -a $average \
                                    -l $logfile -o $outfile -i $restart_in \
-                                   -r $restart_out -c $co2
+                                   -r $restart_out -c $co2_conc
     mpirun -n $cpus $exe
     cp ./cable.nml $namelist
 
