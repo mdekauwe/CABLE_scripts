@@ -44,15 +44,18 @@ fi
 ln -s $cable_aux_path surface_data
 ln -s $met_path gswp
 
+python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
+                              -i $restart_in -r $restart_out -c $co2_conc
+                              
 year=$start_yr
 while [ $year -le $end_yr ]
 do
 
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
 
-    python ./create_spatial_nml.py -y $year -e -g $gw -a $average \
-                                   -l $logfile -o $outfile -i $restart_in \
-                                   -r $restart_out -c $co2_conc
+    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
+                                  -i $restart_in -r $restart_out -c $co2_conc
+
     mpirun -n $cpus $exe
     cp ./cable.nml $namelist
 
