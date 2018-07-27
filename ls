@@ -53,17 +53,17 @@ year=$start_yr
 while [ $year <= $end_yr ]
 do
 
-    #Read CO2 concentration
-    #set co2_file=`cat Annual_CO2_concentration_until_2010.txt`
-    #set co2=$co2_file[$year]
+	#Read CO2 concentration
+	#set co2_file=`cat Annual_CO2_concentration_until_2010.txt`
+	#set co2=$co2_file[$year]
 
     python ./create_spatial_nml.py -y $year -e "false" -g $gw -a $average \
                                    -l $logfile -o $outfile -i $restart_in \
                                    -r $restart_out -c $co2
-    mpirun -n $cpus $exe
+	mpirun -n $cpus $exe
     cp ./cable.nml $namelist
 
     year=$[$year+1]
-    prev_yr=$[$prev_yr+1]
+	prev_yr=$[$prev_yr+1]
 
 done
