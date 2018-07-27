@@ -44,16 +44,13 @@ fi
 ln -s $cable_aux_path surface_data
 ln -s $met_path gswp
 
-python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
-                              -i $restart_in -r $restart_out -c $co2_conc
-                              
 year=$start_yr
 while [ $year -le $end_yr ]
 do
 
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
 
-    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
+    python ./run_cable_spatial.py -y $year -l $logfile -o $outfile \
                                   -i $restart_in -r $restart_out -c $co2_conc
 
     mpirun -n $cpus $exe

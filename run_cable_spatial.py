@@ -39,21 +39,21 @@ class RunCable(object):
         self.cable_exe = exe
         self.verbose = verbose
 
-    def create_nml_file(self, log_fname):
-
+    def setup_nml_file(self):
 
         replace_dict = {
-                        "filename%met": "'%s'" % (self.met_fname),
+                        "filename%met": "'%s'" % (self.met_path),
                         "filename%type": "'%s'" % (self.grid_fname),
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "output%averaging": "'monthly'",
+                        "spinup": ".FALSE.",
 
         }
         self.adjust_param_file(replace_dict)
 
     def adjust_nml_file(self, log_fname, out_fname, restart_in_fname,
-                        restart_out_fname, co2_conc):
+                        restart_out_fname, year, co2_conc):
 
         out_log_fname = os.path.join(self.log_dir, log_fname)
         out_fname = os.path.join(self.output_dir, out_fname)
@@ -127,15 +127,29 @@ if __name__ == "__main__":
                    help="Setup namelist file")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
+    p.add_option("-y", default="0", help="year")
+    p.add_option("-l", default="", help="log filename")
+    p.add_option("-o", default="", help="out filename")
+    p.add_option("-i", default="", help="restart in filename")
+    p.add_option("-r", default="", help="restart out filename")
+    p.add_option("-c", default="400.0", help="CO2 concentration")
+
+    default=""
     options, arguments = p.parse_args()
 
     C = RunCable(met_path, log_dir, output_dir, aux_dir, soil_fname,
                  veg_fname, co2_fname, grid_fname)
     if options.s:
-        C.create_nml_file()
+        C.setup_nml_file()
     elif options.a:
+        log_fname = options.l
+        out_fname = options.o
+        restart_in_fname = options.i
+        restart_out_fname = options.r
+        year = int(options.yr)
+        co2_conc = int(options.c)
         C.adjust_nml_file(log_fname, out_fname, restart_in_fname,
-                          restart_out_fname, co2_conc)
+                          restart_out_fname, year, co2_conc)
     elif options.r:
         start_yr = 1950
         end_yr = 1951
