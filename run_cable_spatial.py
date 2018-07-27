@@ -138,7 +138,6 @@ if __name__ == "__main__":
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-
     options, args = p.cmd_line_parser()
 
     C = RunCable(met_path, log_dir, output_dir, aux_dir, soil_fname,
