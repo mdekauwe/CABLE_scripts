@@ -24,8 +24,8 @@ module load netcdf/4.2.1.1
 cable_aux_path=$cable_aux_path
 met_path=$met_path
 co2_fname=$co2_fname
-gw=$gw           #"TRUE"
-average=$avg     #"monthly"
+gw=$gw
+average=$avg    
 start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
