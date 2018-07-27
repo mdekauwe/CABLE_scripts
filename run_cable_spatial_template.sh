@@ -50,7 +50,8 @@ do
 
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
 
-    python ./run_cable_spatial.py -y $year -l $logfile -o $outfile \
+    # adjust and make a new namelist file
+    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
                                   -i $restart_in -r $restart_out -c $co2_conc
 
     mpirun -n $cpus $exe
