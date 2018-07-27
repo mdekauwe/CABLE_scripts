@@ -67,7 +67,14 @@ class RunCable(object):
                         "filename%restart_in_fname": "'%s'" % (restart_in_fname),
                         "filename%restart_out_fname": "'%s'" % (restart_out_fname),
                         "fixedCO2": "%d" % (co2_conc),
-
+                        "gswpfile%rainf": "/gswp/Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year),
+                        "gswpfile%snowf": "/gswp/Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year),
+                        "gswpfile%LWdown": "/gswp/LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year),
+                        "gswpfile%SWdown": "/gswp/SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year),
+                        "gswpfile%PSurf": "/gswp/PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year),
+                        "gswpfile%Qair": "/gswp/Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year),
+                        "gswpfile%Tair": "/gswp/Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year),
+                        "gswpfile%wind": "/gswp/Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year),
         }
         self.adjust_param_file(replace_dict)
 
