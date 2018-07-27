@@ -48,6 +48,7 @@ class RunCable(object):
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
+                        "gswpfile%mask": "./surface_data/gswp3_landmask_nomissing.nc",
 
         }
         self.adjust_param_file(replace_dict)
@@ -75,6 +76,7 @@ class RunCable(object):
                         "gswpfile%Qair": "/gswp/Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year),
                         "gswpfile%Tair": "/gswp/Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year),
                         "gswpfile%wind": "/gswp/Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year),
+
         }
         self.adjust_param_file(replace_dict)
 
