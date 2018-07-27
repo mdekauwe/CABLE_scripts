@@ -25,7 +25,7 @@ cable_aux_path=$cable_aux_path
 met_path=$met_path
 co2_fname=$co2_fname
 gw=$gw
-average=$avg    
+average=$avg
 start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
@@ -51,7 +51,7 @@ ln -s $cable_aux_path surface_data
 ln -s $met_path gswp
 
 year=$start_yr
-while [ $year <= $end_yr ]
+while [ $year -le $end_yr ]
 do
 
     #Read CO2 concentration
