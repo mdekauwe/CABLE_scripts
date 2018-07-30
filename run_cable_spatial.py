@@ -160,7 +160,7 @@ if __name__ == "__main__":
         out_fname = options.o
         restart_in_fname = options.i
         restart_out_fname = options.r
-        year = int(options.yr)
+        year = int(options.y)
         co2_conc = int(options.c)
         print(out_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
