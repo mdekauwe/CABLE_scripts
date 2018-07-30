@@ -24,7 +24,7 @@ class RunCable(object):
 
     def __init__(self, met_path, log_dir, output_dir, aux_dir,
                  yearly_namelist_dir, soil_fname, veg_fname, co2_fname,
-                 grid_fname, mask_fname, nml_fname):
+                 grid_fname, mask_fname, nml_fname, qsub_template_fname):
 
         self.met_path = met_path
         self.log_dir = log_dir
@@ -40,8 +40,7 @@ class RunCable(object):
         self.nml_fname = nml_fname
         self.co2_fname = co2_fname
         self.grid_fname = grid_fname
-        self.cable_exe = exe
-        self.verbose = verbose
+        self.qsub_template_fname = qsub_template_fname
 
     def setup_nml_file(self):
 
@@ -60,7 +59,7 @@ class RunCable(object):
     def run_me(self, start_yr, end_yr):
 
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d %s' % \
-                    (start_yr, end_yr, template_fn)
+                    (start_yr, end_yr, self.qsub_template_fname)
 
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
@@ -150,6 +149,7 @@ if __name__ == "__main__":
     soil_fname = "def_soil_params.txt"
     veg_fname = "def_veg_params.txt"
     nml_fname = "cable.nml"
+    qsub_template_fname = "qsub_scripts/template_fn"
     start_yr = 1950
     end_yr = 1951
     # ------------------------------------------- #
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
     C = RunCable(met_path, log_dir, output_dir, aux_dir, yearly_namelist_dir,
                  soil_fname, veg_fname, co2_fname, grid_fname, mask_fname,
-                 nml_fname)
+                 nml_fname, qsub_template_fname)
 
     # qsub script is adjusting namelist file
     if options.a:
