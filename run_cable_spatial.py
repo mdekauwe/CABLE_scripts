@@ -140,7 +140,7 @@ if __name__ == "__main__":
     output_dir = "outputs"
     start_yr = 1950
     end_yr = 1951
-    #------------- Change stuff ------------- #
+    # ------------------------------------------- #
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
