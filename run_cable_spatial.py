@@ -75,7 +75,7 @@ class RunCable(object):
         restart_out_fname = os.path.join(self.restart_dir, restart_out_fname)
 
         replace_dict = {
-                        "filename%log: "'%s'" % (out_log_fname),
+                        "filename%log": "'%s'" % (out_log_fname),
                         "filename%out": "'%s'" % (out_fname),
                         "filename%log": "'%s'" % (out_log_fname),
                         "filename%restart_in_fname": "'%s'" % (restart_in_fname),

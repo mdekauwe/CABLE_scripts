@@ -27,25 +27,26 @@ start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
 
-year=$start_yr
-while [ $year -le $end_yr ]
-do
-
-    co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
-
-    # adjust and make a new namelist file
-    restart_in="restart_$prev_year.nc"
-    restart_out="restart_$year.nc"
-    outfile="/cable_out_$year.nc"
-    logfile="/cable_log_$year.txt"
-
-    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
-                                  -i $restart_in -r $restart_out -c $co2_conc
-
-    mpirun -n $cpus $exe
-    cp ./cable.nml $namelist
-
-    year=$[$year+1]
-    prev_yr=$[$prev_yr+1]
-
-done
+echo $start_yr $end_yr
+#year=$start_yr
+#while [ $year -le $end_yr ]
+#do
+#
+#    co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
+#
+#    # adjust and make a new namelist file
+#    restart_in="restart_$prev_year.nc"
+#    restart_out="restart_$year.nc"
+#    outfile="/cable_out_$year.nc"
+#    logfile="/cable_log_$year.txt"
+#
+#    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
+#                                  -i $restart_in -r $restart_out -c $co2_conc
+#
+#    mpirun -n $cpus $exe
+#    cp ./cable.nml $namelist
+#
+#    year=$[$year+1]
+#    prev_yr=$[$prev_yr+1]
+#
+#done
