@@ -35,8 +35,8 @@ do
     # adjust and make a new namelist file
     restart_in="restart_$prev_year.nc"
     restart_out="restart_$year.nc"
-    outfile="/cable_out_$year.nc"
-    logfile="/cable_log_$year.txt"
+    outfile="cable_out_$year.nc"
+    logfile="cable_log_$year.txt"
 
     python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
                                   -i $restart_in -r $restart_out -c $co2_conc
