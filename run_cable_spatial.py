@@ -107,7 +107,7 @@ class RunCable(object):
         replacements : dictionary
             dictionary of replacement values.
         """
-        f = open(self.nml_fname, , 'r')
+        f = open(self.nml_fname, 'r')
         param_str = f.read()
         f.close()
         new_str = self.replace_keys(param_str, replacements)
