@@ -63,7 +63,7 @@ class RunCable(object):
 
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d %s' % \
                     (start_yr, end_yr, self.qsub_template_fname)
-
+        print(qs_cmd)
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
             raise("Job failed to submit")
