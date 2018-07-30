@@ -166,7 +166,7 @@ if __name__ == "__main__":
     if not os.path.exists(yearly_namelist_dir):
         os.makedirs(yearly_namelist_dir)
 
-    options, args = p.cmd_line_parser()
+    options, args = cmd_line_parser()
 
     C = RunCable(met_path, log_dir, output_dir, aux_dir, yearly_namelist_dir,
                  soil_fname, veg_fname, co2_fname, grid_fname, mask_fname,
