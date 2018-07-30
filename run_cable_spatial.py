@@ -129,6 +129,7 @@ def cmd_line_parser():
 
 if __name__ == "__main__":
 
+    #------------- Change stuff ------------- #
     met_path = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
     soil_fname = "def_soil_params.txt"
@@ -137,6 +138,9 @@ if __name__ == "__main__":
     co2_fname = "Annual_CO2_concentration_until_2010.txt"
     grid_fname = "CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc"
     output_dir = "outputs"
+    start_yr = 1950
+    end_yr = 1951
+    #------------- Change stuff ------------- #
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
@@ -151,9 +155,9 @@ if __name__ == "__main__":
 
     C = RunCable(met_path, log_dir, output_dir, aux_dir, soil_fname,
                  veg_fname, co2_fname, grid_fname)
-    if options.s:
-        C.setup_nml_file()
-    elif options.a:
+
+    # qsub script is adjusting namelist file
+    if options.a:
         log_fname = options.l
         out_fname = options.o
         restart_in_fname = options.i
@@ -162,7 +166,8 @@ if __name__ == "__main__":
         co2_conc = int(options.c)
         C.adjust_nml_file(log_fname, out_fname, restart_in_fname,
                           restart_out_fname, year, co2_conc)
-    elif options.r:
-        start_yr = 1950
-        end_yr = 1951
+
+    # Setup initial namelist file and submit qsub job
+    else:
+        C.setup_nml_file()
         C.run_me(start_yr, end_yr)
