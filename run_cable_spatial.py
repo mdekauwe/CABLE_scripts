@@ -118,6 +118,36 @@ class RunCable(object):
         shutil.copy(path, self.nml_fname)
         os.remove(path)
 
+    def replace_keys(self, text, replacements_dict):
+        """ Function expects to find CABLE namelist file formatted key = value.
+        Parameters:
+        ----------
+        text : string
+            input file data.
+        replacements_dict : dictionary
+            dictionary of replacement values.
+        Returns:
+        --------
+        new_text : string
+            input file with replacement values
+        """
+        lines = text.splitlines()
+        for i, row in enumerate(lines):
+            # skip blank lines
+            if not row.strip():
+                continue
+            if "=" not in row:
+                lines[i] = row
+                continue
+            elif not row.startswith("&"):
+                key = row.split("=")[0]
+                val = row.split("=")[1]
+                lines[i] = " ".join((key.rstrip(), "=",
+                                     replacements_dict.get(key.strip(),
+                                     val.lstrip())))
+
+        return '\n'.join(lines) + '\n'
+        
 def cmd_line_parser():
 
     p = optparse.OptionParser()
