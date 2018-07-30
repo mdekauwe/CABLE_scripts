@@ -19,6 +19,7 @@ import glob
 import shutil
 import tempfile
 import optparse
+from adjust_namelist_files import adjust_nml_file
 
 class RunCable(object):
 
@@ -55,7 +56,7 @@ class RunCable(object):
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
         }
-        self.adjust_nml_file(replace_dict)
+        adjust_nml_file(self.nml_fname, replace_dict)
 
 
     def run_me(self, start_yr, end_yr):
@@ -67,9 +68,8 @@ class RunCable(object):
         if error is 1:
             raise("Job failed to submit")
 
-
-    def adjust_nml_file(self, log_fname, out_fname, restart_in_fname,
-                        restart_out_fname, year, co2_conc):
+    def create_new_nml_file(self, log_fname, out_fname, restart_in_fname,
+                            restart_out_fname, year, co2_conc):
 
         out_log_fname = os.path.join(self.log_dir, log_fname)
         out_fname = os.path.join(self.output_dir, out_fname)
@@ -93,61 +93,11 @@ class RunCable(object):
                         "gswpfile%wind": "/gswp/Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year),
 
         }
-        self.adjust_nml_file(replace_dict)
+        adjust_nml_file(self.nml_fname, replace_dict)
 
         # save copy as we go for debugging - remove later
         shutil.copyfile("site.nml", os.path.join(self.yearly_namelist_dir,
                                                  "site_%d_year.nml" % (year)))
-
-    def adjust_nml_file(self, replacements):
-        """
-        Adjust the params/flags in the CABLE namelise file. Note this writes
-        over whatever file it is given!
-
-        Parameters:
-        ----------
-        replacements : dictionary
-            dictionary of replacement values.
-        """
-        f = open(self.nml_fname, 'r')
-        param_str = f.read()
-        f.close()
-        new_str = self.replace_keys(param_str, replacements)
-        fd, path = tempfile.mkstemp()
-        os.write(fd, str.encode(new_str))
-        os.close(fd)
-        shutil.copy(path, self.nml_fname)
-        os.remove(path)
-
-    def replace_keys(self, text, replacements_dict):
-        """ Function expects to find CABLE namelist file formatted key = value.
-        Parameters:
-        ----------
-        text : string
-            input file data.
-        replacements_dict : dictionary
-            dictionary of replacement values.
-        Returns:
-        --------
-        new_text : string
-            input file with replacement values
-        """
-        lines = text.splitlines()
-        for i, row in enumerate(lines):
-            # skip blank lines
-            if not row.strip():
-                continue
-            if "=" not in row:
-                lines[i] = row
-                continue
-            elif not row.startswith("&"):
-                key = row.split("=")[0]
-                val = row.split("=")[1]
-                lines[i] = " ".join((key.rstrip(), "=",
-                                     replacements_dict.get(key.strip(),
-                                     val.lstrip())))
-
-        return '\n'.join(lines) + '\n'
 
 def cmd_line_parser():
 
@@ -212,8 +162,8 @@ if __name__ == "__main__":
         restart_out_fname = options.r
         year = int(options.yr)
         co2_conc = int(options.c)
-        C.adjust_nml_file(log_fname, out_fname, restart_in_fname,
-                          restart_out_fname, year, co2_conc)
+        C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
+                              restart_out_fname, year, co2_conc)
 
     # Setup initial namelist file and submit qsub job
     else:
