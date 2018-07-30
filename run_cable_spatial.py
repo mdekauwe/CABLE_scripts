@@ -36,7 +36,8 @@ class RunCable(object):
         self.veg_fname = os.path.join(self.aux_dir, veg_fname)
         self.soil_fname = os.path.join(self.aux_dir, soil_fname)
         self.grid_fname = os.path.join(self.grid_dir, grid_fname)
-        self.mask_fname = os.path.join(self.aux_dir, mask_fname)
+        self.mask_fname = os.path.join(self.aux_dir,
+                                       "offline/%s" % (mask_fname))
         self.yearly_namelist_dir = yearly_namelist_dir
         self.nml_fname = nml_fname
         self.co2_fname = co2_fname
@@ -170,8 +171,7 @@ if __name__ == "__main__":
     #------------- Change stuff ------------- #
     met_path = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
-    #aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
-    aux_dir = "/Users/mdekauwe/research/CABLE_runs/src/NESP2pt9_TRENDYv7/CABLE-AUX"
+    aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
     output_dir = "outputs"
     restart_dir = "restarts"
     yearly_namelist_dir = "backup_namelists" # remove later
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     grid_fname = "CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc"
     mask_fname = "gswp3_landmask_nomissing.nc"
     soil_fname = "def_soil_params.txt"
-    veg_fname = "def_veg_params.txt"
+    veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
     nml_fname = "cable.nml"
     qsub_template_fname = "qsub_scripts/template_fn"
     start_yr = 1950
