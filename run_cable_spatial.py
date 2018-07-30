@@ -132,7 +132,7 @@ if __name__ == "__main__":
     soil_fname = "def_soil_params.txt"
     veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
     nml_fname = "cable.nml"
-    qsub_template_fname = "qsub_scripts/template_fn"
+    qsub_template_fname = "qsub_scripts/run_cable_spatial_template.sh"
     start_yr = 1950
     end_yr = 1951
     # ------------------------------------------- #
