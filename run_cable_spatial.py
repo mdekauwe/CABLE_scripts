@@ -140,7 +140,8 @@ if __name__ == "__main__":
     #------------- Change stuff ------------- #
     met_path = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
-    aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
+    #aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
+    aux_dir = "/Users/mdekauwe/research/CABLE_runs/src/NESP2pt9_TRENDYv7/CABLE-AUX"
     output_dir = "outputs"
     restart_dir = "restarts"
     yearly_namelist_dir = "backup_namelists" # remove later
@@ -186,6 +187,7 @@ if __name__ == "__main__":
 
     # Setup initial namelist file and submit qsub job
     else:
-        shutil.copyfile(os.path.join(aux_dir, "site.nml"), nml_fname)
+        shutil.copyfile(os.path.join(aux_dir, "offline/%s" % (nml_fname)),
+                        nml_fname)
         C.setup_nml_file()
         C.run_me(start_yr, end_yr)
