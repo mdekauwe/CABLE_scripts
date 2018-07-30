@@ -66,7 +66,8 @@ class RunCable(object):
         print(qs_cmd)
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
-            raise("Job failed to submit")
+            print("Job failed to submit")
+            sys.exit()
 
     def create_new_nml_file(self, log_fname, out_fname, restart_in_fname,
                             restart_out_fname, year, co2_conc):
