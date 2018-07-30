@@ -20,25 +20,12 @@
 module load intel-mpi/4.1.1.036
 module load netcdf/4.2.1.1
 
-start_yr=$start_yr
-prev_yr="$(($start_yr-1))"
-end_yr=$end_yr
-
-# Set output stuff
-outdir=$outdir
-logfile=$outdir"/cable_log_$year.txt"
-outfile=$outdir"/cable_out_$year.nc"
-restart_in=$outdir"/restart_$prev_year.nc"
-restart_out=$outdir"/restart_$year.nc"
-namelist=$outdir"/cable_$year.nml"
 cpus=28
 exe="./cable-mpi"
 
-# Create output directory
-if [ ! -d $outdir ]
-then
-    mkdir -p $outdir
-fi
+start_yr=$start_yr
+prev_yr="$(($start_yr-1))"
+end_yr=$end_yr
 
 # set data dirs
 ln -s $cable_aux_path surface_data
@@ -51,6 +38,11 @@ do
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
 
     # adjust and make a new namelist file
+    restart_in="restart_$prev_year.nc"
+    restart_out="restart_$year.nc"
+    outfile="/cable_out_$year.nc"
+    logfile="/cable_log_$year.txt"
+
     python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
                                   -i $restart_in -r $restart_out -c $co2_conc
 
