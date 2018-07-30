@@ -17,7 +17,7 @@ import os
 import shutil
 import tempfile
 
-def adjust_nml_file(self, fname, replacements):
+def adjust_nml_file(fname, replacements):
     """
     Adjust the params/flags in the CABLE namelise file. Note this writes
     over whatever file it is given!
