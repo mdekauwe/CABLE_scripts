@@ -1,4 +1,4 @@
-!/usr/bin/env python
+#!/usr/bin/env python
 
 """
 Adjust the CABLE namelist files on the fly, i.e. the user passes a replacement
