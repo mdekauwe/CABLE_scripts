@@ -7,7 +7,6 @@
 #
 
 #PBS -m ae
-#PBS -M mdekauwe\@gmail.com
 #PBS -P dt6
 #PBS -q normalbw
 #PBS -l walltime=2:00:00
