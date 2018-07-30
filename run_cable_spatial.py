@@ -147,7 +147,7 @@ class RunCable(object):
                                      val.lstrip())))
 
         return '\n'.join(lines) + '\n'
-        
+
 def cmd_line_parser():
 
     p = optparse.OptionParser()
