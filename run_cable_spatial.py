@@ -22,8 +22,9 @@ import optparse
 
 class RunCable(object):
 
-    def __init__(self, met_path, log_dir, output_dir, aux_dir, soil_fname,
-                 veg_fname, co2_fname, grid_fname):
+    def __init__(self, met_path, log_dir, output_dir, aux_dir,
+                 yearly_namelist_dir, soil_fname, veg_fname, co2_fname,
+                 grid_fname, mask_fname, nml_fname):
 
         self.met_path = met_path
         self.log_dir = log_dir
@@ -34,6 +35,9 @@ class RunCable(object):
         self.veg_fname = os.path.join(self.aux_dir, veg_fname)
         self.soil_fname = os.path.join(self.aux_dir, soil_fname)
         self.grid_fname = os.path.join(self.grid_dir, grid_fname)
+        self.mask_fname = os.path.join(self.aux_dir, mask_fname)
+        self.yearly_namelist_dir = yearly_namelist_dir
+        self.nml_fname = nml_fname
         self.co2_fname = co2_fname
         self.grid_fname = grid_fname
         self.cable_exe = exe
@@ -46,12 +50,22 @@ class RunCable(object):
                         "filename%type": "'%s'" % (self.grid_fname),
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
+                        "gswpfile%mask": "'%s'" % (self.mask_fname),
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
-                        "gswpfile%mask": "./surface_data/gswp3_landmask_nomissing.nc",
-
         }
-        self.adjust_param_file(replace_dict)
+        self.adjust_nml_file(replace_dict)
+
+
+    def run_me(self, start_yr, end_yr):
+
+        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d %s' % \
+                    (start_yr, end_yr, template_fn)
+
+        error = subprocess.call(qs_cmd, shell=True)
+        if error is 1:
+            raise("Job failed to submit")
+
 
     def adjust_nml_file(self, log_fname, out_fname, restart_in_fname,
                         restart_out_fname, year, co2_conc):
@@ -78,36 +92,30 @@ class RunCable(object):
                         "gswpfile%wind": "/gswp/Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year),
 
         }
-        self.adjust_param_file(replace_dict)
+        self.adjust_nml_file(replace_dict)
 
-    def run_me(start_yr, end_yr):
+        # save copy as we go for debugging - remove later
+        shutil.copyfile("site.nml", os.path.join(self.yearly_namelist_dir,
+                                                 "site_%d_year.nml" % (year)))
 
-        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d %s' % \
-                    (start_yr, end_yr, template_fn)
-
-        error = subprocess.call(qs_cmd, shell=True)
-        if error is 1:
-            raise("Job failed to submit")
-
-    def adjust_param_file(self, replacements):
-        """ adjust model parameters in the file and save over the original.
+    def adjust_nml_file(self, replacements):
+        """
+        Adjust the params/flags in the CABLE namelise file. Note this writes
+        over whatever file it is given!
 
         Parameters:
         ----------
-        fname : string
-            parameter filename to be changed.
         replacements : dictionary
             dictionary of replacement values.
-
         """
-        fin = open(self.nml_fn, 'r')
-        param_str = fin.read()
-        fin.close()
+        f = open(self.nml_fname, , 'r')
+        param_str = f.read()
+        f.close()
         new_str = self.replace_keys(param_str, replacements)
         fd, path = tempfile.mkstemp()
         os.write(fd, str.encode(new_str))
         os.close(fd)
-        shutil.copy(path, self.nml_fn)
+        shutil.copy(path, self.nml_fname)
         os.remove(path)
 
 def cmd_line_parser():
@@ -132,12 +140,16 @@ if __name__ == "__main__":
     #------------- Change stuff ------------- #
     met_path = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
-    soil_fname = "def_soil_params.txt"
-    veg_fname = "def_veg_params.txt"
     aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
+    output_dir = "outputs"
+    restart_dir = "restarts"
+    yearly_namelist_dir = "backup_namelists" # remove later
     co2_fname = "Annual_CO2_concentration_until_2010.txt"
     grid_fname = "CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc"
-    output_dir = "outputs"
+    mask_fname = "gswp3_landmask_nomissing.nc"
+    soil_fname = "def_soil_params.txt"
+    veg_fname = "def_veg_params.txt"
+    nml_fname = "cable.nml"
     start_yr = 1950
     end_yr = 1951
     # ------------------------------------------- #
@@ -151,10 +163,14 @@ if __name__ == "__main__":
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
+    if not os.path.exists(yearly_namelist_dir):
+        os.makedirs(yearly_namelist_dir)
+
     options, args = p.cmd_line_parser()
 
-    C = RunCable(met_path, log_dir, output_dir, aux_dir, soil_fname,
-                 veg_fname, co2_fname, grid_fname)
+    C = RunCable(met_path, log_dir, output_dir, aux_dir, yearly_namelist_dir,
+                 soil_fname, veg_fname, co2_fname, grid_fname, mask_fname,
+                 nml_fname)
 
     # qsub script is adjusting namelist file
     if options.a:
@@ -169,5 +185,6 @@ if __name__ == "__main__":
 
     # Setup initial namelist file and submit qsub job
     else:
+        shutil.copyfile(os.path.join(aux_dir, "site.nml"), nml_fname)
         C.setup_nml_file()
         C.run_me(start_yr, end_yr)

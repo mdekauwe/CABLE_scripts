@@ -27,10 +27,6 @@ start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
 
-# set data dirs
-ln -s $cable_aux_path surface_data
-ln -s $met_path gswp
-
 year=$start_yr
 while [ $year -le $end_yr ]
 do
