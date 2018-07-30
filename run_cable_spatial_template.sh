@@ -42,8 +42,7 @@ do
                                   -i $restart_in -r $restart_out -c $co2_conc
 
     mpirun -n $cpus $exe
-    cp ./cable.nml $namelist
-
+    
     year=$[$year+1]
     prev_yr=$[$prev_yr+1]
 
