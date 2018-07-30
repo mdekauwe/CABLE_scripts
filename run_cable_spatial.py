@@ -80,7 +80,6 @@ class RunCable(object):
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "filename%out": "'%s'" % (out_fname),
-                        "filename%log": "'%s'" % (out_log_fname),
                         "filename%restart_in_fname": "'%s'" % (restart_in_fname),
                         "filename%restart_out_fname": "'%s'" % (restart_out_fname),
                         "fixedCO2": "%d" % (co2_conc),
@@ -163,6 +162,7 @@ if __name__ == "__main__":
         restart_out_fname = options.r
         year = int(options.yr)
         co2_conc = int(options.c)
+        print(out_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
                               restart_out_fname, year, co2_conc)
 
