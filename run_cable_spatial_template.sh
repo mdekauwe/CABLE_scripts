@@ -22,6 +22,7 @@ module load netcdf/4.2.1.1
 cpus=28
 exe="./cable-mpi"
 
+# variables passed to this script by the python script
 start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
