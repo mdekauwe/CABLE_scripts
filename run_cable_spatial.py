@@ -44,7 +44,6 @@ class RunCable(object):
         self.yearly_namelist_dir = yearly_namelist_dir
         self.nml_fname = nml_fname
         self.co2_fname = co2_fname
-        self.grid_fname = grid_fname
         self.qsub_template_fname = qsub_template_fname
 
     def setup_nml_file(self):
