@@ -83,7 +83,7 @@ class RunCable(object):
                         "filename%out": "'%s'" % (out_fname),
                         "filename%restart_in": "'%s'" % (restart_in_fname),
                         "filename%restart_out": "'%s'" % (restart_out_fname),
-                        "fixedCO2": "%d" % (co2_conc),
+                        "fixedCO2": "%f" % (co2_conc),
                         "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
                         "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
                         "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
