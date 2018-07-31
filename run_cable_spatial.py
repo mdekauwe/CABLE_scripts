@@ -23,12 +23,12 @@ from adjust_namelist_files import adjust_nml_file
 
 class RunCable(object):
 
-    def __init__(self, met_path, log_dir, output_dir, aux_dir,
+    def __init__(self, met_dir, log_dir, output_dir, aux_dir,
                  yearly_namelist_dir, restart_dir, soil_fname, veg_fname,
                  co2_fname, grid_fname, mask_fname, nml_fname,
                  qsub_template_fname):
 
-        self.met_path = met_path
+        self.met_dir = met_dir
         self.log_dir = log_dir
         self.output_dir = output_dir
         self.aux_dir = aux_dir
@@ -50,7 +50,7 @@ class RunCable(object):
     def setup_nml_file(self):
 
         replace_dict = {
-                        "filename%met": "'%s'" % (self.met_path),
+                        "filename%met": "'%s'" % (self.met_dir),
                         "filename%type": "'%s'" % (self.grid_fname),
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
@@ -85,14 +85,14 @@ class RunCable(object):
                         "filename%restart_in_fname": "'%s'" % (restart_in_fname),
                         "filename%restart_out_fname": "'%s'" % (restart_out_fname),
                         "fixedCO2": "%d" % (co2_conc),
-                        "gswpfile%rainf": "/gswp/Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year),
-                        "gswpfile%snowf": "/gswp/Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year),
-                        "gswpfile%LWdown": "/gswp/LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year),
-                        "gswpfile%SWdown": "/gswp/SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year),
-                        "gswpfile%PSurf": "/gswp/PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year),
-                        "gswpfile%Qair": "/gswp/Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year),
-                        "gswpfile%Tair": "/gswp/Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year),
-                        "gswpfile%wind": "/gswp/Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year),
+                        "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
+                        "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
+                        "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
+                        "gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))),
+                        "gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))),
+                        "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
+                        "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
+                        "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
 
         }
         adjust_nml_file(self.nml_fname, replace_dict)
@@ -121,7 +121,7 @@ def cmd_line_parser():
 if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
-    met_path = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
+    met_dir = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
     output_dir = "outputs"
     aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     options, args = cmd_line_parser()
 
-    C = RunCable(met_path, log_dir, output_dir, aux_dir, yearly_namelist_dir,
+    C = RunCable(met_dir, log_dir, output_dir, aux_dir, yearly_namelist_dir,
                  restart_dir, soil_fname, veg_fname, co2_fname, grid_fname,
                  mask_fname, nml_fname, qsub_template_fname)
 
