@@ -82,8 +82,8 @@ class RunCable(object):
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "filename%out": "'%s'" % (out_fname),
-                        "filename%restart_in_fname": "'%s'" % (restart_in_fname),
-                        "filename%restart_out_fname": "'%s'" % (restart_out_fname),
+                        "filename%restart_in": "'%s'" % (restart_in_fname),
+                        "filename%restart_out": "'%s'" % (restart_out_fname),
                         "fixedCO2": "%d" % (co2_conc),
                         "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
                         "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
