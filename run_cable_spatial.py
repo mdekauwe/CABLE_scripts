@@ -61,8 +61,8 @@ class RunCable(object):
 
     def run_me(self, start_yr, end_yr):
 
-        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d %s' % \
-                    (start_yr, end_yr, self.qsub_template_fname)
+        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
+                    (start_yr, end_yr, self.co2_fname, self.qsub_template_fname)
         print(qs_cmd)
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:

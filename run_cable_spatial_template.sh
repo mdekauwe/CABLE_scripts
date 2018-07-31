@@ -25,6 +25,7 @@ exe="./cable-mpi"
 start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
+co2_fname=$co2_fname
 
 year=$start_yr
 while [ $year -le $end_yr ]
