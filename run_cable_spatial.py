@@ -123,15 +123,15 @@ if __name__ == "__main__":
     #------------- Change stuff ------------- #
     met_path = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
-    aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
     output_dir = "outputs"
-    restart_dir = "restarts"
+    aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
     yearly_namelist_dir = "backup_namelists" # remove later
+    restart_dir = "restarts"
+    soil_fname = "def_soil_params.txt"
+    veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
     co2_fname = "Annual_CO2_concentration_until_2010.txt"
     grid_fname = "CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc"
     mask_fname = "gswp3_landmask_nomissing.nc"
-    soil_fname = "def_soil_params.txt"
-    veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
     nml_fname = "cable.nml"
     qsub_template_fname = "qsub_scripts/run_cable_spatial_template.sh"
     start_yr = 1950
