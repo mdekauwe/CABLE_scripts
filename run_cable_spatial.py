@@ -24,13 +24,15 @@ from adjust_namelist_files import adjust_nml_file
 class RunCable(object):
 
     def __init__(self, met_path, log_dir, output_dir, aux_dir,
-                 yearly_namelist_dir, soil_fname, veg_fname, co2_fname,
-                 grid_fname, mask_fname, nml_fname, qsub_template_fname):
+                 yearly_namelist_dir, restart_dir, soil_fname, veg_fname,
+                 co2_fname, grid_fname, mask_fname, nml_fname,
+                 qsub_template_fname):
 
         self.met_path = met_path
         self.log_dir = log_dir
         self.output_dir = output_dir
         self.aux_dir = aux_dir
+        self.restart_dir = restart_dir
         self.veg_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.soil_fname = soil_fname
@@ -151,8 +153,8 @@ if __name__ == "__main__":
     options, args = cmd_line_parser()
 
     C = RunCable(met_path, log_dir, output_dir, aux_dir, yearly_namelist_dir,
-                 soil_fname, veg_fname, co2_fname, grid_fname, mask_fname,
-                 nml_fname, qsub_template_fname)
+                 restart_dir, soil_fname, veg_fname, co2_fname, grid_fname,
+                 mask_fname, nml_fname, qsub_template_fname)
 
     # qsub script is adjusting namelist file
     if options.a:
