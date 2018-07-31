@@ -98,8 +98,8 @@ class RunCable(object):
         adjust_nml_file(self.nml_fname, replace_dict)
 
         # save copy as we go for debugging - remove later
-        shutil.copyfile("site.nml", os.path.join(self.yearly_namelist_dir,
-                                                 "site_%d_year.nml" % (year)))
+        shutil.copyfile(self.nml_fname, os.path.join(self.yearly_namelist_dir,
+                                                     "cable_%d.nml" % (year)))
 
 def cmd_line_parser():
 
