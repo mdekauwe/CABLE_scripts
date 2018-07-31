@@ -31,7 +31,7 @@ while [ $year -le $end_yr ]
 do
 
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
-
+    echo $co2_conc
     # adjust and make a new namelist file
     restart_in="restart_$prev_year.nc"
     restart_out="restart_$year.nc"
@@ -42,7 +42,7 @@ do
                                   -i $restart_in -r $restart_out -c $co2_conc
 
     mpirun -n $cpus $exe
-    
+
     year=$[$year+1]
     prev_yr=$[$prev_yr+1]
 
