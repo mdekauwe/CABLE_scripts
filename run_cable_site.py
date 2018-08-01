@@ -156,7 +156,7 @@ if __name__ == "__main__":
     # if empty...run all the files in the met_dir
     met_subset = ['TumbaFluxnet.1.4_met.nc']
     lai_fname = None
-    fixed_lai = 5.0
+    fixed_lai = None
     # ------------------------------------------- #
 
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
