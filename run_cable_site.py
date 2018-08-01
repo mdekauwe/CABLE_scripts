@@ -49,6 +49,7 @@ class RunCable(object):
 
     def main(self):
 
+        self.initialise_stuff()
         for fname in self.met_files:
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
@@ -68,6 +69,22 @@ class RunCable(object):
             }
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
+
+    def initialise_stuff():
+
+        if not os.path.exists(self.restart_dir):
+            os.makedirs(self.restart_dir)
+
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
+
+        base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
+        shutil.copy(base_nml_fn, self.nml_fn)
+        add_missing_options_to_nml_file(self.nml_fn)
+
 
     def clean_up_old_files(self, site):
         out_fname = os.path.join(self.output_dir, "%s_out.nc" % (site))
@@ -111,19 +128,6 @@ if __name__ == "__main__":
     all_met_files = False
     subset = ['TumbaFluxnet.1.4_met.nc']
     # ------------------------------------------- #
-
-    if not os.path.exists(restart_dir):
-        os.makedirs(restart_dir)
-
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    base_nml_fn = os.path.join(aux_dir, "offline/%s" % (nml_fname))
-    shutil.copy(base_nml_fn, nml_fn)
-    add_missing_options_to_nml_file(nml_fn)
 
     if all_met_files:
         met_files = glob.glob(os.path.join(met_dir, "*.nc"))
