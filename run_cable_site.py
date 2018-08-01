@@ -21,21 +21,27 @@ import tempfile
 
 class RunCable(object):
 
-    def __init__(self, met_files, output_dir, log_dir, aux_dir,
-                 nml_fn, veg_param_fn, soil_fn, grid_fn, cable_exe, verbose):
+    def __init__(self, met_files, log_dir, output_dir, restart_dir, aux_dir,
+                 nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
+                 cnpbiome_fname, cable_exe, verbose):
 
         self.met_files = met_files
-        self.output_dir = output_dir
         self.log_dir = log_dir
-        self.nml_fn = nml_fn
-        self.veg_param_fn = veg_param_fn
-        self.grid_fn = grid_fn
+        self.output_dir = output_dir
+        self.restart_dir = restart_dir
         self.aux_dir = aux_dir
-        self.veg_dir = os.path.join(self.aux_dir, "core/biogeophys")
-        self.grid_dir = os.path.join(self.aux_dir, "offline")
+        self.cnp_biome_dir = cnp_biome_dir
+        self.nml_fname = nml_fname
+        self.veg_fname = veg_fname
+        self.soil_fname = soil_fname
+        self.grid_fname = grid_fname
+        self.phen_fname = phen_fname
+        self.cnpbiome_fname = cnpbiome_fname
         self.cable_exe = cable_exe
         self.verbose = verbose
-        self.soil_fn = soil_fn
+        self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
+        self.grid_dir = os.path.join(self.aux_dir, "offline")
+        self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
 
     def main(self):
 
@@ -48,13 +54,13 @@ class RunCable(object):
                             "filename%out": "'%s'" % (out_fname),
                             "filename%log": "'%s'" % (out_log_fname),
                             "filename%restart_out": "' '",
-                            "filename%type": "'%s'" % (os.path.join(self.grid_dir, self.grid_fn)),
-                            "filename%veg": "'%s'" % (os.path.join(self.veg_dir, self.veg_param_fn)),
-                            "filename%soil": "'%s'" % (os.path.join(self.veg_dir, self.soil_fn)),
+                            "filename%type": "'%s'" % (os.path.join(self.grid_dir, self.grid_fname)),
+                            "filename%veg": "'%s'" % (os.path.join(self.biogeophys_dir, self.veg_fname)),
+                            "filename%soil": "'%s'" % (os.path.join(self.biogeophys_dir, self.soil_fname)),
                             "output%restart": ".FALSE.",
                             "fixedCO2": "380.0",
-                            "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
-                            "casafile%cnpbiome": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/pftlookup_csiro_v16_17tiles.csv")),
+                            "casafile%phen": "'%s'" % (os.path.join(self.biogeochem_dir, self.phen_fname)),
+                            "casafile%cnpbiome": "'%s'" % (os.path.join(self.biogeochem_dir, self.cnpbiome_fname)),
             }
             self.adjust_param_file(replace_dict)
             self.run_me()
@@ -165,12 +171,23 @@ def add_missing_options_to_nml_file(fname, line_start=None):
 if __name__ == "__main__":
 
     cwd = os.getcwd()
+
+    #------------- Change stuff ------------- #
     met_dir = "../../met_data/plumber_met/"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restart_files"
     aux_dir = "../../src/trunk/CABLE-AUX/"
+    nml_fname = "cable.nml"
+    veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
+    soil_fname = "def_soil_params.txt"
+    grid_fname = "gridinfo_CSIRO_1x1.nc"
+    phen_fname = "modis_phenology_csiro.txt"
+    cnpbiome_fname = "pftlookup_csiro_v16_17tiles.csv"
     cable_exe = "../../src/trunk/CABLE_trunk/offline/cable"
+    verbose = True
+    all_met_files = False
+    # ------------------------------------------- #
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
@@ -181,18 +198,9 @@ if __name__ == "__main__":
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    base_nml_fn = os.path.join(aux_dir, "offline/cable.nml")
-    nml_fn = "cable.nml"
+    base_nml_fn = os.path.join(aux_dir, "offline/%s" % (nml_fname))
     shutil.copy(base_nml_fn, nml_fn)
     add_missing_options_to_nml_file(nml_fn)
-
-    veg_fn = "def_veg_params_zr_clitt_albedo_fix.txt"
-    soil_fn = "def_soil_params.txt"
-    base_veg_param_fn = os.path.join(aux_dir, veg_fn)
-    shutil.copy(base_nml_fn, nml_fn)
-    grid_fn = "gridinfo_CSIRO_1x1.nc"
-    verbose = True
-    all_met_files = False
 
     if all_met_files:
         met_files = glob.glob(os.path.join(met_dir, "*.nc"))
@@ -200,6 +208,7 @@ if __name__ == "__main__":
         subset = ['TumbaFluxnet.1.4_met.nc']
         met_files = [os.path.join(met_dir, i) for i in subset]
 
-    C = RunCable(met_files, output_dir, log_dir, aux_dir,
-                 nml_fn, veg_fn, soil_fn, grid_fn, cable_exe, verbose)
+    C = RunCable(met_files, log_dir, output_dir, restart_dir, aux_dir,
+                 nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
+                 cnpbiome_fname, cable_exe, verbose)
     C.main()
