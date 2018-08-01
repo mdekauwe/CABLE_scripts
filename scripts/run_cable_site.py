@@ -20,6 +20,7 @@ import glob
 import shutil
 import tempfile
 import subprocess
+import netCDF4
 
 cwd = os.getcwd()
 sys.path.append('%s/scripts' % (cwd))
@@ -58,9 +59,12 @@ class RunCable(object):
         (met_files, url, rev) = self.initialise_stuff()
 
         for fname in met_files:
+
+
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
-
+            print(out_fname)
+            sys.exit()
             replace_dict = {
                             "filename%met": "'%s'" % (fname),
                             "filename%out": "'%s'" % (out_fname),
@@ -79,6 +83,7 @@ class RunCable(object):
             }
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
+            self.add_svn_info_to_output_file(out_fname, url, rev)
 
     def initialise_stuff(self):
 
@@ -125,6 +130,12 @@ class RunCable(object):
         else:
             os.system("%s 1>&2" % (self.cable_exe))
 
+    def add_svn_info_to_output_file(self, fname, url, rev):
+
+        nc = netCDF4.Dataset(fname, 'r+')
+        nc.setncattr('cable_branch', url)
+        nc.setncattr('svn_revision_number', rev)
+        nc.close()
 
 
 if __name__ == "__main__":
