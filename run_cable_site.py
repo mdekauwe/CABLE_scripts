@@ -109,6 +109,7 @@ if __name__ == "__main__":
     cable_exe = "../../src/trunk/CABLE_trunk/offline/cable"
     verbose = True
     all_met_files = False
+    subset = ['TumbaFluxnet.1.4_met.nc']
     # ------------------------------------------- #
 
     if not os.path.exists(restart_dir):
@@ -127,7 +128,6 @@ if __name__ == "__main__":
     if all_met_files:
         met_files = glob.glob(os.path.join(met_dir, "*.nc"))
     else:
-        subset = ['TumbaFluxnet.1.4_met.nc']
         met_files = [os.path.join(met_dir, i) for i in subset]
 
     C = RunCable(met_files, log_dir, output_dir, restart_dir, aux_dir,
