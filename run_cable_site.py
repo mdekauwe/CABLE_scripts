@@ -18,6 +18,7 @@ import sys
 import glob
 import shutil
 import tempfile
+from adjust_namelist_files import adjust_nml_file
 
 class RunCable(object):
 
@@ -62,7 +63,7 @@ class RunCable(object):
                             "casafile%phen": "'%s'" % (os.path.join(self.biogeochem_dir, self.phen_fname)),
                             "casafile%cnpbiome": "'%s'" % (os.path.join(self.biogeochem_dir, self.cnpbiome_fname)),
             }
-            self.adjust_param_file(replace_dict)
+            adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
 
     def clean_up_old_files(self, site):
@@ -83,59 +84,6 @@ class RunCable(object):
         else:
             os.system("%s 1>&2" % (self.cable_exe))
 
-    def adjust_param_file(self, replacements):
-        """ adjust model parameters in the file and save over the original.
-
-        Parameters:
-        ----------
-        fname : string
-            parameter filename to be changed.
-        replacements : dictionary
-            dictionary of replacement values.
-
-        """
-        fin = open(self.nml_fn, 'r')
-        param_str = fin.read()
-        fin.close()
-        new_str = self.replace_keys(param_str, replacements)
-        fd, path = tempfile.mkstemp()
-        os.write(fd, str.encode(new_str))
-        os.close(fd)
-        shutil.copy(path, self.nml_fn)
-        os.remove(path)
-
-    def replace_keys(self, text, replacements_dict):
-        """ Function expects to find GDAY input file formatted key = value.
-
-        Parameters:
-        ----------
-        text : string
-            input file data.
-        replacements_dict : dictionary
-            dictionary of replacement values.
-
-        Returns:
-        --------
-        new_text : string
-            input file with replacement values
-
-        """
-        lines = text.splitlines()
-        for i, row in enumerate(lines):
-            # skip blank lines
-            if not row.strip():
-                continue
-            if "=" not in row:
-                lines[i] = row
-                continue
-            elif not row.startswith("&"):
-                key = row.split("=")[0]
-                val = row.split("=")[1]
-                lines[i] = " ".join((key.rstrip(), "=",
-                                     replacements_dict.get(key.strip(),
-                                     val.lstrip())))
-
-        return '\n'.join(lines) + '\n'
 
 def add_missing_options_to_nml_file(fname, line_start=None):
     # Some of the flags we may wish to change are missin from the default
