@@ -32,7 +32,6 @@ class RunCable(object):
         self.output_dir = output_dir
         self.restart_dir = restart_dir
         self.aux_dir = aux_dir
-        self.cnp_biome_dir = cnp_biome_dir
         self.nml_fname = nml_fname
         self.veg_fname = veg_fname
         self.soil_fname = soil_fname
@@ -70,7 +69,7 @@ class RunCable(object):
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
 
-    def initialise_stuff():
+    def initialise_stuff(self):
 
         if not os.path.exists(self.restart_dir):
             os.makedirs(self.restart_dir)
@@ -82,8 +81,8 @@ class RunCable(object):
             os.makedirs(self.log_dir)
 
         base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
-        shutil.copy(base_nml_fn, self.nml_fn)
-        add_missing_options_to_nml_file(self.nml_fn)
+        shutil.copy(base_nml_fn, self.nml_fname)
+        add_missing_options_to_nml_file(self.nml_fname)
 
         # Run all the met files in the directory
         if len(met_subset) == 0:
@@ -119,11 +118,11 @@ if __name__ == "__main__":
     cwd = os.getcwd()
 
     #------------- Change stuff ------------- #
-    met_dir = "../../met_data/plumber_met/"
+    met_dir = "/Users/mdekauwe/research/CABLE_runs/met_data/plumber_met"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restart_files"
-    aux_dir = "../../src/trunk/CABLE-AUX/"
+    aux_dir = "../../src/CMIP6-MOSRS/CABLE-AUX/"
     nml_fname = "cable.nml"
     veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
     soil_fname = "def_soil_params.txt"
@@ -131,7 +130,7 @@ if __name__ == "__main__":
     phen_fname = "modis_phenology_csiro.txt"
     cnpbiome_fname = "pftlookup_csiro_v16_17tiles.csv"
     co2_conc = 380.0
-    cable_exe = "../../src/trunk/CABLE_trunk/offline/cable"
+    cable_exe = "../../src/CMIP6-MOSRS/CMIP6-MOSRS/offline/cable"
     verbose = True
     # if empty...run all the files in the met_dir
     met_subset = ['TumbaFluxnet.1.4_met.nc']

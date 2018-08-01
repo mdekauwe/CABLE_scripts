@@ -1,3 +1,5 @@
+import shutil
+
 def add_missing_options_to_nml_file(fname, line_start=None):
     # Some of the flags we may wish to change are missin from the default
     # file so we can't adjust them via this script...add them
