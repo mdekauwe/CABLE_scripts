@@ -61,7 +61,6 @@ class RunCable(object):
 
         for fname in met_files:
 
-
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
@@ -133,8 +132,6 @@ class RunCable(object):
 
 if __name__ == "__main__":
 
-
-
     #------------- Change stuff ------------- #
     met_dir = "/Users/mdekauwe/research/CABLE_runs/met_data/plumber_met"
     log_dir = "logs"
@@ -153,7 +150,6 @@ if __name__ == "__main__":
     # if empty...run all the files in the met_dir
     met_subset = ['TumbaFluxnet.1.4_met.nc']
     # ------------------------------------------- #
-
 
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
