@@ -21,7 +21,6 @@ import shutil
 import tempfile
 import subprocess
 
-
 cwd = os.getcwd()
 sys.path.append('%s/scripts' % (cwd))
 from adjust_namelist_files import adjust_nml_file
