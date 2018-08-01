@@ -13,21 +13,27 @@ __author__ = "Martin De Kauwe"
 __version__ = "1.0 (01.08.2018)"
 __email__ = "mdekauwe@gmail.com"
 
+import re
 import os
 import sys
 import glob
 import shutil
 import tempfile
+import subprocess
 
-sys.path.append('%s/scripts' % (os.getcwd()))
+
+cwd = os.getcwd()
+sys.path.append('%s/scripts' % (cwd))
 from adjust_namelist_files import adjust_nml_file
 from add_missing_options_to_nml import add_missing_options_to_nml_file
+from get_svn_info import get_svn_info
+from embed_svn_and_namelist_info import add_attributes_to_output_file
 
 class RunCable(object):
 
     def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, co2_conc, met_subset, cable_exe, verbose):
+                 cnpbiome_fname, co2_conc, met_subset, cable_src, verbose):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -42,7 +48,8 @@ class RunCable(object):
         self.cnpbiome_fname = cnpbiome_fname
         self.co2_conc = co2_conc
         self.met_subset = met_subset
-        self.cable_exe = cable_exe
+        self.cable_src = cable_src
+        self.cable_exe = os.path.join(self.cable_src, "offline/cable")
         self.verbose = verbose
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
@@ -50,8 +57,11 @@ class RunCable(object):
 
     def main(self):
 
-        met_files = self.initialise_stuff()
+        (met_files, url, rev) = self.initialise_stuff()
+
         for fname in met_files:
+
+
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
@@ -64,12 +74,16 @@ class RunCable(object):
                             "filename%veg": "'%s'" % (os.path.join(self.biogeophys_dir, self.veg_fname)),
                             "filename%soil": "'%s'" % (os.path.join(self.biogeophys_dir, self.soil_fname)),
                             "output%restart": ".FALSE.",
-                            "fixedCO2": "%f" % (self.co2_conc),
+                            "fixedCO2": "%.2f" % (self.co2_conc),
                             "casafile%phen": "'%s'" % (os.path.join(self.biogeochem_dir, self.phen_fname)),
                             "casafile%cnpbiome": "'%s'" % (os.path.join(self.biogeochem_dir, self.cnpbiome_fname)),
+                            "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
+                            "cable_user%GS_SWITCH": "'medlyn'",
+                            "cable_user%or_evap": ".TRUE.",
             }
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
+            add_attributes_to_output_file(out_fname, url, rev)
 
     def initialise_stuff(self):
 
@@ -92,17 +106,19 @@ class RunCable(object):
         else:
             met_files = [os.path.join(self.met_dir, i) for i in self.met_subset]
 
-        return met_files
+        cwd = os.getcwd()
+        (url, rev) = get_svn_info(cwd, self.cable_src)
 
+        return (met_files, url, rev)
 
     def clean_up_old_files(self, site):
         out_fname = os.path.join(self.output_dir, "%s_out.nc" % (site))
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        #if os.path.isfile(out_fname):
+        #    os.remove(out_fname)
 
         out_log_fname = os.path.join(self.log_dir, "%s_log.txt" % (site))
-        if os.path.isfile(out_log_fname):
-            os.remove(out_log_fname)
+        #if os.path.isfile(out_log_fname):
+        #    os.remove(out_log_fname)
 
         return (out_fname, out_log_fname)
 
@@ -117,6 +133,8 @@ class RunCable(object):
 
 if __name__ == "__main__":
 
+
+
     #------------- Change stuff ------------- #
     met_dir = "/Users/mdekauwe/research/CABLE_runs/met_data/plumber_met"
     log_dir = "logs"
@@ -130,13 +148,14 @@ if __name__ == "__main__":
     phen_fname = "modis_phenology_csiro.txt"
     cnpbiome_fname = "pftlookup_csiro_v16_17tiles.csv"
     co2_conc = 380.0
-    cable_exe = "../../src/CMIP6-MOSRS/CMIP6-MOSRS/offline/cable"
+    cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
     verbose = True
     # if empty...run all the files in the met_dir
     met_subset = ['TumbaFluxnet.1.4_met.nc']
     # ------------------------------------------- #
 
+
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, co2_conc, met_subset, cable_exe, verbose)
+                 cnpbiome_fname, co2_conc, met_subset, cable_src, verbose)
     C.main()
