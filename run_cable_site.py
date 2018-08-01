@@ -18,12 +18,11 @@ import glob
 import shutil
 import subprocess
 
-cwd = os.getcwd()
-sys.path.append('%s/scripts' % (cwd))
-from adjust_namelist_files import adjust_nml_file
-from add_missing_options_to_nml import add_missing_options_to_nml_file
-from get_svn_info import get_svn_info
-from embed_svn_and_namelist_info import add_attributes_to_output_file
+from cable_utils import adjust_nml_file
+from cable_utils import add_missing_options_to_nml_file
+from cable_utils import add_missing_options_to_nml_file
+from cable_utils import get_svn_info
+from cable_utils import add_attributes_to_output_file
 
 class RunCable(object):
 
