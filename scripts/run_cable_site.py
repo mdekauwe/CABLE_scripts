@@ -56,8 +56,7 @@ class RunCable(object):
     def main(self):
 
         (met_files, url, rev) = self.initialise_stuff()
-        print(url, rev)
-        sys.exit()
+        
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
