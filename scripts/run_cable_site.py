@@ -148,8 +148,8 @@ class RunCable(object):
             if "=" not in row:
                 continue
             elif not row.startswith("&"):
-                key = row.split("=")[0]
-                val = row.split("=")[1]
+                key = str(row.split("=")[0])
+                val = str(row.split("=")[1])
                 nc.setncattr(key, val)
         nc.close()
 
