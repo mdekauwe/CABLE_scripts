@@ -18,6 +18,8 @@ import sys
 import glob
 import shutil
 import tempfile
+
+sys.path.append('%s/scripts' % (os.getcwd()))
 from adjust_namelist_files import adjust_nml_file
 from add_missing_options_to_nml import add_missing_options_to_nml_file
 
@@ -114,8 +116,6 @@ class RunCable(object):
 
 
 if __name__ == "__main__":
-
-    cwd = os.getcwd()
 
     #------------- Change stuff ------------- #
     met_dir = "/Users/mdekauwe/research/CABLE_runs/met_data/plumber_met"
