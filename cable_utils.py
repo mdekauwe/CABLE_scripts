@@ -15,7 +15,7 @@ import sys
 import netCDF4
 import shutil
 import tempfile
-
+import pandas as pd
 
 def adjust_nml_file(fname, replacements):
     """
@@ -150,3 +150,51 @@ def add_attributes_to_output_file(nml_fname, fname, url, rev):
             nc.setncattr(key, val)
 
     nc.close()
+
+def ncdump(nc_fid):
+    '''
+    ncdump outputs dimensions, variables and their attribute information.
+
+    Parameters
+    ----------
+    nc_fid : netCDF4.Dataset
+        A netCDF4 dateset object
+
+    Returns
+    -------
+    nc_attrs : list
+        A Python list of the NetCDF file global attributes
+    nc_dims : list
+        A Python list of the NetCDF file dimensions
+    nc_vars : list
+        A Python list of the NetCDF file variables
+    '''
+
+    # NetCDF global attributes
+    nc_attrs = nc_fid.ncattrs()
+    nc_dims = [dim for dim in nc_fid.dimensions]  # list of nc dimensions
+
+    # Variable information.
+    nc_vars = [var for var in nc_fid.variables]  # list of nc variables
+
+    return nc_attrs, nc_dims, nc_vars
+
+def change_LAI(met_fname=None, fixed=None, lai_fname=None):
+
+    new_met_fname = "tmp.nc"
+    if fixed is not None:
+        lai = fixed
+    else:
+        lai = pd.read_csv(lai_fname)
+
+    shutil.copyfile(met_fname, new_met_fname)
+
+    nc = netCDF4.Dataset(new_met_fname, 'r+')
+    (nc_attrs, nc_dims, nc_vars) = ncdump(nc)
+
+    nc_var = nc.createVariable('LAI', 'f4', ('time', 'y', 'x'))
+    nc.setncatts({'long_name': u"Leaf Area Index",})
+    nc.variables['LAI'][:,0,0] = lai
+    nc.close()  # close the new file
+
+    return new_met_fname

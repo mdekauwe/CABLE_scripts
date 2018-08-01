@@ -23,12 +23,14 @@ from cable_utils import add_missing_options_to_nml_file
 from cable_utils import add_missing_options_to_nml_file
 from cable_utils import get_svn_info
 from cable_utils import add_attributes_to_output_file
+from cable_utils import change_LAI
 
 class RunCable(object):
 
     def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, co2_conc, met_subset, cable_src, verbose):
+                 cnpbiome_fname, lai_fname, fixed_lai, co2_conc, met_subset,
+                 cable_src, verbose):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -49,6 +51,8 @@ class RunCable(object):
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
+        self.lai_fname = lai_fname
+        self.fixed_lai = fixed_lai
 
     def main(self):
 
@@ -58,6 +62,10 @@ class RunCable(object):
 
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
+
+            if self.fixed_lai is not None or self.lai_fname is not None:
+                (fname) = change_LAI(fname, fixed=self.fixed_lai,
+                                     lai_fname=self.lai_fname)
 
             replace_dict = {
                             "filename%met": "'%s'" % (fname),
@@ -78,6 +86,9 @@ class RunCable(object):
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
             add_attributes_to_output_file(self.nml_fname, out_fname, url, rev)
+
+            if self.fixed_lai is not None or self.lai_fname is not None:
+                os.remove(fname)
 
     def initialise_stuff(self):
 
@@ -144,9 +155,12 @@ if __name__ == "__main__":
     verbose = True
     # if empty...run all the files in the met_dir
     met_subset = ['TumbaFluxnet.1.4_met.nc']
+    lai_fname = None
+    fixed_lai = 5.0
     # ------------------------------------------- #
 
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, co2_conc, met_subset, cable_src, verbose)
+                 cnpbiome_fname, lai_fname, fixed_lai, co2_conc, met_subset,
+                 cable_src, verbose)
     C.main()
