@@ -6,7 +6,6 @@ in the met directory
 
 - Only intended for biophysics
 
-
 That's all folks.
 """
 __author__ = "Martin De Kauwe"
