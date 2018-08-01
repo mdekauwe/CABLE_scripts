@@ -63,8 +63,7 @@ class RunCable(object):
 
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
-            print(out_fname)
-            sys.exit()
+
             replace_dict = {
                             "filename%met": "'%s'" % (fname),
                             "filename%out": "'%s'" % (out_fname),
@@ -83,7 +82,7 @@ class RunCable(object):
             }
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
-            self.add_svn_info_to_output_file(out_fname, url, rev)
+            self.add_attributes_to_output_file(out_fname, url, rev)
 
     def initialise_stuff(self):
 
@@ -114,12 +113,12 @@ class RunCable(object):
 
     def clean_up_old_files(self, site):
         out_fname = os.path.join(self.output_dir, "%s_out.nc" % (site))
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        #if os.path.isfile(out_fname):
+        #    os.remove(out_fname)
 
         out_log_fname = os.path.join(self.log_dir, "%s_log.txt" % (site))
-        if os.path.isfile(out_log_fname):
-            os.remove(out_log_fname)
+        #if os.path.isfile(out_log_fname):
+        #    os.remove(out_log_fname)
 
         return (out_fname, out_log_fname)
 
@@ -130,13 +129,29 @@ class RunCable(object):
         else:
             os.system("%s 1>&2" % (self.cable_exe))
 
-    def add_svn_info_to_output_file(self, fname, url, rev):
+    def add_attributes_to_output_file(self, fname, url, rev):
 
+        # Add SVN info to output file
         nc = netCDF4.Dataset(fname, 'r+')
         nc.setncattr('cable_branch', url)
         nc.setncattr('svn_revision_number', rev)
-        nc.close()
 
+        # Add namelist to output file
+        fp = open(self.nml_fname, "r")
+        namelist = fp.readlines()
+        fp.close()
+
+        for i, row in enumerate(namelist):
+            # skip blank lines
+            if not row.strip():
+                continue
+            if "=" not in row:
+                continue
+            elif not row.startswith("&"):
+                key = row.split("=")[0]
+                val = row.split("=")[1]
+                nc.setncattr(key, val)
+        nc.close()
 
 if __name__ == "__main__":
 
