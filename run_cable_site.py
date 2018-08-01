@@ -25,7 +25,7 @@ class RunCable(object):
 
     def __init__(self, met_files, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, cable_exe, verbose):
+                 cnpbiome_fname, co2_conc, cable_exe, verbose):
 
         self.met_files = met_files
         self.log_dir = log_dir
@@ -39,11 +39,13 @@ class RunCable(object):
         self.grid_fname = grid_fname
         self.phen_fname = phen_fname
         self.cnpbiome_fname = cnpbiome_fname
+        self.co2_conc = co2_conc
         self.cable_exe = cable_exe
         self.verbose = verbose
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
+
 
     def main(self):
 
@@ -60,7 +62,7 @@ class RunCable(object):
                             "filename%veg": "'%s'" % (os.path.join(self.biogeophys_dir, self.veg_fname)),
                             "filename%soil": "'%s'" % (os.path.join(self.biogeophys_dir, self.soil_fname)),
                             "output%restart": ".FALSE.",
-                            "fixedCO2": "380.0",
+                            "fixedCO2": "%f" % (self.co2_conc),
                             "casafile%phen": "'%s'" % (os.path.join(self.biogeochem_dir, self.phen_fname)),
                             "casafile%cnpbiome": "'%s'" % (os.path.join(self.biogeochem_dir, self.cnpbiome_fname)),
             }
@@ -103,6 +105,7 @@ if __name__ == "__main__":
     grid_fname = "gridinfo_CSIRO_1x1.nc"
     phen_fname = "modis_phenology_csiro.txt"
     cnpbiome_fname = "pftlookup_csiro_v16_17tiles.csv"
+    co2_conc = 380.0
     cable_exe = "../../src/trunk/CABLE_trunk/offline/cable"
     verbose = True
     all_met_files = False
@@ -129,5 +132,5 @@ if __name__ == "__main__":
 
     C = RunCable(met_files, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, cable_exe, verbose)
+                 cnpbiome_fname, co2_conc, cable_exe, verbose)
     C.main()
