@@ -56,7 +56,7 @@ class RunCable(object):
     def main(self):
 
         (met_files, url, rev) = self.initialise_stuff()
-        
+
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
@@ -70,9 +70,12 @@ class RunCable(object):
                             "filename%veg": "'%s'" % (os.path.join(self.biogeophys_dir, self.veg_fname)),
                             "filename%soil": "'%s'" % (os.path.join(self.biogeophys_dir, self.soil_fname)),
                             "output%restart": ".FALSE.",
-                            "fixedCO2": "%f" % (self.co2_conc),
+                            "fixedCO2": "%.2f" % (self.co2_conc),
                             "casafile%phen": "'%s'" % (os.path.join(self.biogeochem_dir, self.phen_fname)),
                             "casafile%cnpbiome": "'%s'" % (os.path.join(self.biogeochem_dir, self.cnpbiome_fname)),
+                            "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
+                            "cable_user%GS_SWITCH": "'medlyn'",
+                            "cable_user%or_evap": ".TRUE.",
             }
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
