@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 """
-Site run - just biophysics
-==========================
-
 Run CABLE either for a single site, a subset, or all the flux sites pointed to
-in the met directory. The script creates cable.nml file.
+in the met directory
+
+- Only intended for biophysics
+
 
 That's all folks.
 """
 __author__ = "Martin De Kauwe"
-__version__ = "1.0 (14.09.2017)"
+__version__ = "1.0 (01.08.2018)"
 __email__ = "mdekauwe@gmail.com"
 
 import os
