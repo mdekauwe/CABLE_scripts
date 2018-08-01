@@ -23,11 +23,11 @@ from add_missing_options_to_nml import add_missing_options_to_nml_file
 
 class RunCable(object):
 
-    def __init__(self, met_files, log_dir, output_dir, restart_dir, aux_dir,
+    def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, co2_conc, cable_exe, verbose):
+                 cnpbiome_fname, co2_conc, met_subset, cable_exe, verbose):
 
-        self.met_files = met_files
+        self.met_dir = met_dir
         self.log_dir = log_dir
         self.output_dir = output_dir
         self.restart_dir = restart_dir
@@ -40,17 +40,17 @@ class RunCable(object):
         self.phen_fname = phen_fname
         self.cnpbiome_fname = cnpbiome_fname
         self.co2_conc = co2_conc
+        self.met_subset = met_subset
         self.cable_exe = cable_exe
         self.verbose = verbose
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
 
-
     def main(self):
 
-        self.initialise_stuff()
-        for fname in self.met_files:
+        met_files = self.initialise_stuff()
+        for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
@@ -84,6 +84,14 @@ class RunCable(object):
         base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
         shutil.copy(base_nml_fn, self.nml_fn)
         add_missing_options_to_nml_file(self.nml_fn)
+
+        # Run all the met files in the directory
+        if len(met_subset) == 0:
+            met_files = glob.glob(os.path.join(self.met_dir, "*.nc"))
+        else:
+            met_files = [os.path.join(self.met_dir, i) for i in self.met_subset]
+
+        return met_files
 
 
     def clean_up_old_files(self, site):
@@ -125,16 +133,11 @@ if __name__ == "__main__":
     co2_conc = 380.0
     cable_exe = "../../src/trunk/CABLE_trunk/offline/cable"
     verbose = True
-    all_met_files = False
-    subset = ['TumbaFluxnet.1.4_met.nc']
+    # if empty...run all the files in the met_dir
+    met_subset = ['TumbaFluxnet.1.4_met.nc']
     # ------------------------------------------- #
 
-    if all_met_files:
-        met_files = glob.glob(os.path.join(met_dir, "*.nc"))
-    else:
-        met_files = [os.path.join(met_dir, i) for i in subset]
-
-    C = RunCable(met_files, log_dir, output_dir, restart_dir, aux_dir,
+    C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, co2_conc, cable_exe, verbose)
+                 cnpbiome_fname, co2_conc, met_subset, cable_exe, verbose)
     C.main()
