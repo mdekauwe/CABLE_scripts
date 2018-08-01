@@ -13,12 +13,10 @@ __author__ = "Martin De Kauwe"
 __version__ = "1.0 (01.08.2018)"
 __email__ = "mdekauwe@gmail.com"
 
-import re
 import os
 import sys
 import glob
 import shutil
-import tempfile
 import subprocess
 
 cwd = os.getcwd()
