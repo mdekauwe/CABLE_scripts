@@ -11,9 +11,10 @@ __email__ = "mdekauwe@gmail.com"
 
 
 import os
+import sys
 import netCDF4
 
-def add_attributes_to_output_file(fname, url, rev):
+def add_attributes_to_output_file(nml_fname, fname, url, rev):
 
     # Add SVN info to output file
     nc = netCDF4.Dataset(fname, 'r+')
@@ -21,7 +22,7 @@ def add_attributes_to_output_file(fname, url, rev):
     nc.setncattr('svn_revision_number', rev)
 
     # Add namelist to output file
-    fp = open(self.nml_fname, "r")
+    fp = open(nml_fname, "r")
     namelist = fp.readlines()
     fp.close()
 
@@ -29,10 +30,12 @@ def add_attributes_to_output_file(fname, url, rev):
         # skip blank lines
         if not row.strip():
             continue
+        # skip comment lines
         if "=" not in row:
             continue
         elif not row.startswith("&"):
-            key = str(row.split("=")[0])
-            val = str(row.split("=")[1])
+            key = str(row.strip().split("=")[0]).rstrip()
+            val = str(row.strip().split("=")[1]).rstrip()
             nc.setncattr(key, val)
+
     nc.close()

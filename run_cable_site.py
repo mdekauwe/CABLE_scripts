@@ -83,7 +83,7 @@ class RunCable(object):
             }
             adjust_nml_file(self.nml_fname, replace_dict)
             self.run_me()
-            add_attributes_to_output_file(out_fname, url, rev)
+            add_attributes_to_output_file(self.nml_fname, out_fname, url, rev)
 
     def initialise_stuff(self):
 
