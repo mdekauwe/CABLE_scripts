@@ -35,30 +35,55 @@ from cable_utils import get_svn_info
 
 class RunCable(object):
 
-    def __init__(self, experiment_id, driver_dir, output_dir, restart_dir,
-                 dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
-                 veg_param_fn,log_dir, exe, aux_dir, biogeochem, call_pop,
-                 verbose):
+    def __init__(self, experiment_id, met_dir, dump_dir, driver_dir, log_dir,
+                 output_dir, co2_ndep_dir, restart_dir, aux_dir, nml_fname,
+                 site_nml_fname, veg_fname, soil_fname, grid_fname,
+                 phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
+                 cable_src, biogeochem, call_pop, verbose):
 
         self.experiment_id = experiment_id
-        self.driver_dir = driver_dir
-        self.output_dir = output_dir
-        self.restart_dir = restart_dir
+        self.met_dir = met_dir
         self.dump_dir = dump_dir
-        self.met_fname = met_fname
-        self.co2_ndep_fname = co2_ndep_fname
-        self.nml_fn = nml_fn
-        self.site_nml_fn = site_nml_fn
-        self.veg_param_fn = veg_param_fn
-        self.cable_restart_fname = "%s_cable_rst.nc" % (self.experiment_id)
-        self.casa_restart_fname = "%s_casa_rst.nc" % (self.experiment_id)
-        self.pop_restart_fname = "%s_pop_rst.nc" % (self.experiment_id)
-        self.climate_restart_fname = "%s_climate_rst.nc" % (self.experiment_id)
+        self.driver_dir = driver_dir
         self.log_dir = log_dir
-        self.cable_exe = exe
+        self.output_dir = output_dir
+        self.co2_ndep_dir = co2_ndep_dir
+        self.restart_dir = restart_dir
         self.aux_dir = aux_dir
+        self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
+        self.grid_dir = os.path.join(self.aux_dir, "offline")
+        self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
+        self.nml_fname = nml_fname
+        # set as we go, but we need access to this to add svn info
+        self.out_fname = None
+        self.out_fname_CASA = None
+        self.site_nml_fname = site_nml_fname
+        #self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
+        #self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
+
+        self.veg_fname = os.path.join(self.driver_dir, veg_fname)
+        self.soil_fname = os.path.join(self.driver_dir, soil_fname)
+        self.grid_fname = os.path.join(self.grid_dir, grid_fname)
+        self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
+        #self.cnpbiome_fname = os.path.join(self.biogeochem_dir, cnpbiome_fname)
+        self.cnpbiome_fname = os.path.join(self.driver_dir, cnpbiome_fname)
+        self.met_fname = os.path.join(self.met_dir, met_fname)
+        self.co2_ndep_fname = os.path.join(co2_ndep_dir, co2_ndep_fname)
+        self.cable_restart_fname = os.path.join(self.restart_dir, \
+                                    "%s_cable_rst.nc" % (self.experiment_id))
+        self.casa_restart_fname = os.path.join(self.restart_dir, \
+                                    "%s_casa_rst.nc" % (self.experiment_id))
+        self.pop_restart_fname = os.path.join(self.restart_dir, \
+                                    "%s_pop_rst.nc" % (self.experiment_id))
+        self.climate_restart_fname = os.path.join(self.restart_dir, \
+                                "%s_climate_rst.nc" % (self.experiment_id))
+        self.cable_src = cable_src
+        self.cable_exe = os.path.join(self.cable_src, "offline/cable")
+        self.biogeochem = biogeochem
+        self.call_pop = call_pop
         self.verbose = verbose
         self.nyear_spinup = 30
+
         if biogeochem == "C":
             self.biogeochem = 1
             #self.vcmax = "standard"
@@ -74,7 +99,7 @@ class RunCable(object):
             self.vcmax_feedback = ".TRUE."
         else:
             raise ValueError("Unknown biogeochemistry option: C, CN, CNP")
-        self.call_pop = call_pop
+
         if self.call_pop:
             self.pop_flag = ".TRUE."
         else:
@@ -90,7 +115,7 @@ class RunCable(object):
          st_yr_trans, en_yr_trans,
          st_yr_spin, en_yr_spin) = self.get_years()
 
-        self.initial_setup(st_yr_spin, en_yr_spin, st_yr, en_yr)
+        (url, rev) = self.initial_setup(st_yr_spin, en_yr_spin, st_yr, en_yr)
 
         if SPIN_UP == True:
 
@@ -98,20 +123,20 @@ class RunCable(object):
             print("Spinup")
 
             self.run_me()
-            self.clean_up(end=False, tag="zero")
+            self.clean_up(url, rev, end=False, tag="zero")
 
             while not_in_equilibrium:
 
                 self.logfile="log_ccp%d" % (num)
                 self.setup_re_spin(number=num)
                 self.run_me()
-                self.clean_up(end=False, tag="ccp%d" % (num))
+                self.clean_up(url, rev, end=False, tag="ccp%d" % (num))
 
                 self.logfile="log_sa%d" % (num)
                 self.setup_analytical_spin(number=num, st_yr_spin=st_yr_spin,
                                            en_yr_spin=en_yr_spin )
                 self.run_me()
-                self.clean_up(end=False, tag="saa%d" % (num))
+                self.clean_up(url, rev, end=False, tag="saa%d" % (num))
 
                 not_in_equilibrium = self.check_steady_state(num)
 
@@ -121,14 +146,14 @@ class RunCable(object):
             self.logfile="log_ccp%d" % (num)
             self.setup_re_spin(number=num)
             self.run_me()
-            self.clean_up(end=False, tag="ccp%d" % (num))
+            self.clean_up(url, rev, end=False, tag="ccp%d" % (num))
 
         if TRANSIENT == True:
             print("Transient")
 
             self.setup_transient(st_yr_trans, en_yr_trans, st_yr, en_yr)
             self.run_me()
-            self.clean_up(end=False, tag="transient")
+            self.clean_up(url, rev, end=False, tag="transient")
 
         if SIMULATION == True:
             print("Simulation")
@@ -136,7 +161,7 @@ class RunCable(object):
             self.setup_simulation(st_yr, en_yr)
             self.run_me()
 
-        self.clean_up(end=True)
+        self.clean_up(url, rev, end=True)
 
     def get_years(self):
         """
@@ -176,21 +201,34 @@ class RunCable(object):
         """
         Setup CABLE namelist file for spinup from zero
         """
+
+        if not os.path.exists(self.restart_dir):
+            os.makedirs(self.restart_dir)
+
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
+
+        if not os.path.exists(self.dump_dir):
+            os.makedirs(self.dump_dir)
+
         shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
-                        self.site_nml_fn)
+                        self.site_nml_fname)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
-                        self.nml_fn)
-        #add_missing_options_to_nml_file(self.nml_fn)
+                        self.nml_fname)
+        #add_missing_options_to_nml_file(self.nml_fname)
 
-        out_fname = os.path.join(self.output_dir,
+        self.out_fname = os.path.join(self.output_dir,
                                  "%s_out_cable_zero.nc" % (self.experiment_id))
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        if os.path.isfile(self.out_fname):
+            os.remove(self.out_fname)
 
-        out_fname_CASA = os.path.join(self.output_dir,
+        self.out_fname_CASA = os.path.join(self.output_dir,
                                  "%s_out_CASA_zero.nc" % (self.experiment_id))
-        if os.path.isfile(out_fname_CASA):
-            os.remove(out_fname_CASA)
+        if os.path.isfile(self.out_fname_CASA):
+            os.remove(self.out_fname_CASA)
 
         out_log_fname = os.path.join(self.log_dir,
                                      "%s_log_zero.txt" % (self.experiment_id))
@@ -206,26 +244,26 @@ class RunCable(object):
                         "spinNdep": "0.79",
                         "spinPdep": "0.144",
         }
-        adjust_nml_file(self.site_nml_fn, replace_dict)
+        adjust_nml_file(self.site_nml_fname, replace_dict)
 
         replace_dict = {
                         "filename%met": "'%s'" % (self.met_fname),
-                        "filename%out": "'%s'" % (out_fname),
-                        "casafile%out": "'%s'" % (out_fname_CASA),
+                        "filename%out": "'%s'" % (self.out_fname),
+                        "casafile%out": "'%s'" % (self.out_fname_CASA),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_out": "'%s'" % os.path.join(self.restart_dir, self.cable_restart_fname),
-                        "cable_user%climate_restart_out": "'%s'" % os.path.join(self.restart_dir, self.climate_restart_fname),
-                        "cable_user%POP_restart_out": "'%s'" % os.path.join(self.restart_dir, self.pop_restart_fname),
-                        "casafile%cnpepool": "'%s'" % os.path.join(self.restart_dir, self.casa_restart_fname),
+                        "filename%restart_out": "'%s'" % (self.cable_restart_fname),
+                        "cable_user%climate_restart_out": "'%s'" % (self.climate_restart_fname),
+                        "cable_user%POP_restart_out": "'%s'" % (self.pop_restart_fname),
+                        "casafile%cnpepool": "'%s'" % (self.casa_restart_fname),
                         "filename%restart_in": "''" ,
                         "cable_user%climate_restart_in": "''" ,
                         "cable_user%POP_restart_in": "''",
-                        "filename%type": "'%s'" % (os.path.join(self.aux_dir, "offline/gridinfo_CSIRO_1x1.nc")),
-                        "filename%veg": "'%s'" % os.path.join(self.driver_dir, veg_param_fn),
-                        "filename%soil": "'%s'" % os.path.join(self.driver_dir, soil_param_fn),
+                        "filename%type": "'%s'" % self.grid_fname,
+                        "filename%veg": "'%s'" % (self.veg_fname),
+                        "filename%soil": "'%s'" % (self.soil_fname),
                         "output%restart": ".TRUE.",
-                        "casafile%phen": "'%s'" % (os.path.join(self.aux_dir, "core/biogeochem/modis_phenology_csiro.txt")),
-                        "casafile%cnpbiome": "'%s'" % (os.path.join(self.driver_dir, bgc_param_fn)),
+                        "casafile%phen": "'%s'" % (phen_fname),
+                        "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%POP_out": "'ini'",
                         "cable_user%POP_rst": "'./'",
@@ -242,8 +280,12 @@ class RunCable(object):
                         "icycle": "%d" % (self.biogeochem),
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
         }
-        adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fname, replace_dict)
 
+        cwd = os.getcwd()
+        (url, rev) = get_svn_info(cwd, self.cable_src)
+
+        return (url, rev)
     def setup_re_spin(self, number=None):
         """
         Adjust the CABLE namelist file with the various flags for another spin
@@ -253,22 +295,23 @@ class RunCable(object):
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
-        out_fname = "%s_out_cable_ccp%d.nc" % (self.experiment_id, number)
-        out_fname = os.path.join(self.output_dir, out_fname)
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        self.out_fname = "%s_out_cable_ccp%d.nc" % (self.experiment_id, number)
+        self.out_fname = os.path.join(self.output_dir, self.out_fname)
+        if os.path.isfile(self.out_fname):
+            os.remove(self.out_fname)
 
-        out_fname_CASA = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, number)
-        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
-        if os.path.isfile(out_fname_CASA):
-            os.remove(out_fname_CASA)
+        self.out_fname_CASA = "%s_out_CASA_ccp%d.nc" % \
+                                (self.experiment_id, number)
+        self.out_fname_CASA = os.path.join(self.output_dir, self.out_fname_CASA)
+        if os.path.isfile(self.out_fname_CASA):
+            os.remove(self.out_fname_CASA)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_in": "'%s'" % os.path.join(self.restart_dir, self.cable_restart_fname),
-                        "cable_user%climate_restart_in": "'%s'" % os.path.join(self.restart_dir, self.climate_restart_fname),
-                        "cable_user%POP_restart_in": "'%s'" % os.path.join(self.restart_dir, self.pop_restart_fname),
-                        "casafile%cnpipool": "'%s'" % os.path.join(self.restart_dir,self.casa_restart_fname),
+                        "filename%restart_in": "'%s'" % (self.cable_restart_fname),
+                        "cable_user%climate_restart_in": "'%s'" % (self.climate_restart_fname),
+                        "cable_user%POP_restart_in": "'%s'" % (self.pop_restart_fname),
+                        "casafile%cnpipool": "'%s'" % (self.casa_restart_fname),
                         "cable_user%POP_fromZero": ".F.",
                         "cable_user%CASA_fromZero": ".F.",
                         "cable_user%POP_rst": "'./'",
@@ -282,10 +325,10 @@ class RunCable(object):
                         "spincasa": ".FALSE.",
                         "casafile%c2cdumppath": "' '",
                         "output%restart": ".TRUE.",
-                        "filename%out": "'%s'" % (out_fname),
-                        "casafile%out": "'%s'" % (out_fname_CASA),
+                        "filename%out": "'%s'" % (self.out_fname),
+                        "casafile%out": "'%s'" % (self.out_fname_CASA),
         }
-        adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fname, replace_dict)
 
     def setup_analytical_spin(self, number, st_yr_spin, en_yr_spin):
         """
@@ -297,11 +340,11 @@ class RunCable(object):
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
-        out_fname_CASA = "%s_out_CASA_analytic_%d.nc" % \
+        self.out_fname_CASA = "%s_out_CASA_analytic_%d.nc" % \
                             (self.experiment_id, number)
-        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
-        if os.path.isfile(out_fname_CASA):
-            os.remove(out_fname_CASA)
+        self.out_fname_CASA = os.path.join(self.output_dir, self.out_fname_CASA)
+        if os.path.isfile(self.out_fname_CASA):
+            os.remove(self.out_fname_CASA)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
@@ -315,9 +358,9 @@ class RunCable(object):
                         "casafile%c2cdumppath": "'./'",
                         "cable_user%CASA_SPIN_STARTYEAR": "%d" % (st_yr_spin),
                         "cable_user%CASA_SPIN_ENDYEAR": "%d" % (en_yr_spin),
-                        "casafile%out": "'%s'" % (out_fname_CASA),
+                        "casafile%out": "'%s'" % (self.out_fname_CASA),
         }
-        adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fname, replace_dict)
 
     def setup_transient(self, st_yr_trans, en_yr_trans, st_yr, en_yr):
         """
@@ -329,25 +372,26 @@ class RunCable(object):
                         "spinstartyear": "%d" % (st_yr),
                         "spinendyear": "%d" % (en_yr),
            }
-        adjust_nml_file(self.site_nml_fn, replace_dict)
+        adjust_nml_file(self.site_nml_fname, replace_dict)
 
         out_log_fname = "%s_log_transient.txt" % (self.experiment_id)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
-        out_fname = "%s_out_cable_transient.nc" % (self.experiment_id)
-        out_fname = os.path.join(self.output_dir, out_fname)
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        self.out_fname = "%s_out_cable_transient.nc" % (self.experiment_id)
+        self.out_fname = os.path.join(self.output_dir, self.out_fname)
+        if os.path.isfile(self.out_fname):
+            os.remove(self.out_fname)
 
-        out_fname_CASA = "%s_out_casa_transient.nc" % (self.experiment_id)
-        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
-        if os.path.isfile(out_fname_CASA):
-            os.remove(out_fname_CASA)
+        self.out_fname_CASA = "%s_out_casa_transient.nc" % (self.experiment_id)
+        self.out_fname_CASA = os.path.join(self.output_dir, self.out_fname_CASA)
+        if os.path.isfile(self.out_fname_CASA):
+            os.remove(self.out_fname_CASA)
 
         replace_dict = {
-                        "filename%out": "'%s'" % (out_fname),
+                        "filename%out": "'%s'" % (self.out_fname),
+                        "casafile%out": "'%s'" % (self.out_fname_CASA),
                         "filename%log": "'%s'" % (out_log_fname),
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
@@ -358,12 +402,10 @@ class RunCable(object):
                         "spinup": ".FALSE.",
                         "icycle": "%d" % (self.biogeochem),
                         "POPLUC": ".T.",
-                        "filename%out": "'%s'" % (out_fname),
-                        "casafile%out": "'%s'" % (out_fname_CASA),
                         "cable_user%YearStart": "%d" % (st_yr_trans),
                         "cable_user%YearEnd": "%d" % (en_yr_trans),
         }
-        adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fname, replace_dict)
 
     def setup_simulation(self, st_yr, en_yr):
         """
@@ -375,21 +417,21 @@ class RunCable(object):
                         "spinstartyear": "%d" % (st_yr),
                         "spinendyear": "%d" % (en_yr)
         }
-        adjust_nml_file(self.site_nml_fn, replace_dict)
+        adjust_nml_file(self.site_nml_fname, replace_dict)
 
         out_log_fname = "%s_log_simulation.txt" % (self.experiment_id)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
         if os.path.isfile(out_log_fname):
             os.remove(out_log_fname)
 
-        out_fname = "%s_out_cable.nc" % (self.experiment_id)
-        out_fname = os.path.join(self.output_dir, out_fname)
+        self.out_fname = "%s_out_cable.nc" % (self.experiment_id)
+        self.out_fname = os.path.join(self.output_dir, self.out_fname)
 
-        out_fname_CASA = "%s_out_casa.nc" % (self.experiment_id)
-        out_fname_CASA = os.path.join(self.output_dir, out_fname_CASA)
+        self.out_fname_CASA = "%s_out_casa.nc" % (self.experiment_id)
+        self.out_fname_CASA = os.path.join(self.output_dir, self.out_fname_CASA)
 
-        if os.path.isfile(out_fname):
-            os.remove(out_fname)
+        if os.path.isfile(self.out_fname):
+            os.remove(self.out_fname)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
@@ -397,7 +439,7 @@ class RunCable(object):
                         "icycle": "%d" % (self.biogeochem),
                         "cable_user%YearStart": "%d" % (st_yr),
                         "cable_user%YearEnd": "%d" % (en_yr),
-                        "filename%out": "'%s'" % (out_fname),
+                        "filename%out": "'%s'" % (self.out_fname),
                         "POPLUC": ".F.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
@@ -406,9 +448,9 @@ class RunCable(object):
                         "spinup": ".FALSE.",
                         "l_laiFeedbk": ".TRUE.",
                         "output%averaging": "'all'",
-                        "casafile%out": "'%s'" % (out_fname_CASA),
+                        "casafile%out": "'%s'" % (self.out_fname_CASA),
         }
-        adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fname, replace_dict)
 
     def run_me(self):
         if self.verbose:
@@ -456,11 +498,16 @@ class RunCable(object):
 
         return not_in_equilibrium
 
-    def clean_up(self, end=True, tag=None):
+    def clean_up(self, url, rev, end=True, tag=None):
         """
         Move restart files to a directory and delete various files we no longer
         need that CABLE spits out as it spins up.
         """
+        add_attributes_to_output_file(self.nml_fname, self.out_fname,
+                                      url, rev)
+        add_attributes_to_output_file(self.nml_fname, self.out_fname_CASA,
+                                      url, rev)
+
         if end:
             for f in glob.glob("c2c_*_dump.nc"):
                 shutil.move(f, os.path.join(self.dump_dir, f))
@@ -475,67 +522,57 @@ class RunCable(object):
             for f in glob.glob("restart_*.nc"):
                 os.remove(f)
         else:
-            old = os.path.join(self.restart_dir, self.cable_restart_fname)
+            old = self.cable_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
             shutil.copyfile(old, new)
 
-            old = os.path.join(self.restart_dir, self.casa_restart_fname)
+            old = self.casa_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
             shutil.copyfile(old, new)
 
-            old = os.path.join(self.restart_dir, self.climate_restart_fname)
+            old = self.climate_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
             shutil.copyfile(old, new)
 
             if self.call_pop:
-                old = os.path.join(self.restart_dir, self.pop_restart_fname)
+                old = self.pop_restart_fname
                 new = "%s_%s.nc" % (old[:-3], tag)
                 shutil.copyfile(old, new)
 
 if __name__ == "__main__":
 
+    #------------- Change stuff ------------- #
     experiment_id = "Cumberland"
 
-    cwd = os.getcwd()
-    driver_dir = "driver_files"
-    dump_dir = "dump"
     met_dir = "met"
-    co2_ndep_dir = "met"
-    aux_dir = "../../src/NESP2pt9_TRENDYv7/CABLE-AUX/"
+    dump_dir = "dump"
+    driver_dir = "driver_files"
     log_dir = "logs"
     output_dir = "outputs"
+    co2_ndep_dir = "met"
     restart_dir = "restart_files"
-    nml_fn = "cable.nml"
-    site_nml_fn = "site.nml"
-    #met_fname = os.path.join(met_dir, '%s.1.4_met.nc' % (experiment_id))
-    met_fname = os.path.join(met_dir, 'AU_Cum_2014_2017_met.nc')
-    co2_ndep_fname = os.path.join(co2_ndep_dir,
-                                  "AmaFACE_co2npdepforcing_1850_2100_AMB.csv")
-    veg_param_fn = "def_veg_params.txt"
-    bgc_param_fn = "pftlookup.csv"
-    soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
-    exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
+    aux_dir = "../../src/NESP2pt9_TRENDYv7/CABLE-AUX/"
+    nml_fname = "cable.nml"
+    site_nml_fname = "site.nml"
+    veg_fname = "def_veg_params.txt"
+    soil_fname = "def_soil_params.txt"
+    grid_fname = "gridinfo_CSIRO_1x1.nc"
+    phen_fname = "modis_phenology_csiro.txt"
+    cnpbiome_fname = "pftlookup.csv"
+    met_fname = "AU_Cum_2014_2017_met.nc"
+    co2_ndep_fname = "AmaFACE_co2npdepforcing_1850_2100_AMB.csv"
+    cable_src = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7"
     call_pop = False
     verbose = True
-
-    if not os.path.exists(restart_dir):
-        os.makedirs(restart_dir)
-
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    if not os.path.exists(dump_dir):
-        os.makedirs(dump_dir)
+    # ------------------------------------------- #
 
     #for biogeochem in ["C", "CN", "CNP"]:
     for biogeochem in ["C"]:
 
         experiment_id = "Cumberland_%s" % (biogeochem)
-        C = RunCable(experiment_id, driver_dir, output_dir, restart_dir,
-                     dump_dir, met_fname, co2_ndep_fname, nml_fn, site_nml_fn,
-                     veg_param_fn, log_dir, exe, aux_dir, biogeochem, call_pop,
-                     verbose)
+        C = RunCable(experiment_id, met_dir, dump_dir, driver_dir, log_dir,
+                     output_dir,co2_ndep_dir, restart_dir, aux_dir, nml_fname,
+                     site_nml_fname, veg_fname, soil_fname, grid_fname,
+                     phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
+                     cable_src, biogeochem, call_pop, verbose)
         C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
