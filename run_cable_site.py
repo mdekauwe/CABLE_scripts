@@ -60,19 +60,18 @@ class RunCable(object):
 
         (met_files, url, rev) = self.initialise_stuff()
 
+        # Setup multi-processor jobs
         if self.mpi:
-            # Setup multi-processor jobs
             num_cpus = mp.cpu_count()
             chunk_size = int(np.ceil(len(met_files) / float(num_cpus)))
-
             pool = mp.Pool(processes=num_cpus)
             processes = []
+
             for i in range(num_cpus):
                 start = chunk_size * i
                 end = chunk_size * (i + 1)
                 if end > len(met_files):
                     end = len(met_files)
-
 
                 # setup a list of processes that we want to run
                 p = mp.Process(target=self.worker,
