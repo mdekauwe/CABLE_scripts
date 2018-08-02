@@ -138,11 +138,14 @@ def add_attributes_to_output_file(nml_fname, fname, url, rev):
     fp.close()
 
     for i, row in enumerate(namelist):
+        print(row)
         # skip blank lines
         if not row.strip():
             continue
         # skip comment lines
         if "=" not in row:
+            continue
+        if row.startswith("!"):
             continue
         elif not row.startswith("&"):
             key = str(row.strip().split("=")[0]).rstrip()
