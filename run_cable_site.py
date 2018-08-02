@@ -17,6 +17,7 @@ import sys
 import glob
 import shutil
 import subprocess
+import multiprocessing
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
@@ -37,6 +38,9 @@ class RunCable(object):
         self.restart_dir = restart_dir
         self.aux_dir = aux_dir
         self.nml_fname = nml_fname
+        self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
+        self.grid_dir = os.path.join(self.aux_dir, "offline")
+        self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
         self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
         self.grid_fname = os.path.join(self.grid_dir, grid_fname)
@@ -47,9 +51,7 @@ class RunCable(object):
         self.cable_src = cable_src
         self.cable_exe = os.path.join(self.cable_src, "offline/cable")
         self.verbose = verbose
-        self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
-        self.grid_dir = os.path.join(self.aux_dir, "offline")
-        self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
+
         self.lai_fname = lai_fname
         self.fixed_lai = fixed_lai
 
@@ -153,7 +155,7 @@ if __name__ == "__main__":
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
     verbose = True
     # if empty...run all the files in the met_dir
-    met_subset = ['TumbaFluxnet.1.4_met.nc']
+    met_subset = []#['TumbaFluxnet.1.4_met.nc']
     lai_fname = None
     fixed_lai = None
     # ------------------------------------------- #
