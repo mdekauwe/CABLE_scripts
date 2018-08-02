@@ -87,10 +87,10 @@ class RunCable(object):
             self.worker(met_files, url, rev)
 
     def worker(self, met_files, url, rev):
-        
+
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
-            #print(site)
+            print(site)
 
             base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
             nml_fname = "cable_%s.nml" % (site)
