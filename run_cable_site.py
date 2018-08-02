@@ -52,7 +52,7 @@ class RunCable(object):
         self.cable_src = cable_src
         self.cable_exe = os.path.join(self.cable_src, "offline/cable")
         self.verbose = verbose
-        self.mpi = False
+        self.mpi = mpi
         self.lai_fname = lai_fname
         self.fixed_lai = fixed_lai
 
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     co2_conc = 380.0
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
     verbose = False
-    mpi = False
+    mpi = True
     # if empty...run all the files in the met_dir
     met_subset = []#['TumbaFluxnet.1.4_met.nc']
     lai_fname = None
