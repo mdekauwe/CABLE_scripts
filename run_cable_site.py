@@ -36,11 +36,11 @@ class RunCable(object):
         self.restart_dir = restart_dir
         self.aux_dir = aux_dir
         self.nml_fname = nml_fname
-        self.veg_fname = veg_fname
-        self.soil_fname = soil_fname
-        self.grid_fname = grid_fname
-        self.phen_fname = phen_fname
-        self.cnpbiome_fname = cnpbiome_fname
+        self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
+        self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
+        self.grid_fname = os.path.join(self.grid_dir, grid_fname)
+        self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
+        self.cnpbiome_fname = os.path.join(self.biogeochem_dir, cnpbiome_fname)
         self.co2_conc = co2_conc
         self.met_subset = met_subset
         self.cable_src = cable_src
@@ -70,13 +70,13 @@ class RunCable(object):
                             "filename%out": "'%s'" % (out_fname),
                             "filename%log": "'%s'" % (out_log_fname),
                             "filename%restart_out": "' '",
-                            "filename%type": "'%s'" % (os.path.join(self.grid_dir, self.grid_fname)),
-                            "filename%veg": "'%s'" % (os.path.join(self.biogeophys_dir, self.veg_fname)),
-                            "filename%soil": "'%s'" % (os.path.join(self.biogeophys_dir, self.soil_fname)),
+                            "filename%type": "'%s'" % (self.grid_fname),
+                            "filename%veg": "'%s'" % (self.veg_fname),
+                            "filename%soil": "'%s'" % (self.soil_fname),
                             "output%restart": ".FALSE.",
                             "fixedCO2": "%.2f" % (self.co2_conc),
-                            "casafile%phen": "'%s'" % (os.path.join(self.biogeochem_dir, self.phen_fname)),
-                            "casafile%cnpbiome": "'%s'" % (os.path.join(self.biogeochem_dir, self.cnpbiome_fname)),
+                            "casafile%phen": "'%s'" % (self.phen_fname),
+                            "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                             "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
                             "cable_user%GS_SWITCH": "'medlyn'",
                             "cable_user%or_evap": ".TRUE.",
