@@ -30,15 +30,16 @@ from cable_utils import add_attributes_to_output_file
 class RunCable(object):
 
     def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
-                 nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, lai_fname, fixed_lai, co2_conc, met_subset,
-                 cable_src, mpi, verbose):
+                 namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
+                 phen_fname, cnpbiome_fname, lai_fname, fixed_lai, co2_conc,
+                 met_subset, cable_src, mpi, verbose):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
         self.output_dir = output_dir
         self.restart_dir = restart_dir
         self.aux_dir = aux_dir
+        self.namelist_dir = namelist_dir
         self.nml_fname = nml_fname
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
@@ -90,6 +91,12 @@ class RunCable(object):
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
             print(site)
+
+            base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
+            nml_fname = "cable_%s.nml" % (site)
+            shutil.copy(base_nml_fn, nml_fname)
+            add_missing_options_to_nml_file(nml_fname)
+
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
             if self.fixed_lai is not None or self.lai_fname is not None:
@@ -112,12 +119,16 @@ class RunCable(object):
                             "cable_user%GS_SWITCH": "'medlyn'",
                             "cable_user%or_evap": ".TRUE.",
             }
-            adjust_nml_file(self.nml_fname, replace_dict)
-            self.run_me()
-            add_attributes_to_output_file(self.nml_fname, out_fname, url, rev)
+            adjust_nml_file(nml_fname, replace_dict)
+            self.run_me(nml_fname)
+            add_attributes_to_output_file(nml_fname, out_fname, url, rev)
 
             if self.fixed_lai is not None or self.lai_fname is not None:
                 os.remove(fname)
+
+        # cleanup namelist files
+        for f in glob.glob("*.nml"):
+            shutil.move(f, os.path.join(self.namelist_dir, f))
 
     def initialise_stuff(self):
 
@@ -130,9 +141,8 @@ class RunCable(object):
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
 
-        base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
-        shutil.copy(base_nml_fn, self.nml_fname)
-        add_missing_options_to_nml_file(self.nml_fname)
+        if not os.path.exists(self.namelist_dir):
+            os.makedirs(self.namelist_dir)
 
         # Run all the met files in the directory
         if len(met_subset) == 0:
@@ -156,13 +166,13 @@ class RunCable(object):
 
         return (out_fname, out_log_fname)
 
-    def run_me(self):
+    def run_me(self, nml_fname):
         # run the model
         if self.verbose:
-            os.system("%s" % (self.cable_exe))
+            os.system("%s %s" % (self.cable_exe, nml_fname))
         else:
             # No outputs to the screen, stout and stderr to dev/null
-            os.system("%s > /dev/null 2>&1" % (self.cable_exe))
+            os.system("%s %s> /dev/null 2>&1" % (self.cable_exe, nml_fname))
 
 
 
@@ -174,6 +184,7 @@ if __name__ == "__main__":
     output_dir = "outputs"
     restart_dir = "restart_files"
     aux_dir = "../../src/CMIP6-MOSRS/CABLE-AUX/"
+    namelist_dir = "namelists"
     nml_fname = "cable.nml"
     veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
     soil_fname = "def_soil_params.txt"
@@ -191,7 +202,7 @@ if __name__ == "__main__":
     # ------------------------------------------- #
 
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
-                 nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
-                 cnpbiome_fname, lai_fname, fixed_lai, co2_conc, met_subset,
-                 cable_src, mpi, verbose)
+                 namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
+                 phen_fname, cnpbiome_fname, lai_fname, fixed_lai, co2_conc,
+                 met_subset, cable_src, mpi, verbose)
     C.main()
