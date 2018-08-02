@@ -31,7 +31,7 @@ class RunCable(object):
     def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
                  cnpbiome_fname, lai_fname, fixed_lai, co2_conc, met_subset,
-                 cable_src, verbose):
+                 cable_src, mpi, verbose):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -52,41 +52,41 @@ class RunCable(object):
         self.cable_src = cable_src
         self.cable_exe = os.path.join(self.cable_src, "offline/cable")
         self.verbose = verbose
-
+        self.mpi = False
         self.lai_fname = lai_fname
         self.fixed_lai = fixed_lai
 
-    def single_processor(self):
-        (met_files, url, rev) = self.initialise_stuff()
-        self.worker(met_files)
-
-    def mpi_approach(self):
+    def main(self):
 
         (met_files, url, rev) = self.initialise_stuff()
 
-        # Setup multi-processor jobs
-        num_cpus = mp.cpu_count()
-        chunk_size = int(np.ceil(len(met_files) / float(num_cpus)))
+        if self.mpi:
+            # Setup multi-processor jobs
+            num_cpus = mp.cpu_count()
+            chunk_size = int(np.ceil(len(met_files) / float(num_cpus)))
 
-        pool = mp.Pool(processes=num_cpus)
-        processes = []
-        for i in range(num_cpus):
-            start = chunk_size * i
-            end = chunk_size * (i + 1)
-            if end > len(met_files):
-                end = len(met_files)
+            pool = mp.Pool(processes=num_cpus)
+            processes = []
+            for i in range(num_cpus):
+                start = chunk_size * i
+                end = chunk_size * (i + 1)
+                if end > len(met_files):
+                    end = len(met_files)
 
 
-            # setup a list of processes that we want to run
-            p = mp.Process(target=self.worker,
-                           args=(met_files[start:end],))
-            processes.append(p)
+                # setup a list of processes that we want to run
+                p = mp.Process(target=self.worker,
+                               args=(met_files[start:end], url, rev, ))
+                processes.append(p)
 
-        # Run processes
-        for p in processes:
-            p.start()
+            # Run processes
+            for p in processes:
+                p.start()
+        else:
+            self.worker(met_files, url, rev)
 
-    def worker(self, met_files):
+    def worker(self, met_files, url, rev):
+
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
             print(site)
@@ -183,6 +183,7 @@ if __name__ == "__main__":
     co2_conc = 380.0
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
     verbose = False
+    mpi = False
     # if empty...run all the files in the met_dir
     met_subset = []#['TumbaFluxnet.1.4_met.nc']
     lai_fname = None
@@ -192,5 +193,5 @@ if __name__ == "__main__":
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
                  cnpbiome_fname, lai_fname, fixed_lai, co2_conc, met_subset,
-                 cable_src, verbose)
-    C.single_processor()
+                 cable_src, mpi, verbose)
+    C.main()
