@@ -17,7 +17,8 @@ import sys
 import glob
 import shutil
 import subprocess
-import multiprocessing
+import multiprocessing as mp
+import numpy as np
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
@@ -55,13 +56,40 @@ class RunCable(object):
         self.lai_fname = lai_fname
         self.fixed_lai = fixed_lai
 
-    def main(self):
+    def single_processor(self):
+        (met_files, url, rev) = self.initialise_stuff()
+        self.worker(met_files)
+
+    def mpi_approach(self):
 
         (met_files, url, rev) = self.initialise_stuff()
 
-        for fname in met_files:
+        # Setup multi-processor jobs
+        num_cpus = mp.cpu_count()
+        chunk_size = int(np.ceil(len(met_files) / float(num_cpus)))
 
+        pool = mp.Pool(processes=num_cpus)
+        processes = []
+        for i in range(num_cpus):
+            start = chunk_size * i
+            end = chunk_size * (i + 1)
+            if end > len(met_files):
+                end = len(met_files)
+
+
+            # setup a list of processes that we want to run
+            p = mp.Process(target=self.worker,
+                           args=(met_files[start:end],))
+            processes.append(p)
+
+        # Run processes
+        for p in processes:
+            p.start()
+
+    def worker(self, met_files):
+        for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
+            print(site)
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
             if self.fixed_lai is not None or self.lai_fname is not None:
@@ -133,7 +161,8 @@ class RunCable(object):
         if self.verbose:
             os.system("%s" % (self.cable_exe))
         else:
-            os.system("%s 1>&2" % (self.cable_exe))
+            # No outputs to the screen, stout and stderr to dev/null
+            os.system("%s > /dev/null 2>&1" % (self.cable_exe))
 
 
 
@@ -153,7 +182,7 @@ if __name__ == "__main__":
     cnpbiome_fname = "pftlookup_csiro_v16_17tiles.csv"
     co2_conc = 380.0
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
-    verbose = True
+    verbose = False
     # if empty...run all the files in the met_dir
     met_subset = []#['TumbaFluxnet.1.4_met.nc']
     lai_fname = None
@@ -164,4 +193,4 @@ if __name__ == "__main__":
                  nml_fname, veg_fname, soil_fname, grid_fname, phen_fname,
                  cnpbiome_fname, lai_fname, fixed_lai, co2_conc, met_subset,
                  cable_src, verbose)
-    C.main()
+    C.single_processor()
