@@ -122,13 +122,9 @@ class RunCable(object):
             adjust_nml_file(nml_fname, replace_dict)
             self.run_me(nml_fname)
             add_attributes_to_output_file(nml_fname, out_fname, url, rev)
-
+            shutil.move(nml_fname, os.path.join(self.namelist_dir, nml_fname))
             if self.fixed_lai is not None or self.lai_fname is not None:
                 os.remove(fname)
-
-        # cleanup namelist files
-        for f in glob.glob("*.nml"):
-            shutil.move(f, os.path.join(self.namelist_dir, f))
 
     def initialise_stuff(self):
 
