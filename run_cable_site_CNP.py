@@ -29,6 +29,10 @@ import pandas as pd
 import xarray as xr
 import numpy as np
 
+from cable_utils import adjust_nml_file
+from cable_utils import add_missing_options_to_nml_file
+from cable_utils import get_svn_info
+
 class RunCable(object):
 
     def __init__(self, experiment_id, driver_dir, output_dir, restart_dir,
@@ -92,7 +96,7 @@ class RunCable(object):
 
             # initial spin
             print("Spinup")
-            
+
             self.run_me()
             self.clean_up(end=False, tag="zero")
 
@@ -168,62 +172,6 @@ class RunCable(object):
         return (st_yr, en_yr, st_yr_transient, en_yr_transient,
                 st_yr_spin, en_yr_spin)
 
-    def adjust_nml_file(self, fname, replacements):
-        """
-        Adjust the params/flags in the CABLE namelise file. Note this writes
-        over whatever file it is given!
-
-        Parameters:
-        ----------
-        fname : string
-            parameter filename to be changed.
-        replacements : dictionary
-            dictionary of replacement values.
-
-        """
-        f = open(fname, 'r')
-        param_str = f.read()
-        f.close()
-        new_str = self.replace_keys(param_str, replacements)
-        fd, path = tempfile.mkstemp()
-        os.write(fd, str.encode(new_str))
-        os.close(fd)
-        shutil.copy(path, fname)
-        os.remove(path)
-
-    def replace_keys(self, text, replacements_dict):
-        """ Function expects to find CABLE namelist file formatted key = value.
-
-        Parameters:
-        ----------
-        text : string
-            input file data.
-        replacements_dict : dictionary
-            dictionary of replacement values.
-
-        Returns:
-        --------
-        new_text : string
-            input file with replacement values
-
-        """
-        lines = text.splitlines()
-        for i, row in enumerate(lines):
-            # skip blank lines
-            if not row.strip():
-                continue
-            if "=" not in row:
-                lines[i] = row
-                continue
-            elif not row.startswith("&"):
-                key = row.split("=")[0]
-                val = row.split("=")[1]
-                lines[i] = " ".join((key.rstrip(), "=",
-                                     replacements_dict.get(key.strip(),
-                                     val.lstrip())))
-
-        return '\n'.join(lines) + '\n'
-
     def initial_setup(self, st_yr_spin, en_yr_spin, st_yr, en_yr):
         """
         Setup CABLE namelist file for spinup from zero
@@ -258,7 +206,7 @@ class RunCable(object):
                         "spinNdep": "0.79",
                         "spinPdep": "0.144",
         }
-        self.adjust_nml_file(self.site_nml_fn, replace_dict)
+        adjust_nml_file(self.site_nml_fn, replace_dict)
 
         replace_dict = {
                         "filename%met": "'%s'" % (self.met_fname),
@@ -294,7 +242,7 @@ class RunCable(object):
                         "icycle": "%d" % (self.biogeochem),
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
         }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_re_spin(self, number=None):
         """
@@ -337,7 +285,7 @@ class RunCable(object):
                         "filename%out": "'%s'" % (out_fname),
                         "casafile%out": "'%s'" % (out_fname_CASA),
         }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_analytical_spin(self, number, st_yr_spin, en_yr_spin):
         """
@@ -369,7 +317,7 @@ class RunCable(object):
                         "cable_user%CASA_SPIN_ENDYEAR": "%d" % (en_yr_spin),
                         "casafile%out": "'%s'" % (out_fname_CASA),
         }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_transient(self, st_yr_trans, en_yr_trans, st_yr, en_yr):
         """
@@ -381,7 +329,7 @@ class RunCable(object):
                         "spinstartyear": "%d" % (st_yr),
                         "spinendyear": "%d" % (en_yr),
            }
-        self.adjust_nml_file(self.site_nml_fn, replace_dict)
+        adjust_nml_file(self.site_nml_fn, replace_dict)
 
         out_log_fname = "%s_log_transient.txt" % (self.experiment_id)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
@@ -415,7 +363,7 @@ class RunCable(object):
                         "cable_user%YearStart": "%d" % (st_yr_trans),
                         "cable_user%YearEnd": "%d" % (en_yr_trans),
         }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fn, replace_dict)
 
     def setup_simulation(self, st_yr, en_yr):
         """
@@ -427,7 +375,7 @@ class RunCable(object):
                         "spinstartyear": "%d" % (st_yr),
                         "spinendyear": "%d" % (en_yr)
         }
-        self.adjust_nml_file(self.site_nml_fn, replace_dict)
+        adjust_nml_file(self.site_nml_fn, replace_dict)
 
         out_log_fname = "%s_log_simulation.txt" % (self.experiment_id)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
@@ -460,7 +408,7 @@ class RunCable(object):
                         "output%averaging": "'all'",
                         "casafile%out": "'%s'" % (out_fname_CASA),
         }
-        self.adjust_nml_file(self.nml_fn, replace_dict)
+        adjust_nml_file(self.nml_fn, replace_dict)
 
     def run_me(self):
         if self.verbose:
@@ -601,7 +549,7 @@ if __name__ == "__main__":
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
     call_pop = False
-    verbose = False
+    verbose = True
 
     if not os.path.exists(restart_dir):
         os.makedirs(restart_dir)
