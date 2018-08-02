@@ -20,9 +20,7 @@ import subprocess
 
 from cable_utils import adjust_nml_file
 from cable_utils import add_missing_options_to_nml_file
-from cable_utils import add_missing_options_to_nml_file
 from cable_utils import get_svn_info
-from cable_utils import add_attributes_to_output_file
 from cable_utils import change_LAI
 
 class RunCable(object):
