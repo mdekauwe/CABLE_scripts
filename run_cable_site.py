@@ -87,7 +87,7 @@ class RunCable(object):
             self.worker(met_files, url, rev)
 
     def worker(self, met_files, url, rev):
-        print(met_files)
+        
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
             #print(site)

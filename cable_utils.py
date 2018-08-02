@@ -70,7 +70,7 @@ def replace_keys(text, replacements_dict):
     return '\n'.join(lines) + '\n'
 
 
-def add_missing_options_to_nml_file(fname, line_start=None):
+def add_missing_options_to_nml_file(fname, site, line_start=None):
     """
     Some of the flags we may wish to change are missin from the default
     file so we can't adjust them via this script...add them
@@ -95,7 +95,7 @@ def add_missing_options_to_nml_file(fname, line_start=None):
     contents.insert(line_start, arg)
     line_start += 1
 
-    tmp_fname = "tmp.nml"
+    tmp_fname = "tmp_%s.nml" % (site)
     f = open(tmp_fname, "w")
     contents = "".join(contents)
     f.write(contents)
@@ -138,7 +138,7 @@ def add_attributes_to_output_file(nml_fname, fname, url, rev):
     fp.close()
 
     for i, row in enumerate(namelist):
-        
+
         # skip blank lines
         if not row.strip():
             continue
