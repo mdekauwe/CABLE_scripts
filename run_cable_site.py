@@ -178,7 +178,7 @@ class RunCable(object):
 if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
-    met_dir = "/Users/mdekauwe/research/CABLE_runs/met_data/plumber_met"
+    met_dir = "../../met_data/plumber_met"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restart_files"
