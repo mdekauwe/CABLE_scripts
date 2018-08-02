@@ -180,7 +180,7 @@ class RunCable(object):
                         self.site_nml_fn)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
                         self.nml_fn)
-        #self.add_missing_options_to_nml_file(self.nml_fn)
+        #add_missing_options_to_nml_file(self.nml_fn)
 
         out_fname = os.path.join(self.output_dir,
                                  "%s_out_cable_zero.nc" % (self.experiment_id))
@@ -491,39 +491,6 @@ class RunCable(object):
                 old = os.path.join(self.restart_dir, self.pop_restart_fname)
                 new = "%s_%s.nc" % (old[:-3], tag)
                 shutil.copyfile(old, new)
-
-    def add_missing_options_to_nml_file(self, fname, line_start=None):
-        """
-        Some of the flags we may wish to change are missing from the default
-        file so we can't adjust them via this script...add them
-        """
-        if line_start is None:
-            line_start = sum(1 for line in open(fname)) - 1
-
-        f = open(fname, "r")
-        contents = f.readlines()
-        f.close()
-
-        arg = "   cable_user%GW_MODEL = .FALSE.\n"
-        contents.insert(line_start, arg)
-        line_start += 1
-
-        arg = "   cable_user%or_evap = .FALSE.\n"
-        contents.insert(line_start, arg)
-        line_start += 1
-
-        arg = "   filename%gw_elev = 'GSWP3_elevation_slope_stddev.nc'\n"
-        contents.insert(line_start, arg)
-        line_start += 1
-
-        tmp_fname = "tmp.nml"
-        f = open(tmp_fname, "w")
-        contents = "".join(contents)
-        f.write(contents)
-        f.close()
-
-        shutil.move(tmp_fname, fname)
-
 
 if __name__ == "__main__":
 
