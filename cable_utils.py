@@ -142,10 +142,11 @@ def add_attributes_to_output_file(nml_fname, fname, url, rev):
         # skip blank lines
         if not row.strip():
             continue
-        # skip comment lines
-        if "=" not in row:
+        # Lines without key = value statement
+        elif "=" not in row:
             continue
-        if row.startswith("!"):
+        # Skip lines that are just comments as these can have "=" too
+        elif row.startswith("!"):
             continue
         elif not row.startswith("&"):
             key = str(row.strip().split("=")[0]).rstrip()
