@@ -57,7 +57,7 @@ def replace_keys(text, replacements_dict):
         # skip blank lines
         if not row.strip():
             continue
-        if "=" not in row:
+        elif "=" not in row:
             lines[i] = row
             continue
         elif not row.startswith("&"):
@@ -138,7 +138,7 @@ def add_attributes_to_output_file(nml_fname, fname, url, rev):
     fp.close()
 
     for i, row in enumerate(namelist):
-        print(row)
+        
         # skip blank lines
         if not row.strip():
             continue
@@ -146,7 +146,7 @@ def add_attributes_to_output_file(nml_fname, fname, url, rev):
         elif "=" not in row:
             continue
         # Skip lines that are just comments as these can have "=" too
-        elif row.startswith("!"):
+        elif row.strip().startswith("!"):
             continue
         elif not row.startswith("&"):
             key = str(row.strip().split("=")[0]).rstrip()

@@ -287,6 +287,7 @@ class RunCable(object):
         (url, rev) = get_svn_info(cwd, self.cable_src)
 
         return (url, rev)
+
     def setup_re_spin(self, number=None):
         """
         Adjust the CABLE namelist file with the various flags for another spin
@@ -504,6 +505,7 @@ class RunCable(object):
         Move restart files to a directory and delete various files we no longer
         need that CABLE spits out as it spins up.
         """
+
         add_attributes_to_output_file(self.nml_fname, self.out_fname,
                                       url, rev)
         add_attributes_to_output_file(self.nml_fname, self.out_fname_CASA,
@@ -564,7 +566,7 @@ if __name__ == "__main__":
     co2_ndep_fname = "AmaFACE_co2npdepforcing_1850_2100_AMB.csv"
     cable_src = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7"
     call_pop = False
-    verbose = True
+    verbose = False
     # ------------------------------------------- #
 
     #for biogeochem in ["C", "CN", "CNP"]:
