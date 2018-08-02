@@ -92,7 +92,7 @@ class RunCable(object):
 
             # initial spin
             print("Spinup")
-
+            
             self.run_me()
             self.clean_up(end=False, tag="zero")
 
@@ -600,7 +600,7 @@ if __name__ == "__main__":
     bgc_param_fn = "pftlookup.csv"
     soil_param_fn = "def_soil_params.txt"   # only used when soilparmnew = .FALSE. in cable.nml
     exe = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7/offline/cable"
-    call_pop = True
+    call_pop = False
     verbose = False
 
     if not os.path.exists(restart_dir):
