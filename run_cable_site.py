@@ -87,15 +87,15 @@ class RunCable(object):
             self.worker(met_files, url, rev)
 
     def worker(self, met_files, url, rev):
-
+        print(met_files)
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
-            print(site)
+            #print(site)
 
             base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
             nml_fname = "cable_%s.nml" % (site)
             shutil.copy(base_nml_fn, nml_fname)
-            add_missing_options_to_nml_file(nml_fname)
+            add_missing_options_to_nml_file(nml_fname, site)
 
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
@@ -122,6 +122,7 @@ class RunCable(object):
             adjust_nml_file(nml_fname, replace_dict)
 
             self.run_me(nml_fname)
+
             add_attributes_to_output_file(nml_fname, out_fname, url, rev)
             shutil.move(nml_fname, os.path.join(self.namelist_dir, nml_fname))
 
