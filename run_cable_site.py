@@ -32,7 +32,7 @@ class RunCable(object):
     def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
                  phen_fname, cnpbiome_fname, lai_fname, fixed_lai, co2_conc,
-                 met_subset, cable_src, mpi, verbose):
+                 met_subset, cable_src, cable_exe, mpi, verbose):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -52,7 +52,8 @@ class RunCable(object):
         self.co2_conc = co2_conc
         self.met_subset = met_subset
         self.cable_src = cable_src
-        self.cable_exe = os.path.join(self.cable_src, "offline/cable")
+        self.cable_exe = cable_exe
+        self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
         self.verbose = verbose
         self.mpi = mpi
         self.lai_fname = lai_fname
@@ -153,6 +154,13 @@ class RunCable(object):
         cwd = os.getcwd()
         (url, rev) = get_svn_info(cwd, self.cable_src)
 
+        # delete local executable, copy a local copy and use taht
+        local_exe = "cable"
+        if os.path.isfile(local_exe):
+            os.remove(local_exe)
+        shutil.copy(self.cable_exe, local_exe)
+        self.cable_exe = local_exe
+
         return (met_files, url, rev)
 
     def clean_up_old_files(self, site):
@@ -193,6 +201,7 @@ if __name__ == "__main__":
     cnpbiome_fname = "pftlookup_csiro_v16_17tiles.csv"
     co2_conc = 380.0
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
+    cable_exe = "cable"
     verbose = False
     mpi = True
     num_cores = None # set to a number, if None it will use all cores...!
@@ -205,5 +214,5 @@ if __name__ == "__main__":
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
                  phen_fname, cnpbiome_fname, lai_fname, fixed_lai, co2_conc,
-                 met_subset, cable_src, mpi, verbose)
+                 met_subset, cable_src, cable_exe, mpi, verbose)
     C.main(num_cores)
