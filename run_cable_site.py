@@ -195,11 +195,11 @@ if __name__ == "__main__":
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
     verbose = False
     mpi = True
+    num_cores = None # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
     met_subset = []#['TumbaFluxnet.1.4_met.nc']
     lai_fname = None
     fixed_lai = None
-    num_cores = None # set to a number, if None it will use all cores...!
     # ------------------------------------------- #
 
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
