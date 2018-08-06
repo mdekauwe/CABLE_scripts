@@ -58,13 +58,14 @@ class RunCable(object):
         self.lai_fname = lai_fname
         self.fixed_lai = fixed_lai
 
-    def main(self):
+    def main(self, num_cores=None):
 
         (met_files, url, rev) = self.initialise_stuff()
 
         # Setup multi-processor jobs
         if self.mpi:
-            num_cpus = mp.cpu_count()
+            if num_cores is None: # use them all!
+                num_cpus = mp.cpu_count()
             chunk_size = int(np.ceil(len(met_files) / float(num_cpus)))
             pool = mp.Pool(processes=num_cpus)
             processes = []
@@ -198,10 +199,11 @@ if __name__ == "__main__":
     met_subset = []#['TumbaFluxnet.1.4_met.nc']
     lai_fname = None
     fixed_lai = None
+    num_cores = None # set to a number, if None it will use all cores...!
     # ------------------------------------------- #
 
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
                  phen_fname, cnpbiome_fname, lai_fname, fixed_lai, co2_conc,
                  met_subset, cable_src, mpi, verbose)
-    C.main()
+    C.main(num_cores)
