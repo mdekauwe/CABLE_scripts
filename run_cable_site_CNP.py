@@ -40,7 +40,7 @@ class RunCable(object):
                  output_dir, co2_ndep_dir, restart_dir, aux_dir, nml_fname,
                  site_nml_fname, veg_fname, soil_fname, grid_fname,
                  phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                 cable_src, biogeochem, call_pop, verbose):
+                 cable_src, biogeochem, call_pop, use_sli, verbose):
 
         self.experiment_id = experiment_id
         self.met_dir = met_dir
@@ -82,6 +82,7 @@ class RunCable(object):
         self.cable_exe = os.path.join(self.cable_src, "offline/cable")
         self.biogeochem = biogeochem
         self.call_pop = call_pop
+        self.use_sli = use_sli
         self.verbose = verbose
         self.nyear_spinup = 30
 
@@ -106,6 +107,11 @@ class RunCable(object):
         else:
             self.pop_flag = ".FALSE."
         self.debug = True
+
+        if self.use_sli:
+            self.soil_flag = "sli"
+        else:
+            self.soil_flag = "default"
 
     def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
 
@@ -321,7 +327,7 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".TRUE.",
                         "cable_user%CASA_NREP": "0",
-                        "cable_user%SOIL_STRUC": "'sli'",
+                        "cable_user%SOIL_STRUC": "'%s'", % (self.soil_flag)
                         "icycle": "%d" % (self.biogeochem),
                         "leaps": ".TRUE.",
                         "spincasa": ".FALSE.",
@@ -354,7 +360,7 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_READ": ".TRUE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%CASA_NREP": "1",
-                        "cable_user%SOIL_STRUC": "'default'",
+                        "cable_user%SOIL_STRUC": "'default'", # THIS needs to be default, we don't turn sli on here, presumably because it is too slow but does this make sense?
                         "leaps": ".FALSE.",
                         "spincasa": ".TRUE.",
                         "casafile%c2cdumppath": "'./'",
@@ -398,7 +404,7 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%CASA_NREP": "0",
-                        "cable_user%SOIL_STRUC": "'sli'",
+                        "cable_user%SOIL_STRUC": "'%s'", % (self.soil_flag)
                         "output%restart": ".TRUE.",
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
@@ -445,7 +451,7 @@ class RunCable(object):
                         "POPLUC": ".F.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
-                        "cable_user%SOIL_STRUC": "'sli'",
+                        "cable_user%SOIL_STRUC": "'%s'", % (self.soil_flag)
                         "spincasa": ".FALSE.",
                         "spinup": ".FALSE.",
                         "l_laiFeedbk": ".TRUE.",
@@ -571,6 +577,7 @@ if __name__ == "__main__":
     cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
     call_pop = False
     verbose = True
+    use_sli = False
     # ------------------------------------------- #
 
     #for biogeochem in ["C", "CN", "CNP"]:
@@ -581,5 +588,5 @@ if __name__ == "__main__":
                      output_dir,co2_ndep_dir, restart_dir, aux_dir, nml_fname,
                      site_nml_fname, veg_fname, soil_fname, grid_fname,
                      phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                     cable_src, biogeochem, call_pop, verbose)
+                     cable_src, biogeochem, call_pop, use_sli, verbose)
         C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
