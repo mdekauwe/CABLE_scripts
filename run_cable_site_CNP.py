@@ -40,7 +40,7 @@ class RunCable(object):
                  output_dir, co2_ndep_dir, restart_dir, aux_dir, nml_fname,
                  site_nml_fname, veg_fname, soil_fname, grid_fname,
                  phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                 cable_src, biogeochem, call_pop, use_sli, verbose):
+                 cable_src, biogeochem, use_pop, use_sli, verbose):
 
         self.experiment_id = experiment_id
         self.met_dir = met_dir
@@ -81,7 +81,7 @@ class RunCable(object):
         self.cable_src = cable_src
         self.cable_exe = os.path.join(self.cable_src, "offline/cable")
         self.biogeochem = biogeochem
-        self.call_pop = call_pop
+        self.use_pop = use_pop
         self.use_sli = use_sli
         self.verbose = verbose
         self.nyear_spinup = 30
@@ -102,7 +102,7 @@ class RunCable(object):
         else:
             raise ValueError("Unknown biogeochemistry option: C, CN, CNP")
 
-        if self.call_pop:
+        if self.use_pop:
             self.pop_flag = ".TRUE."
         else:
             self.pop_flag = ".FALSE."
@@ -546,7 +546,7 @@ class RunCable(object):
             if os.path.isfile(old):
                 shutil.copyfile(old, new)
 
-            if self.call_pop:
+            if self.use_pop:
                 old = self.pop_restart_fname
                 new = "%s_%s.nc" % (old[:-3], tag)
                 if os.path.isfile(old):
@@ -575,7 +575,7 @@ if __name__ == "__main__":
     met_fname = "AU_Cum_2014_2017_met.nc"
     co2_ndep_fname = "AmaFACE_co2npdepforcing_1850_2100_AMB.csv"
     cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
-    call_pop = False
+    use_pop = False
     verbose = True
     use_sli = False
     # ------------------------------------------- #
@@ -588,5 +588,5 @@ if __name__ == "__main__":
                      output_dir,co2_ndep_dir, restart_dir, aux_dir, nml_fname,
                      site_nml_fname, veg_fname, soil_fname, grid_fname,
                      phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                     cable_src, biogeochem, call_pop, use_sli, verbose)
+                     cable_src, biogeochem, use_pop, use_sli, verbose)
         C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
