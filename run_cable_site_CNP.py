@@ -127,18 +127,19 @@ class RunCable(object):
         if SPIN_UP == True:
 
             # initial spin
-            print("Spinup")
+            print("*******First Spinup****** \n")
 
             self.run_me()
             self.clean_up(url, rev, end=False, tag="zero")
 
             while not_in_equilibrium:
-
+                print("*******Spinup stage****** \n")
                 self.logfile="log_ccp%d" % (num)
                 self.setup_re_spin(number=num)
                 self.run_me()
                 self.clean_up(url, rev, end=False, tag="ccp%d" % (num))
 
+                print("*******Analytical stage****** \n")
                 self.logfile="log_sa%d" % (num)
                 self.setup_analytical_spin(number=num, st_yr_spin=st_yr_spin,
                                            en_yr_spin=en_yr_spin )
@@ -150,6 +151,7 @@ class RunCable(object):
                 num += 1
 
             # one final spin
+            print("****** Final stage****** \n")
             self.logfile="log_ccp%d" % (num)
             self.setup_re_spin(number=num)
             self.run_me()
