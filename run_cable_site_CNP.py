@@ -283,7 +283,6 @@ class RunCable(object):
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
         }
         adjust_nml_file(self.nml_fname, replace_dict)
-
         cwd = os.getcwd()
         (url, rev) = get_svn_info(cwd, self.cable_src)
 
@@ -529,23 +528,23 @@ class RunCable(object):
             old = self.cable_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
             if os.path.isfile(old):
-                shutil.copyfile(old, ne
+                shutil.copyfile(old, new)
 
             old = self.casa_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
             if os.path.isfile(old):
-                shutil.copyfile(old, ne
+                shutil.copyfile(old, new)
 
             old = self.climate_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
             if os.path.isfile(old):
-                shutil.copyfile(old, ne
+                shutil.copyfile(old, new)
 
             if self.call_pop:
                 old = self.pop_restart_fname
                 new = "%s_%s.nc" % (old[:-3], tag)
                 if os.path.isfile(old):
-                    shutil.copyfile(old, ne
+                    shutil.copyfile(old, new)
 
 if __name__ == "__main__":
 
