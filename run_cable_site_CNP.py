@@ -40,7 +40,7 @@ class RunCable(object):
                  output_dir, co2_ndep_dir, restart_dir, aux_dir, nml_fname,
                  site_nml_fname, veg_fname, soil_fname, grid_fname,
                  phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                 cable_src, biogeochem, use_pop, use_sli, verbose):
+                 cable_src, biogeochem, use_pop, use_sli, use_clim, verbose):
 
         self.experiment_id = experiment_id
         self.met_dir = met_dir
@@ -76,13 +76,12 @@ class RunCable(object):
                                     "%s_casa_rst.nc" % (self.experiment_id))
         self.pop_restart_fname = os.path.join(self.restart_dir, \
                                     "%s_pop_rst.nc" % (self.experiment_id))
-        self.climate_restart_fname = os.path.join(self.restart_dir, \
-                                "%s_climate_rst.nc" % (self.experiment_id))
         self.cable_src = cable_src
         self.cable_exe = os.path.join(self.cable_src, "offline/cable")
         self.biogeochem = biogeochem
         self.use_pop = use_pop
         self.use_sli = use_sli
+        self.use_clim = use_clim
         self.verbose = verbose
         self.nyear_spinup = 30
 
@@ -113,6 +112,14 @@ class RunCable(object):
         else:
             self.soil_flag = "default"
 
+        if self.use_clim:
+            self.clim_flag = ".TRUE."
+            self.climate_restart_fname = os.path.join(self.restart_dir, \
+                                    "%s_climate_rst.nc" % (self.experiment_id))
+        else:
+            self.clim_flag = ".FALSE."
+            self.climate_restart_fname = ""
+
     def main(self, SPIN_UP=False, TRANSIENT=False, SIMULATION=False):
 
         num = 1
@@ -130,8 +137,8 @@ class RunCable(object):
             print("*******First Spinup****** \n")
 
             self.run_me()
-            self.clean_up(url, rev, end=False, tag="zero")
-
+            #self.clean_up(url, rev, end=False, tag="zero")
+            sys.exit()
             while not_in_equilibrium:
                 print("*******Spinup stage****** \n")
                 self.logfile="log_ccp%d" % (num)
@@ -279,7 +286,7 @@ class RunCable(object):
                         "cable_user%POP_fromZero": ".T.",
                         "cable_user%CASA_fromZero": ".T.",
                         "cable_user%CLIMATE_fromZero": ".T.",
-                        "cable_user%CALL_CLIMATE": ".F.",
+                        "cable_user%CALL_CLIMATE": "%s" % (self.clim_flag),
                         "cable_user%SOIL_STRUC": "'%s'" % (self.soil_flag),
                         "cable_user%vcmax": "'%s'" % (self.vcmax),
                         "cable_user%YearStart": "%d" % (st_yr_spin),
@@ -581,6 +588,7 @@ if __name__ == "__main__":
     use_pop = False
     verbose = True
     use_sli = False
+    use_clim = False
     # ------------------------------------------- #
 
     #for biogeochem in ["C", "CN", "CNP"]:
@@ -591,5 +599,5 @@ if __name__ == "__main__":
                      output_dir,co2_ndep_dir, restart_dir, aux_dir, nml_fname,
                      site_nml_fname, veg_fname, soil_fname, grid_fname,
                      phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                     cable_src, biogeochem, use_pop, use_sli, verbose)
+                     cable_src, biogeochem, use_pop, use_sli, use_clim, verbose)
         C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
