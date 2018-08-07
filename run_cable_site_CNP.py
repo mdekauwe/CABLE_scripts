@@ -327,7 +327,7 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".TRUE.",
                         "cable_user%CASA_NREP": "0",
-                        "cable_user%SOIL_STRUC": "'%s'", % (self.soil_flag)
+                        "cable_user%SOIL_STRUC": "'%s'" % (self.soil_flag)
                         "icycle": "%d" % (self.biogeochem),
                         "leaps": ".TRUE.",
                         "spincasa": ".FALSE.",
@@ -404,7 +404,7 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%CASA_NREP": "0",
-                        "cable_user%SOIL_STRUC": "'%s'", % (self.soil_flag)
+                        "cable_user%SOIL_STRUC": "'%s'" % (self.soil_flag)
                         "output%restart": ".TRUE.",
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
@@ -451,7 +451,7 @@ class RunCable(object):
                         "POPLUC": ".F.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
-                        "cable_user%SOIL_STRUC": "'%s'", % (self.soil_flag)
+                        "cable_user%SOIL_STRUC": "'%s'" % (self.soil_flag)
                         "spincasa": ".FALSE.",
                         "spinup": ".FALSE.",
                         "l_laiFeedbk": ".TRUE.",
