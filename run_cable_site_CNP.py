@@ -271,6 +271,7 @@ class RunCable(object):
                         "cable_user%POP_fromZero": ".T.",
                         "cable_user%CASA_fromZero": ".T.",
                         "cable_user%CLIMATE_fromZero": ".T.",
+                        "cable_user%CALL_CLIMATE": ".F.",
                         "cable_user%vcmax": "'%s'" % (self.vcmax),
                         "cable_user%YearStart": "%d" % (st_yr_spin),
                         "cable_user%YearEnd": "%d" % (en_yr_spin),
@@ -527,20 +528,24 @@ class RunCable(object):
         else:
             old = self.cable_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
-            shutil.copyfile(old, new)
+            if os.path.isfile(old):
+                shutil.copyfile(old, ne
 
             old = self.casa_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
-            shutil.copyfile(old, new)
+            if os.path.isfile(old):
+                shutil.copyfile(old, ne
 
             old = self.climate_restart_fname
             new = "%s_%s.nc" % (old[:-3], tag)
-            shutil.copyfile(old, new)
+            if os.path.isfile(old):
+                shutil.copyfile(old, ne
 
             if self.call_pop:
                 old = self.pop_restart_fname
                 new = "%s_%s.nc" % (old[:-3], tag)
-                shutil.copyfile(old, new)
+                if os.path.isfile(old):
+                    shutil.copyfile(old, ne
 
 if __name__ == "__main__":
 
@@ -554,7 +559,7 @@ if __name__ == "__main__":
     output_dir = "outputs"
     co2_ndep_dir = "met"
     restart_dir = "restart_files"
-    aux_dir = "../../src/NESP2pt9_TRENDYv7/CABLE-AUX/"
+    aux_dir = "../../src/CMIP6-MOSRS_CNP/CABLE-AUX/"
     nml_fname = "cable.nml"
     site_nml_fname = "site.nml"
     veg_fname = "def_veg_params.txt"
@@ -564,9 +569,9 @@ if __name__ == "__main__":
     cnpbiome_fname = "pftlookup.csv"
     met_fname = "AU_Cum_2014_2017_met.nc"
     co2_ndep_fname = "AmaFACE_co2npdepforcing_1850_2100_AMB.csv"
-    cable_src = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7"
+    cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
     call_pop = False
-    verbose = False
+    verbose = True
     # ------------------------------------------- #
 
     #for biogeochem in ["C", "CN", "CNP"]:
