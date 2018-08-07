@@ -278,6 +278,7 @@ class RunCable(object):
                         "cable_user%CASA_fromZero": ".T.",
                         "cable_user%CLIMATE_fromZero": ".T.",
                         "cable_user%CALL_CLIMATE": ".F.",
+                        "cable_user%SOIL_STRUC": "'%s'" % (self.soil_flag),
                         "cable_user%vcmax": "'%s'" % (self.vcmax),
                         "cable_user%YearStart": "%d" % (st_yr_spin),
                         "cable_user%YearEnd": "%d" % (en_yr_spin),
