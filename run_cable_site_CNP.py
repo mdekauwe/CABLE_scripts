@@ -144,7 +144,7 @@ class RunCable(object):
                 self.setup_re_spin(number=num)
                 self.run_me()
                 self.clean_up(url, rev, end=False, tag="ccp%d" % (num))
-                sys.exit()
+                
                 print("*******Analytical stage****** \n")
                 self.logfile="log_sa%d" % (num)
                 self.setup_analytical_spin(number=num, st_yr_spin=st_yr_spin,
