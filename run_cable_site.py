@@ -105,6 +105,12 @@ class RunCable(object):
                 (fname) = change_LAI(fname, fixed=self.fixed_lai,
                                      lai_fname=self.lai_fname)
 
+            # Add LAI to met file?
+            if self.fixed_lai is not None or self.lai_dir is not None:
+                lai_fname = os.path.join(self.lai_dir, "%s_lai.csv" % (site))
+                fname = change_LAI(lai_fname, site, fixed=self.fixed_lai,
+                                   lai_fname=lai_fname)
+
             replace_dict = {
                             "filename%met": "'%s'" % (fname),
                             "filename%out": "'%s'" % (out_fname),

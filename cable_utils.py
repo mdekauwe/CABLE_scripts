@@ -183,9 +183,10 @@ def ncdump(nc_fid):
 
     return nc_attrs, nc_dims, nc_vars
 
-def change_LAI(met_fname=None, fixed=None, lai_fname=None):
+def change_LAI(met_fname, site, fixed=None, lai_fname=None):
 
-    new_met_fname = "tmp.nc"
+    new_met_fname = "%s_tmp.nc" % (site)
+
     if fixed is not None:
         lai = fixed
     else:
