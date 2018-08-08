@@ -31,7 +31,7 @@ class RunCable(object):
 
     def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
-                 phen_fname, cnpbiome_fname, lai_fname, fixed_lai, co2_conc,
+                 phen_fname, cnpbiome_fname, lai_dir, fixed_lai, co2_conc,
                  met_subset, cable_src, cable_exe, mpi, verbose):
 
         self.met_dir = met_dir
@@ -56,7 +56,7 @@ class RunCable(object):
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
         self.verbose = verbose
         self.mpi = mpi
-        self.lai_fname = lai_fname
+        self.lai_dir = lai_dir
         self.fixed_lai = fixed_lai
 
     def main(self, num_cores=None):
@@ -128,8 +128,8 @@ class RunCable(object):
             add_attributes_to_output_file(nml_fname, out_fname, url, rev)
             shutil.move(nml_fname, os.path.join(self.namelist_dir, nml_fname))
 
-            if self.fixed_lai is not None or self.lai_fname is not None:
-                os.remove(fname)
+            if self.fixed_lai is not None or self.lai_dir is not None:
+                os.remove("%s_tmp.nc" % (site))
 
     def initialise_stuff(self):
 
@@ -207,12 +207,12 @@ if __name__ == "__main__":
     num_cores = None # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
     met_subset = []#['TumbaFluxnet.1.4_met.nc']
-    lai_fname = None
+    lai_dir = None
     fixed_lai = None
     # ------------------------------------------- #
 
     C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
                  namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
-                 phen_fname, cnpbiome_fname, lai_fname, fixed_lai, co2_conc,
+                 phen_fname, cnpbiome_fname, lai_dir, fixed_lai, co2_conc,
                  met_subset, cable_src, cable_exe, mpi, verbose)
     C.main(num_cores)
