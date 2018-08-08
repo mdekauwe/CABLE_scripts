@@ -134,18 +134,18 @@ class RunCable(object):
         if SPIN_UP == True:
 
             # initial spin
-            print("*******First Spinup****** \n")
+            print("First Spinup\n")
             self.run_me()
             self.clean_up(url, rev, end=False, tag="zero")
 
             while not_in_equilibrium:
-                print("*******Spinup stage****** \n")
+                print("Spinup stage %d\n" % (num))
                 self.logfile="log_ccp%d" % (num)
                 self.setup_re_spin(number=num)
                 self.run_me()
                 self.clean_up(url, rev, end=False, tag="ccp%d" % (num))
-                
-                print("*******Analytical stage****** \n")
+
+                print("Analytical stage %d\n" % (num))
                 self.logfile="log_sa%d" % (num)
                 self.setup_analytical_spin(number=num, st_yr_spin=st_yr_spin,
                                            en_yr_spin=en_yr_spin )
@@ -157,7 +157,7 @@ class RunCable(object):
                 num += 1
 
             # one final spin
-            print("****** Final stage****** \n")
+            print("Final spin\n")
             self.logfile="log_ccp%d" % (num)
             self.setup_re_spin(number=num)
             self.run_me()
@@ -165,14 +165,12 @@ class RunCable(object):
 
         if TRANSIENT == True:
             print("Transient")
-
             self.setup_transient(st_yr_trans, en_yr_trans, st_yr, en_yr)
             self.run_me()
             self.clean_up(url, rev, end=False, tag="transient")
 
         if SIMULATION == True:
             print("Simulation")
-
             self.setup_simulation(st_yr, en_yr)
             self.run_me()
 
@@ -564,8 +562,7 @@ class RunCable(object):
 if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
-    experiment_id = "Cumberland"
-
+    site = "Cumberland"
     met_dir = "met"
     dump_dir = "dump"
     driver_dir = "driver_files"
@@ -573,7 +570,8 @@ if __name__ == "__main__":
     output_dir = "outputs"
     co2_ndep_dir = "met"
     restart_dir = "restart_files"
-    aux_dir = "../../src/CMIP6-MOSRS_CNP/CABLE-AUX/"
+    #aux_dir = "../../src/CMIP6-MOSRS_CNP/CABLE-AUX/"
+    aux_dir = "../../src/NESP2pt9_TRENDYv7//CABLE-AUX/"
     nml_fname = "cable.nml"
     site_nml_fname = "site.nml"
     veg_fname = "def_veg_params.txt"
@@ -583,7 +581,8 @@ if __name__ == "__main__":
     cnpbiome_fname = "pftlookup.csv"
     met_fname = "AU_Cum_2014_2017_met.nc"
     co2_ndep_fname = "AmaFACE_co2npdepforcing_1850_2100_AMB.csv"
-    cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
+    #cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
+    cable_src = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7"
     use_pop = False
     verbose = True
     use_sli = False
@@ -593,7 +592,7 @@ if __name__ == "__main__":
     #for biogeochem in ["C", "CN", "CNP"]:
     for biogeochem in ["C"]:
 
-        experiment_id = "Cumberland_%s" % (biogeochem)
+        experiment_id = "%s_%s" % (site, biogeochem)
         C = RunCable(experiment_id, met_dir, dump_dir, driver_dir, log_dir,
                      output_dir,co2_ndep_dir, restart_dir, aux_dir, nml_fname,
                      site_nml_fname, veg_fname, soil_fname, grid_fname,
