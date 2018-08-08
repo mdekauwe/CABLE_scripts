@@ -101,10 +101,6 @@ class RunCable(object):
 
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
-            if self.fixed_lai is not None or self.lai_fname is not None:
-                (fname) = change_LAI(fname, fixed=self.fixed_lai,
-                                     lai_fname=self.lai_fname)
-
             # Add LAI to met file?
             if self.fixed_lai is not None or self.lai_dir is not None:
                 fname = change_LAI(lai_fname, site, fixed=self.fixed_lai,
