@@ -66,11 +66,9 @@ class RunCable(object):
         # Setup multi-processor jobs
         if self.mpi:
             if num_cores is None: # use them all!
-                num_cpus = mp.cpu_count()
-            else:
-                num_cpus = num_cores
-            chunk_size = int(np.ceil(len(met_files) / float(num_cpus)))
-            pool = mp.Pool(processes=num_cpus)
+                num_cores = mp.cpu_count()
+            chunk_size = int(np.ceil(len(met_files) / float(num_cores)))
+            pool = mp.Pool(processes=num_cores)
             processes = []
 
             for i in range(num_cpus):
