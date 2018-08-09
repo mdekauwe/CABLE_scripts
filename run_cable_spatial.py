@@ -56,6 +56,10 @@ class RunCable(object):
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
+                        "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
+                        "cable_user%GS_SWITCH": "'medlyn'",
+                        "cable_user%GW_MODEL": ".FALSE.",
+                        "cable_user%or_evap": ".TRUE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 

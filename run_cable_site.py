@@ -120,7 +120,6 @@ class RunCable(object):
                             "cable_user%GS_SWITCH": "'medlyn'",
                             "cable_user%GW_MODEL": ".FALSE.",
                             "cable_user%or_evap": ".TRUE.",
-                            "cable_user%or_evap": ".TRUE.",
             }
             adjust_nml_file(nml_fname, replace_dict)
 
