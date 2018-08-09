@@ -211,7 +211,7 @@ if __name__ == "__main__":
     mpi = True
     num_cores = 4 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
-    met_subset = ['TumbaFluxnet.1.4_met.nc'] # []
+    met_subset = [] #['TumbaFluxnet.1.4_met.nc'] 
     # ------------------------------------------- #
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
