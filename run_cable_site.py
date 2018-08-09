@@ -183,12 +183,14 @@ class RunCable(object):
             if error is 1:
                 print("Job failed to submit")
                 sys.exit()
-            os.system("%s %s" % (self.cable_exe, nml_fname))
         else:
             # No outputs to the screen, stout and stderr to dev/null
             cmd = '%s %s> /dev/null 2>&1' % (self.cable_exe, nml_fname)
             error = subprocess.call(cmd, shell=True)
-            
+            if error is 1:
+                print("Job failed to submit")
+                sys.exit()
+
 error = subprocess.call(qs_cmd, shell=True)
 
 if __name__ == "__main__":
