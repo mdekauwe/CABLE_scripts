@@ -24,7 +24,6 @@ import numpy as np
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
 from cable_utils import change_LAI
-from cable_utils import add_missing_options_to_nml_file
 from cable_utils import add_attributes_to_output_file
 
 class RunCable(object):
@@ -97,7 +96,6 @@ class RunCable(object):
             base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
             nml_fname = "cable_%s.nml" % (site)
             shutil.copy(base_nml_fn, nml_fname)
-            add_missing_options_to_nml_file(nml_fname, site)
 
             (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
@@ -120,6 +118,8 @@ class RunCable(object):
                             "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                             "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
                             "cable_user%GS_SWITCH": "'medlyn'",
+                            "cable_user%GW_MODEL": ".FALSE.",
+                            "cable_user%or_evap": ".TRUE.",
                             "cable_user%or_evap": ".TRUE.",
             }
             adjust_nml_file(nml_fname, replace_dict)
@@ -210,10 +210,10 @@ if __name__ == "__main__":
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
     cable_exe = "cable"
     verbose = False
-    mpi = True
+    mpi = False
     num_cores = None # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
-    met_subset = []#['TumbaFluxnet.1.4_met.nc']
+    met_subset = ['TumbaFluxnet.1.4_met.nc'] # []
     lai_dir = None
     fixed_lai = None
     # ------------------------------------------- #
