@@ -28,10 +28,17 @@ from cable_utils import add_attributes_to_output_file
 
 class RunCable(object):
 
-    def __init__(self, met_dir, log_dir, output_dir, restart_dir, aux_dir,
-                 namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
-                 phen_fname, cnpbiome_fname, lai_dir, fixed_lai, co2_conc,
-                 met_subset, cable_src, cable_exe, mpi, verbose):
+    def __init__(self, met_dir=None, log_dir=None, output_dir=None,
+                 restart_dir=None, aux_dir=None, namelist_dir=None,
+                 nml_fname="cable.nml",
+                 veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
+                 soil_fname="def_soil_params.txt",
+                 grid_fname="gridinfo_CSIRO_1x1.nc",
+                 phen_fname="modis_phenology_csiro.txt",
+                 cnpbiome_fname="pftlookup_csiro_v16_17tiles.csv",
+                 lai_dir=None, fixed_lai=None, co2_conc=400.0,
+                 met_subset=[], cable_src=None, cable_exe="cable", mpi=True,
+                 num_cores=None, verbose=False):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -55,22 +62,23 @@ class RunCable(object):
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
         self.verbose = verbose
         self.mpi = mpi
+        self.num_cores = num_cores
         self.lai_dir = lai_dir
         self.fixed_lai = fixed_lai
 
-    def main(self, num_cores=None):
+    def main(self):
 
         (met_files, url, rev) = self.initialise_stuff()
 
         # Setup multi-processor jobs
         if self.mpi:
-            if num_cores is None: # use them all!
-                num_cores = mp.cpu_count()
-            chunk_size = int(np.ceil(len(met_files) / float(num_cores)))
-            pool = mp.Pool(processes=num_cores)
+            if self.num_cores is None: # use them all!
+                self.num_cores = mp.cpu_count()
+            chunk_size = int(np.ceil(len(met_files) / float(self.num_cores)))
+            pool = mp.Pool(processes=self.num_cores)
             processes = []
 
-            for i in range(num_cpus):
+            for i in range(self.num_cores):
                 start = chunk_size * i
                 end = chunk_size * (i + 1)
                 if end > len(met_files):
@@ -199,26 +207,15 @@ if __name__ == "__main__":
     restart_dir = "restart_files"
     aux_dir = "../../src/CMIP6-MOSRS/CABLE-AUX/"
     namelist_dir = "namelists"
-    nml_fname = "cable.nml"
-    veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
-    soil_fname = "def_soil_params.txt"
-    grid_fname = "gridinfo_CSIRO_1x1.nc"
-    phen_fname = "modis_phenology_csiro.txt"
-    cnpbiome_fname = "pftlookup_csiro_v16_17tiles.csv"
-    co2_conc = 380.0
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
-    cable_exe = "cable"
-    verbose = False
-    mpi = False
-    num_cores = None # set to a number, if None it will use all cores...!
+    mpi = True
+    num_cores = 4 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
     met_subset = ['TumbaFluxnet.1.4_met.nc'] # []
-    lai_dir = None
-    fixed_lai = None
     # ------------------------------------------- #
 
-    C = RunCable(met_dir, log_dir, output_dir, restart_dir, aux_dir,
-                 namelist_dir, nml_fname, veg_fname, soil_fname, grid_fname,
-                 phen_fname, cnpbiome_fname, lai_dir, fixed_lai, co2_conc,
-                 met_subset, cable_src, cable_exe, mpi, verbose)
-    C.main(num_cores)
+    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir,
+                 namelist_dir=namelist_dir, met_subset=met_subset,
+                 cable_src=cable_src, mpi=mpi, num_cores=num_cores)
+    C.main()
