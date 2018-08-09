@@ -31,7 +31,6 @@ import numpy as np
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
-#from cable_utils import add_missing_options_to_nml_file
 from cable_utils import add_attributes_to_output_file
 
 class RunCable(object):
@@ -231,7 +230,6 @@ class RunCable(object):
                         self.site_nml_fname)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
                         self.nml_fname)
-        #add_missing_options_to_nml_file(self.nml_fname)
 
         self.out_fname = os.path.join(self.output_dir,
                                  "%s_out_cable_zero.nc" % (self.experiment_id))
