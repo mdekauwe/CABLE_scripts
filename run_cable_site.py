@@ -191,8 +191,6 @@ class RunCable(object):
                 print("Job failed to submit")
                 sys.exit()
 
-error = subprocess.call(qs_cmd, shell=True)
-
 if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
