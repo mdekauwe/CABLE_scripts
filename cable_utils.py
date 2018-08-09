@@ -52,6 +52,7 @@ def replace_keys(text, replacements_dict):
     new_text : string
         input file with replacement values
     """
+    keys = [] # save our keys
     lines = text.splitlines()
     for i, row in enumerate(lines):
         # skip blank lines
@@ -66,6 +67,27 @@ def replace_keys(text, replacements_dict):
             lines[i] = " ".join((key.rstrip(), "=",
                                  replacements_dict.get(key.strip(),
                                  val.lstrip())))
+            keys.append(key.strip())
+
+    # Make sure our replacements were in the namelist to begin with, it is
+    # possible they were missing completely so we will need to add these
+    # manually
+    fix_end_statement = False
+    for key, val in replacements_dict.items():
+        if key not in keys:
+            key_to_add = " ".join((key.rstrip(), "=", val.strip()))
+            # add 3 extra spaces at the front to line things up
+            string_length = len(key_to_add) + 3
+            key_to_add = key_to_add.rjust(string_length)
+            lines[i] = key_to_add
+            fix_end_statement = True
+
+            # Need to add an extra element and sort out counter
+            lines.append("")
+            i += 1
+
+    if fix_end_statement:
+        lines[i] = "&end"
 
     return '\n'.join(lines) + '\n'
 
