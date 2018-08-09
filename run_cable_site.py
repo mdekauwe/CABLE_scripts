@@ -205,13 +205,13 @@ if __name__ == "__main__":
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restart_files"
-    aux_dir = "../../src/CMIP6-MOSRS/CABLE-AUX/"
     namelist_dir = "namelists"
+    aux_dir = "../../src/CMIP6-MOSRS/CABLE-AUX/"
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
     mpi = True
     num_cores = 4 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
-    met_subset = [] #['TumbaFluxnet.1.4_met.nc'] 
+    met_subset = [] #['TumbaFluxnet.1.4_met.nc']
     # ------------------------------------------- #
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
