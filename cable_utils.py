@@ -228,3 +228,42 @@ def get_years(met_fname, nyear_spinup):
 
     return (st_yr, en_yr, st_yr_transient, en_yr_transient,
             st_yr_spin, en_yr_spin)
+
+def check_steady_state(experiment_id, output_dir, num, debug=True):
+    """
+    Check whether the plant (leaves, wood and roots) and soil
+    (fast, slow and active) carbon pools have reached equilibrium. To do
+    this we are checking the state of the last year in the previous spin
+    cycle to the state in the final year of the current spin cycle.
+    """
+    tol = 0.05 # This is quite high, I use 0.005 in GDAY
+    g_2_kg = 0.001
+
+    if num == 1:
+        prev_cplant = 99999.9
+        prev_csoil = 99999.9
+    else:
+        fname = "%s_out_CASA_ccp%d.nc" % (experiment_id, num-1)
+        fname = os.path.join(output_dir, fname)
+        ds = xr.open_dataset(fname)
+        prev_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
+        prev_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
+
+    fname = "%s_out_CASA_ccp%d.nc" % (experiment_id, num)
+    fname = os.path.join(output_dir, fname)
+    ds = xr.open_dataset(fname)
+    new_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
+    new_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
+
+    if ( np.fabs(prev_cplant - new_cplant) < tol and
+         np.fabs(prev_csoil - new_csoil) < tol ):
+        not_in_equilibrium = False
+    else:
+        not_in_equilibrium = True
+
+    if debug:
+        print("*", num, not_in_equilibrium,
+              "*cplant", np.fabs(prev_cplant - new_cplant),
+              "*csoil", np.fabs(prev_csoil - new_csoil))
+
+    return not_in_equilibrium

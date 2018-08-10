@@ -34,6 +34,7 @@ from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
 from cable_utils import get_years
 from cable_utils import add_attributes_to_output_file
+from cable_utils import check_steady_state
 
 class RunCable(object):
 
@@ -113,7 +114,6 @@ class RunCable(object):
             self.pop_flag = ".TRUE."
         else:
             self.pop_flag = ".FALSE."
-        self.debug = True
 
         if self.use_sli:
             self.soil_flag = "sli"
@@ -158,9 +158,10 @@ class RunCable(object):
                 self.setup_analytical_spin(number=num, st_yr_spin=st_yr_spin,
                                            en_yr_spin=en_yr_spin )
                 self.run_me()
-                self.clean_up(url, rev, end=False, tag="saa%d" % (num))
+                #self.clean_up(url, rev, end=False, tag="saa%d" % (num))
 
-                not_in_equilibrium = self.check_steady_state(num)
+                not_in_equilibrium = check_steady_state(self.experiment_id,
+                                                        self.output_dir, num)
 
                 num += 1
 
@@ -448,44 +449,7 @@ class RunCable(object):
             # No outputs to the screen, stout and stderr to dev/null
             os.system('%s > /dev/null 2>&1' % (self.cable_exe))
 
-    def check_steady_state(self, num):
-        """
-        Check whether the plant (leaves, wood and roots) and soil
-        (fast, slow and active) carbon pools have reached equilibrium. To do
-        this we are checking the state of the last year in the previous spin
-        cycle to the state in the final year of the current spin cycle.
-        """
-        tol = 0.05 # This is quite high, I use 0.005 in GDAY
-        g_2_kg = 0.001
 
-        if num == 1:
-            prev_cplant = 99999.9
-            prev_csoil = 99999.9
-        else:
-            fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num-1)
-            fname = os.path.join(self.output_dir, fname)
-            ds = xr.open_dataset(fname)
-            prev_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
-            prev_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
-
-        fname = "%s_out_CASA_ccp%d.nc" % (self.experiment_id, num)
-        fname = os.path.join(self.output_dir, fname)
-        ds = xr.open_dataset(fname)
-        new_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
-        new_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
-
-        if ( np.fabs(prev_cplant - new_cplant) < tol and
-             np.fabs(prev_csoil - new_csoil) < tol ):
-            not_in_equilibrium = False
-        else:
-            not_in_equilibrium = True
-
-        if self.debug:
-            print("*", num, not_in_equilibrium,
-                  "*cplant", np.fabs(prev_cplant - new_cplant),
-                  "*csoil", np.fabs(prev_csoil - new_csoil))
-
-        return not_in_equilibrium
 
     def clean_up(self, url, rev, end=True, tag=None):
         """
