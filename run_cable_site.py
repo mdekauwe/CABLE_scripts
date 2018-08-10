@@ -38,7 +38,7 @@ class RunCable(object):
                  cnpbiome_fname="pftlookup_csiro_v16_17tiles.csv",
                  lai_dir=None, fixed_lai=None, co2_conc=400.0,
                  met_subset=[], cable_src=None, cable_exe="cable", mpi=True,
-                 num_cores=None, verbose=False):
+                 num_cores=None, verbose=True):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -182,7 +182,7 @@ class RunCable(object):
 
         return (out_fname, out_log_fname)
 
-    def run_me(self, nml_fname):
+    def _run_me(self, nml_fname):
         # run the model
         if self.verbose:
             cmd = '%s %s' % (self.cable_exe, nml_fname)
@@ -192,11 +192,19 @@ class RunCable(object):
                 raise
         else:
             # No outputs to the screen: stout and stderr to dev/null
-            cmd = '%s %s> /dev/null 2>&1' % (self.cable_exe, nml_fname)
+            cmd = '%s %s > /dev/null 2>&1' % (self.cable_exe, nml_fname)
             error = subprocess.call(cmd, shell=True)
             if error is 1:
                 print("Job failed to submit")
                 raise
+
+        def run_me(self, nml_fname):
+            # run the model
+            if self.verbose:
+                os.system('%s %s' % (self.cable_exe, nml_fname))
+            else:
+                # No outputs to the screen, stout and stderr to dev/null
+                os.system('%s %s > /dev/null 2>&1' % (self.cable_exe, nml_fname))
 
 if __name__ == "__main__":
 
@@ -208,7 +216,7 @@ if __name__ == "__main__":
     namelist_dir = "namelists"
     aux_dir = "../../src/CMIP6-MOSRS/CABLE-AUX/"
     cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
-    mpi = True
+    mpi = False
     num_cores = 4 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
     met_subset = [] #['TumbaFluxnet.1.4_met.nc']
