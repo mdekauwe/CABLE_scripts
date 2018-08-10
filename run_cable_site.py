@@ -181,29 +181,20 @@ class RunCable(object):
 
         return (out_fname, out_log_fname)
 
-    def _run_me(self, nml_fname):
+    def run_me(self, nml_fname):
         # run the model
         if self.verbose:
-            cmd = '%s %s' % (self.cable_exe, nml_fname)
+            cmd = './%s %s' % (self.cable_exe, nml_fname)
             error = subprocess.call(cmd, shell=True)
             if error is 1:
                 print("Job failed to submit")
                 raise
         else:
             # No outputs to the screen: stout and stderr to dev/null
-            cmd = '%s %s > /dev/null 2>&1' % (self.cable_exe, nml_fname)
+            cmd = './%s %s > /dev/null 2>&1' % (self.cable_exe, nml_fname)
             error = subprocess.call(cmd, shell=True)
             if error is 1:
                 print("Job failed to submit")
-                raise
-
-    def run_me(self, nml_fname):
-        # run the model
-        if self.verbose:
-            os.system('%s %s' % (self.cable_exe, nml_fname))
-        else:
-            # No outputs to the screen, stout and stderr to dev/null
-            os.system('%s %s > /dev/null 2>&1' % (self.cable_exe, nml_fname))
 
 if __name__ == "__main__":
 
