@@ -16,6 +16,8 @@ import netCDF4
 import shutil
 import tempfile
 import pandas as pd
+import xarray as xr
+import numpy as np
 
 def adjust_nml_file(fname, replacements):
     """
@@ -192,3 +194,37 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
     nc.close()  # close the new file
 
     return new_met_fname
+
+def get_years(met_fname, nyear_spinup):
+    """
+    Figure out the start and end of the met file, the number of times we
+    need to recycle the met data to cover the transient period and the
+    start and end of the transient period.
+    """
+    pre_indust = 1850
+
+    ds = xr.open_dataset(met_fname)
+
+    st_yr = pd.to_datetime(ds.time[0].values).year
+
+    # PALS met files final year tag only has a single 30 min, so need to
+    # end at the previous year, which is the real file end
+    en_yr = pd.to_datetime(ds.time[-1].values).year - 1
+
+    # length of met record
+    nrec = en_yr - st_yr + 1
+
+    # number of times met data is recycled during transient simulation
+    nloop_transient = np.ceil((st_yr - 1 - pre_indust) / nrec) - 1
+
+    # number of times met data is recycled with a spinup run of nyear_spinup
+    nloop_spin = np.ceil(nyear_spinup / nrec)
+
+    st_yr_transient = st_yr - 1 - nloop_transient * nrec + 1
+    en_yr_transient = st_yr_transient + nloop_transient * nrec - 1
+
+    en_yr_spin = st_yr_transient - 1
+    st_yr_spin = en_yr_spin - nloop_spin * nrec + 1
+
+    return (st_yr, en_yr, st_yr_transient, en_yr_transient,
+            st_yr_spin, en_yr_spin)

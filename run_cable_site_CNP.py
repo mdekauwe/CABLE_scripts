@@ -28,18 +28,27 @@ import tempfile
 import pandas as pd
 import xarray as xr
 import numpy as np
+import subprocess
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
+from cable_utils import get_years
 from cable_utils import add_attributes_to_output_file
 
 class RunCable(object):
 
-    def __init__(self, experiment_id, met_dir, dump_dir, driver_dir, log_dir,
-                 output_dir, co2_ndep_dir, restart_dir, aux_dir, nml_fname,
-                 site_nml_fname, veg_fname, soil_fname, grid_fname,
-                 phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                 cable_src, biogeochem, use_pop, use_sli, use_clim, verbose):
+    def __init__(self, experiment_id=None, met_dir=None, dump_dir=None,
+                 driver_dir=None, log_dir=None, output_dir=None,
+                 co2_ndep_dir=None, restart_dir=None, aux_dir=None,
+                 nml_fname="cable.nml", site_nml_fname="site.nml",
+                 veg_fname="def_veg_params.txt",
+                 soil_fname="def_soil_params.txt",
+                 grid_fname="gridinfo_CSIRO_1x1.nc",
+                 phen_fname="modis_phenology_csiro.txt",
+                 cnpbiome_fname="pftlookup.csv", met_fname=None,
+                 co2_ndep_fname="AmaFACE_co2npdepforcing_1850_2100_AMB.csv",
+                 cable_src=None, biogeochem="C", use_pop=False, use_sli=False,
+                 use_clim=False, verbose=True):
 
         self.experiment_id = experiment_id
         self.met_dir = met_dir
@@ -126,7 +135,7 @@ class RunCable(object):
 
         (st_yr, en_yr,
          st_yr_trans, en_yr_trans,
-         st_yr_spin, en_yr_spin) = self.get_years()
+         st_yr_spin, en_yr_spin) = get_years(self.met_fname, self.nyear_spinup)
 
         (url, rev) = self.initial_setup(st_yr_spin, en_yr_spin, st_yr, en_yr)
 
@@ -174,40 +183,6 @@ class RunCable(object):
             self.run_me()
 
         self.clean_up(url, rev, end=True)
-
-    def get_years(self):
-        """
-        Figure out the start and end of the met file, the number of times we
-        need to recycle the met data to cover the transient period and the
-        start and end of the transient period.
-        """
-        pre_indust = 1850
-
-        ds = xr.open_dataset(self.met_fname)
-
-        st_yr = pd.to_datetime(ds.time[0].values).year
-
-        # PALS met files final year tag only has a single 30 min, so need to
-        # end at the previous year, which is the real file end
-        en_yr = pd.to_datetime(ds.time[-1].values).year - 1
-
-        # length of met record
-        nrec = en_yr - st_yr + 1
-
-        # number of times met data is recycled during transient simulation
-        nloop_transient = np.ceil((st_yr - 1 - pre_indust) / nrec) - 1
-
-        # number of times met data is recycled with a spinup run of nyear_spinup
-        nloop_spin = np.ceil( self.nyear_spinup / nrec)
-
-        st_yr_transient = st_yr - 1 - nloop_transient * nrec + 1
-        en_yr_transient = st_yr_transient + nloop_transient * nrec - 1
-
-        en_yr_spin = st_yr_transient - 1
-        st_yr_spin = en_yr_spin - nloop_spin * nrec + 1
-
-        return (st_yr, en_yr, st_yr_transient, en_yr_transient,
-                st_yr_spin, en_yr_spin)
 
     def initial_setup(self, st_yr_spin, en_yr_spin, st_yr, en_yr):
         """
@@ -273,7 +248,7 @@ class RunCable(object):
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "output%restart": ".TRUE.",
-                        "casafile%phen": "'%s'" % (phen_fname),
+                        "casafile%phen": "'%s'" % (self.phen_fname),
                         "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%POP_out": "'ini'",
@@ -466,11 +441,12 @@ class RunCable(object):
         adjust_nml_file(self.nml_fname, replace_dict)
 
     def run_me(self):
+        # run the model
         if self.verbose:
-            os.system("%s" % (self.cable_exe))
+            os.system('%s' % (self.cable_exe))
         else:
             # No outputs to the screen, stout and stderr to dev/null
-            os.system("%s > /dev/null 2>&1" % (self.cable_exe))
+            os.system('%s > /dev/null 2>&1' % (self.cable_exe))
 
     def check_steady_state(self, num):
         """
@@ -570,15 +546,7 @@ if __name__ == "__main__":
     restart_dir = "restart_files"
     #aux_dir = "../../src/CMIP6-MOSRS_CNP/CABLE-AUX/"
     aux_dir = "../../src/NESP2pt9_TRENDYv7//CABLE-AUX/"
-    nml_fname = "cable.nml"
-    site_nml_fname = "site.nml"
-    veg_fname = "def_veg_params.txt"
-    soil_fname = "def_soil_params.txt"
-    grid_fname = "gridinfo_CSIRO_1x1.nc"
-    phen_fname = "modis_phenology_csiro.txt"
-    cnpbiome_fname = "pftlookup.csv"
     met_fname = "AU_Cum_2014_2017_met.nc"
-    co2_ndep_fname = "AmaFACE_co2npdepforcing_1850_2100_AMB.csv"
     #cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
     cable_src = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7"
     use_pop = False
@@ -591,9 +559,11 @@ if __name__ == "__main__":
     for biogeochem in ["C"]:
 
         experiment_id = "%s_%s" % (site, biogeochem)
-        C = RunCable(experiment_id, met_dir, dump_dir, driver_dir, log_dir,
-                     output_dir,co2_ndep_dir, restart_dir, aux_dir, nml_fname,
-                     site_nml_fname, veg_fname, soil_fname, grid_fname,
-                     phen_fname, cnpbiome_fname, met_fname, co2_ndep_fname,
-                     cable_src, biogeochem, use_pop, use_sli, use_clim, verbose)
+        C = RunCable(experiment_id=experiment_id, met_dir=met_dir,
+                     dump_dir=dump_dir, driver_dir=driver_dir, log_dir=log_dir,
+                     output_dir=output_dir, co2_ndep_dir=co2_ndep_dir,
+                     restart_dir=restart_dir, aux_dir=aux_dir,
+                     met_fname=met_fname, cable_src=cable_src,
+                     biogeochem=biogeochem, use_pop=use_pop, use_sli=use_sli,
+                     use_clim=use_clim, verbose=verbose)
         C.main(SPIN_UP=True, TRANSIENT=True, SIMULATION=True)
