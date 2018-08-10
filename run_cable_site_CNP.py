@@ -249,7 +249,7 @@ class RunCable(object):
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "output%restart": ".TRUE.",
-                        "casafile%phen": "'%s'" % (self.phen_fname),
+                        "casafile%phen": "'%s'" % (phen_fname),
                         "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%POP_out": "'ini'",

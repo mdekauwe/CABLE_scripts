@@ -198,13 +198,13 @@ class RunCable(object):
                 print("Job failed to submit")
                 raise
 
-        def run_me(self, nml_fname):
-            # run the model
-            if self.verbose:
-                os.system('%s %s' % (self.cable_exe, nml_fname))
-            else:
-                # No outputs to the screen, stout and stderr to dev/null
-                os.system('%s %s > /dev/null 2>&1' % (self.cable_exe, nml_fname))
+    def run_me(self, nml_fname):
+        # run the model
+        if self.verbose:
+            os.system('%s %s' % (self.cable_exe, nml_fname))
+        else:
+            # No outputs to the screen, stout and stderr to dev/null
+            os.system('%s %s > /dev/null 2>&1' % (self.cable_exe, nml_fname))
 
 if __name__ == "__main__":
 
