@@ -36,6 +36,7 @@ class RunCable(object):
                  grid_fname="gridinfo_CSIRO_1x1.nc",
                  phen_fname="modis_phenology_csiro.txt",
                  cnpbiome_fname="pftlookup_csiro_v16_17tiles.csv",
+                 elev_fname="GSWP3_gwmodel_parameters.nc",
                  lai_dir=None, fixed_lai=None, co2_conc=400.0,
                  met_subset=[], cable_src=None, cable_exe="cable", mpi=True,
                  num_cores=None, verbose=True):
@@ -55,6 +56,7 @@ class RunCable(object):
         self.grid_fname = os.path.join(self.grid_dir, grid_fname)
         self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
         self.cnpbiome_fname = os.path.join(self.biogeochem_dir, cnpbiome_fname)
+        self.elev_fname = elev_fname
         self.co2_conc = co2_conc
         self.met_subset = met_subset
         self.cable_src = cable_src
@@ -127,6 +129,7 @@ class RunCable(object):
                             "cable_user%GS_SWITCH": "'medlyn'",
                             "cable_user%GW_MODEL": ".FALSE.",
                             "cable_user%or_evap": ".TRUE.",
+                            "elev_fname": "'%s'" % (self.elev_fname),
             }
             adjust_nml_file(nml_fname, replace_dict)
 
