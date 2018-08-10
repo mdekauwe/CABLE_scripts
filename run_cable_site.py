@@ -58,7 +58,6 @@ class RunCable(object):
         self.co2_conc = co2_conc
         self.met_subset = met_subset
         self.cable_src = cable_src
-        self.cable_exe = cable_exe
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
         self.verbose = verbose
         self.mpi = mpi
