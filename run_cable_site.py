@@ -156,7 +156,7 @@ class RunCable(object):
             os.makedirs(self.namelist_dir)
 
         # Run all the met files in the directory
-        if len(met_subset) == 0:
+        if len(self.met_subset) == 0:
             met_files = glob.glob(os.path.join(self.met_dir, "*.nc"))
         else:
             met_files = [os.path.join(self.met_dir, i) for i in self.met_subset]
