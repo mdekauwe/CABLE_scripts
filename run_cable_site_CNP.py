@@ -508,11 +508,11 @@ if __name__ == "__main__":
     output_dir = "outputs"
     co2_ndep_dir = "met"
     restart_dir = "restart_files"
-    #aux_dir = "../../src/CMIP6-MOSRS_CNP/CABLE-AUX/"
-    aux_dir = "../../src/NESP2pt9_TRENDYv7//CABLE-AUX/"
+    aux_dir = "../../src/CMIP6-MOSRS_CNP/CABLE-AUX/"
+    #aux_dir = "../../src/NESP2pt9_TRENDYv7//CABLE-AUX/"
     met_fname = "AU_Cum_2014_2017_met.nc"
-    #cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
-    cable_src = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7"
+    cable_src = "../../src/CMIP6-MOSRS_CNP/CMIP6-MOSRS_CNP"
+    #cable_src = "../../src/NESP2pt9_TRENDYv7/NESP2pt9_TRENDYv7"
     use_pop = False
     verbose = True
     use_sli = False
