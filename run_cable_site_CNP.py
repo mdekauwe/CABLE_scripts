@@ -278,6 +278,7 @@ class RunCable(object):
                         "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
                         "cable_user%GS_SWITCH": "'medlyn'",
                         "cable_user%limit_labile": ".F.",
+                        "cable_user%SSNOW_POTEV": "'P-M'", 
         }
         adjust_nml_file(self.nml_fname, replace_dict)
         sys.exit()
