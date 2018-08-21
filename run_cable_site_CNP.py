@@ -42,7 +42,7 @@ class RunCable(object):
                  driver_dir=None, log_dir=None, output_dir=None,
                  co2_ndep_dir=None, restart_dir=None, aux_dir=None,
                  nml_fname="cable.nml", site_nml_fname="site.nml",
-                 veg_fname="def_veg_params.txt",
+                 veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  soil_fname="def_soil_params.txt",
                  grid_fname="gridinfo_CSIRO_1x1.nc",
                  phen_fname="modis_phenology_csiro.txt",
@@ -68,11 +68,11 @@ class RunCable(object):
         self.out_fname = None
         self.out_fname_CASA = None
         self.site_nml_fname = site_nml_fname
-        #self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
-        #self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
+        self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
+        self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
 
-        self.veg_fname = os.path.join(self.driver_dir, veg_fname)
-        self.soil_fname = os.path.join(self.driver_dir, soil_fname)
+        #self.veg_fname = os.path.join(self.driver_dir, veg_fname)
+        #self.soil_fname = os.path.join(self.driver_dir, soil_fname)
         self.grid_fname = os.path.join(self.grid_dir, grid_fname)
         self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
         #self.cnpbiome_fname = os.path.join(self.biogeochem_dir, cnpbiome_fname)
