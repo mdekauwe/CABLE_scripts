@@ -285,9 +285,10 @@ class RunCable(object):
                         "output%casa": ".TRUE.",
                         "output%grid": "'land'",
                         "leaps": ".FALSE.",
+                        "cable_user%litter": ".true.",
+                        "cable_user%CASA_OUT_FREQ": "'monthly'",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
-        sys.exit()
         cwd = os.getcwd()
         (url, rev) = get_svn_info(cwd, self.cable_src)
 
