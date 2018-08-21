@@ -282,6 +282,7 @@ class RunCable(object):
                         "cable_user%CASA_NREP": "0", # number of times to repeat CASA forcing
                         "delsoilM":"0.01",
                         "delsoilT":"0.1",
+                        "output%casa": ".TRUE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
         sys.exit()
