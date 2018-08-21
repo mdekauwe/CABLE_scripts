@@ -274,8 +274,12 @@ class RunCable(object):
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
+                        "spinup": ".TRUE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
+        print(self.nml_fname)
+        sys.exit()
+
         cwd = os.getcwd()
         (url, rev) = get_svn_info(cwd, self.cable_src)
 
