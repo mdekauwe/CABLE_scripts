@@ -205,7 +205,7 @@ class RunCable(object):
 
         base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
         nml_fname = "cable_%s.nml" % (site)
-        shutil.copy(base_nml_fn, self.nml_fnam)
+        shutil.copy(base_nml_fn, self.nml_fname)
         #shutil.copyfile(os.path.join(self.driver_dir, "site.nml"),
         #                self.site_nml_fname)
         shutil.copyfile(os.path.join(self.driver_dir, "cable.nml"),
