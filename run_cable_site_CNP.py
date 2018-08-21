@@ -284,6 +284,7 @@ class RunCable(object):
                         "delsoilT":"0.1",
                         "output%casa": ".TRUE.",
                         "output%grid": "'land'",
+                        "leaps": ".FALSE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
         sys.exit()
