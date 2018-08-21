@@ -164,7 +164,7 @@ class RunCable(object):
         cwd = os.getcwd()
         (url, rev) = get_svn_info(cwd, self.cable_src)
 
-        # delete local executable, copy a local copy and use taht
+        # delete local executable, copy a local copy and use that
         local_exe = "cable"
         if os.path.isfile(local_exe):
             os.remove(local_exe)
