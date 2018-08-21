@@ -275,11 +275,11 @@ class RunCable(object):
                         "icycle": "%d" % (self.biogeochem),
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
                         "spinup": ".TRUE.",
+                        "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
+                        "cable_user%GS_SWITCH": "'medlyn'",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
-        print(self.nml_fname)
         sys.exit()
-
         cwd = os.getcwd()
         (url, rev) = get_svn_info(cwd, self.cable_src)
 
