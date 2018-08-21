@@ -287,7 +287,6 @@ class RunCable(object):
                         "leaps": ".FALSE.",
                         "cable_user%litter": ".true.",
                         "cable_user%CASA_OUT_FREQ": "'monthly'",
-                        "cable_user%CONSISTENCY_CHECK": ".TRUE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
         cwd = os.getcwd()
