@@ -449,13 +449,20 @@ class RunCable(object):
         adjust_nml_file(self.nml_fname, replace_dict)
 
     def run_me(self):
+
         # run the model
         if self.verbose:
-            os.system('%s' % (self.cable_exe))
+            cmd = './%s' % (self.cable_exe)
+            error = subprocess.call(cmd, shell=True)
+            if error is 1:
+                print("Error running CABLE")
+                raise
         else:
-            # No outputs to the screen, stout and stderr to dev/null
-            os.system('%s > /dev/null 2>&1' % (self.cable_exe))
-
+            # No outputs to the screen: stout and stderr to dev/null
+            cmd = './%s > /dev/null 2>&1' % (self.cable_exe)
+            error = subprocess.call(cmd, shell=True)
+            if error is 1:
+                print("Error running CABLE")
 
 
     def clean_up(self, url, rev, end=True, tag=None):
