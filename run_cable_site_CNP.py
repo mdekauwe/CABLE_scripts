@@ -274,7 +274,7 @@ class RunCable(object):
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
-                        "spinup": ".TRUE.",
+                        "spinup": ".FALSE.",
                         "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
                         "cable_user%GS_SWITCH": "'medlyn'",
                         "cable_user%limit_labile": ".F.",
