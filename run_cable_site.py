@@ -129,7 +129,7 @@ class RunCable(object):
                             "cable_user%GS_SWITCH": "'medlyn'",
                             "cable_user%GW_MODEL": ".FALSE.",
                             "cable_user%or_evap": ".TRUE.",
-                            "elev_fname": "'%s'" % (self.elev_fname),
+                            #"elev_fname": "'%s'" % (self.elev_fname),
             }
             adjust_nml_file(nml_fname, replace_dict)
 
