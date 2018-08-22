@@ -288,6 +288,7 @@ class RunCable(object):
                         "cable_user%litter": ".true.",
                         "cable_user%CASA_OUT_FREQ": "'monthly'",
                         "cable_user%MetType": "'site'",
+                        "cable_user%PHENOLOGY_SWITCH": "'modis'",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
         cwd = os.getcwd()
