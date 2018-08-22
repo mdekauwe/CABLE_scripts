@@ -110,8 +110,8 @@ class RunCable(object):
 
             # Add LAI to met file?
             if self.fixed_lai is not None or self.lai_dir is not None:
-                fname = change_LAI(lai_fname, site, fixed=self.fixed_lai,
-                                   lai_fname=self.lai_dir)
+                fname = change_LAI(fname, site, fixed=self.fixed_lai,
+                                   lai_dir=self.lai_dir)
 
             replace_dict = {
                             "filename%met": "'%s'" % (fname),
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     mpi = False
     num_cores = 4 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
-    met_subset = [] #['TumbaFluxnet.1.4_met.nc']
+    met_subset = ['TumbaFluxnet.1.4_met.nc']
     # ------------------------------------------- #
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
