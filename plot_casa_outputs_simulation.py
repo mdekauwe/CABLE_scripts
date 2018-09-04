@@ -198,8 +198,8 @@ def open_file(fname):
 
 if __name__ == "__main__":
 
-    #for cycle in ["C", "CN", "CNP"]:
-    for cycle in ["CN"]:
+    for cycle in ["C", "CN", "CNP"]:
+    #for cycle in ["CN"]:
 
         print(cycle)
 

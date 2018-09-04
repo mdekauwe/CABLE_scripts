@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Plot some CASA outputs for the simulation
+Plot some CASA outputs for the spinup
 
 That's all folks.
 """
@@ -17,6 +17,7 @@ import numpy as np
 from matplotlib.ticker import FixedLocator
 import os
 import xarray as xr
+import glob
 
 def plot_carbon_fluxes(tag, cycle, ds):
 
@@ -198,7 +199,8 @@ def open_file(fname):
 
 if __name__ == "__main__":
 
-    for cycle in ["C", "CN", "CNP"]:
+    #for cycle in ["C", "CN", "CNP"]:
+    for cycle in ["CN"]:
 
         print(cycle)
 
@@ -212,9 +214,12 @@ if __name__ == "__main__":
             experiment_id = "Cumberland_CNP"
             tag = "CNP"
 
-        fname = "outputs/%s_out_casa.nc" % (experiment_id)
-        simulation = open_file(fname)
+        files = glob.glob("outputs/%s_out_CASA_ccp?.nc" % (experiment_id))
+        files.insert(0, "outputs/%s_out_CASA_zero.nc" % (experiment_id))
 
-        plot_carbon_fluxes(tag, cycle, simulation)
-        plot_nitrogen_fluxes(tag, cycle, simulation)
-        plot_phosphorus_fluxes(tag, cycle, simulation)
+        # open last file
+        ds = xr.open_dataset(files[-1])
+
+        plot_carbon_fluxes(tag, cycle, ds)
+        plot_nitrogen_fluxes(tag, cycle, ds)
+        plot_phosphorus_fluxes(tag, cycle, ds)

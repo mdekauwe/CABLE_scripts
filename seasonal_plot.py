@@ -18,16 +18,12 @@ import numpy as np
 from matplotlib.ticker import FixedLocator
 import os
 
-def main(C_fname, CN_fname, CNP_fname):
+def main(fname, plot_fname=None):
 
-    df_C = read_cable_file(C_fname)
-    df_C = resample_to_seasonal_cycle(df_C)
-    df_CN = read_cable_file(CN_fname)
-    df_CN = resample_to_seasonal_cycle(df_CN)
-    df_CNP = read_cable_file(CNP_fname)
-    df_CNP = resample_to_seasonal_cycle(df_CNP)
+    df = read_cable_file(fname)
+    df = resample_to_seasonal_cycle(df)
 
-    fig = plt.figure(figsize=(10,9))
+    fig = plt.figure(figsize=(6,9))
     fig.subplots_adjust(hspace=0.3)
     fig.subplots_adjust(wspace=0.2)
     plt.rcParams['text.usetex'] = False
@@ -49,11 +45,7 @@ def main(C_fname, CN_fname, CNP_fname):
     axes = [ax1, ax2, ax3, ax4, ax5, ax6]
     vars = ["GPP", "NEE", "Qle", "LAI", "TVeg", "ESoil"]
     for a, v in zip(axes, vars):
-        a.plot(df_C.month, df_C[v], c="lightblue", lw=2.0, ls="-", label="C")
-        a.plot(df_CN.month, df_CN[v], c="DodgerBlue", lw=2.0, ls="-",
-               label="CN")
-        a.plot(df_CNP.month, df_CNP[v], c="darkblue", lw=2.0, ls="-",
-               label="CNP")
+        a.plot(df.month, df[v], c="black", lw=2.0, ls="-")
 
     labels = ["GPP (g C m$^{-2}$ d$^{-1}$)", "NEE (g C m$^{-2}$ d$^{-1}$)",\
               "Qle (W m$^{-2}$)", "LAI (m$^{2}$ m$^{-2}$)",\
@@ -70,16 +62,16 @@ def main(C_fname, CN_fname, CNP_fname):
         a.set_xticklabels(['Jan', 'Jun', 'Dec'])
         if i < 4:
             plt.setp(a.get_xticklabels(), visible=False)
-    ax1.legend(numpoints=1, loc="best")
 
+    if plot_fname is None:
+        plt.show()
+    else:
+        plot_dir = "plots"
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
 
-    plot_fname = "seasonal_plot_C_vs_CN_vs_CNP.pdf"
-    plot_dir = "plots"
-    if not os.path.exists(plot_dir):
-        os.makedirs(plot_dir)
-
-    fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
-                pad_inches=0.1)
+        fig.savefig(os.path.join(plot_dir, plot_fname), bbox_inches='tight',
+                    pad_inches=0.1)
 
 
 def read_cable_file(fname):
@@ -122,8 +114,14 @@ def resample_to_seasonal_cycle(df, OBS=False):
 
 if __name__ == "__main__":
 
-    site = "Cumberland"
-    C_fname = "outputs/%s_C_out_cable.nc" % (site)
-    CN_fname = "outputs/%s_CN_out_cable.nc"  % (site)
-    CNP_fname = "outputs/%s_CNP_out_cable.nc"  % (site)
-    main(C_fname, CN_fname, CNP_fname)
+    from optparse import OptionParser
+
+    parser = OptionParser()
+    parser.add_option("-f", "--fname", dest="fname",
+                      action="store", help="filename",
+                      type="string")
+    parser.add_option("-p", "--plot_fname", dest="plot_fname", action="store",
+                      help="Benchmark plot filename", type="string")
+    (options, args) = parser.parse_args()
+
+    main(options.fname, options.plot_fname)
