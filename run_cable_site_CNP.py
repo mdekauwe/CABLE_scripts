@@ -506,8 +506,8 @@ class RunCable(object):
             f = "new_sumbal"
             if os.path.isfile(f):
                 os.remove(f)
-            for f in glob.glob("*.out"):
-                os.remove(f)
+            #for f in glob.glob("*.out"):
+            #    os.remove(f)
             for f in glob.glob("restart_*.nc"):
                 os.remove(f)
         else:
@@ -554,8 +554,8 @@ if __name__ == "__main__":
     use_clim = False
     # ------------------------------------------- #
 
-    #for biogeochem in ["C", "CN", "CNP"]:
-    for biogeochem in ["C"]:
+    for biogeochem in ["C", "CN", "CNP"]:
+    #for biogeochem in ["C"]:
 
         experiment_id = "%s_%s" % (site, biogeochem)
         C = RunCable(experiment_id=experiment_id, met_dir=met_dir,
