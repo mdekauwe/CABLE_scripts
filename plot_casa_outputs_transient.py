@@ -42,6 +42,7 @@ def plot_carbon_fluxes(tag, cycle, ds, type, window=6):
 
     ax1.set_title("GPP")
     gpp = ds.Cgpp[:,0].to_dataframe()
+    #print(np.unique(gpp.index.year))
     ax1.plot(gpp.rolling(window=window).mean())
     ax1.set_xticks(gpp.index.to_pydatetime())
     ax1.locator_params(tight=True, nbins=6)
@@ -263,7 +264,7 @@ def plot_phosphorus_fluxes(tag, cycle, ds, type, window=6):
 def open_file(fname):
 
     ds = xr.open_dataset(fname)
-    dates = pd.date_range('1/1/1750', periods=len(ds.time), freq='M')
+    dates = pd.date_range('1/1/1850', periods=len(ds.time), freq='M')
     ds['time'] = dates
 
     return ds

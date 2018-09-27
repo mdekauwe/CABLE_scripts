@@ -262,7 +262,7 @@ def plot_phosphorus_fluxes(tag, cycle, ds, type, window=6):
 def open_file(fname):
 
     ds = xr.open_dataset(fname)
-    dates = pd.date_range('1/1/1750', periods=len(ds.time), freq='M')
+    dates = pd.date_range('1/1/2010', periods=len(ds.time), freq='M')
     ds['time'] = dates
 
     return ds
