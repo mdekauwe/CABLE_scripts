@@ -274,6 +274,7 @@ class RunCable(object):
                         "output%averaging": "'monthly'",
                         "icycle": "%d" % (self.biogeochem),
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
+                        "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "spinup": ".FALSE.",
                         "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
                         "cable_user%GS_SWITCH": "'medlyn'",
@@ -463,7 +464,6 @@ class RunCable(object):
                         "cable_user%SOIL_STRUC": "'%s'" % (self.soil_flag),
                         "spincasa": ".FALSE.",
                         "spinup": ".FALSE.",
-                        "l_laiFeedbk": ".TRUE.",
                         "output%averaging": "'all'",
                         "casafile%out": "'%s'" % (self.out_fname_CASA),
         }
