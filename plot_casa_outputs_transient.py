@@ -62,7 +62,7 @@ def plot_carbon_fluxes(tag, cycle, ds):
     ax6.set_title("C labile")
     ax6.plot(ds.clabile[:,0])
 
-    plot_fname = "%s_spinup_carbon_fluxes.pdf" % (tag)
+    plot_fname = "%s_transient_carbon_fluxes.pdf" % (tag)
     plot_dir = "plots"
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
@@ -123,7 +123,7 @@ def plot_nitrogen_fluxes(tag, cycle, ds):
     ax9.plot(ds.nplant[:,0,0]/ds.cplant[:,0,0])
 
 
-    plot_fname = "%s_spinup_nitrogen_fluxes_spinup.pdf" % (tag)
+    plot_fname = "%s_transient_nitrogen_fluxes.pdf" % (tag)
     plot_dir = "plots"
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
@@ -183,7 +183,7 @@ def plot_phosphorus_fluxes(tag, cycle, ds):
     ax9.plot(ds.nplant[:,0,0]/ds.cplant[:,0,0])
 
 
-    plot_fname = "%s_spinup_phosphorus_fluxes.pdf" % (tag)
+    plot_fname = "%s_transient_phosphorus_fluxes.pdf" % (tag)
     plot_dir = "plots"
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
@@ -214,11 +214,11 @@ if __name__ == "__main__":
             experiment_id = "Cumberland_CNP"
             tag = "CNP"
 
-        files = glob.glob("outputs/%s_out_CASA_ccp?.nc" % (experiment_id))
-        files.insert(0, "outputs/%s_out_CASA_zero.nc" % (experiment_id))
+
+        fname = "outputs/%s_out_CASA_transient.nc" % (experiment_id)
 
         # open last file
-        ds = xr.open_dataset(files[-1])
+        ds = xr.open_dataset(fname)
 
         plot_carbon_fluxes(tag, cycle, ds)
         plot_nitrogen_fluxes(tag, cycle, ds)
