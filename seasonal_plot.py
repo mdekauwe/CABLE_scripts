@@ -57,7 +57,7 @@ def main(fname, plot_fname=None):
     for i,a in enumerate(axes):
         a.set_xticks([1, 6, 12])
         if i != 1:
-            a.set_ylim(ymin=0)
+            a.set_ylim(bottom=0)
         a.xaxis.set_minor_locator(xtickagaes_minor)
         a.set_xticklabels(['Jan', 'Jun', 'Dec'])
         if i < 4:
@@ -79,12 +79,12 @@ def read_cable_file(fname):
     f = nc.Dataset(fname)
     time = nc.num2date(f.variables['time'][:],
                         f.variables['time'].units)
-    df = pd.DataFrame(f.variables['GPP'][:,0], columns=['GPP'])
-    df['Qle'] = f.variables['Qle'][:,0]
-    df['LAI'] = f.variables['LAI'][:,0]
-    df['TVeg'] = f.variables['TVeg'][:,0]
-    df['ESoil'] = f.variables['ESoil'][:,0]
-    df['NEE'] = f.variables['NEE'][:,0]
+    df = pd.DataFrame(f.variables['GPP'][:,0,0], columns=['GPP'])
+    df['Qle'] = f.variables['Qle'][:,0,0]
+    df['LAI'] = f.variables['LAI'][:,0,0]
+    df['TVeg'] = f.variables['TVeg'][:,0,0]
+    df['ESoil'] = f.variables['ESoil'][:,0,0]
+    df['NEE'] = f.variables['NEE'][:,0,0]
 
     df['dates'] = time
     df = df.set_index('dates')
