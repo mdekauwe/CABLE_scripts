@@ -207,7 +207,7 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
     nc_var = nc.createVariable('LAI', 'f4', ('time', 'y', 'x'))
     nc.setncatts({'long_name': u"Leaf Area Index",})
     if lai_dir is not None:
-        nc.variables['LAI'][:,0,0] = df_lai_out.LAI.values
+        nc.variables['LAI'][:,0,0] = df_lai_out.LAI.values.reshape(out_length, 1, 1)
     else:
         nc.variables['LAI'][:,0,0] = lai
     nc.close()  # close the new file
