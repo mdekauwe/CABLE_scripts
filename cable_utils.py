@@ -18,6 +18,7 @@ import tempfile
 import pandas as pd
 import xarray as xr
 import numpy as np
+import matplotlib.pyplot as plt
 
 def adjust_nml_file(fname, replacements):
     """
@@ -182,22 +183,45 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
     else:
         lai_fname = os.path.join(lai_dir, "%s_lai.csv" % (site))
         df_lai = pd.read_csv(lai_fname)
+
         if lai_dir is not None:
             ds = xr.open_dataset(met_fname)
-            out_length = len(ds.Tair)
+
+            vars_to_keep = ['Tair']
+            dfx = ds[vars_to_keep].squeeze(dim=["x","y","z"],
+                                          drop=True).to_dataframe()
+
+            out_length = len(dfx.Tair)
+            time_idx = dfx.index
+            dfx = dfx.reindex(time_idx)
+            dfx['year'] = dfx.index.year
+            dfx['doy'] = dfx.index.dayofyear
 
             df_lai_out = pd.DataFrame(columns=['LAI'], index=range(out_length))
 
-            j = 0
-            for i in range(out_length):
+            df_non_leap = df_lai.copy()
+            df_leap = df_lai.copy()
+            extra = pd.DataFrame(columns=["LAI"], index=range(1))
+            extra.LAI[0] = df_lai.LAI[364]
+            df_leap = df_leap.append(extra)
+            df_leap = df_leap.reset_index(drop=True)
 
-                if j > len(df_lai)-1:
-                    df_lai_out.loc[i].LAI = df_lai.LAI[j-1]
-                    j = 0
+
+            idx = 0
+            for yr in np.unique(dfx.index.year):
+                #print(yr)
+                ndays = int(len(dfx[dfx.index.year == yr]) / 48)
+
+                if ndays == 366:
+                    st = idx
+                    en = idx + (366 * 48)
+                    df_lai_out.LAI[st:en] = np.repeat(df_leap.values, 48)
                 else:
-                    df_lai_out.loc[i].LAI = df_lai.LAI[j]
+                    st = idx
+                    en = idx + (365 * 48)
+                    df_lai_out.LAI[st:en] = np.repeat(df_non_leap.values, 48)
 
-                j += 1
+                idx += (ndays * 48)
 
     shutil.copyfile(met_fname, new_met_fname)
 
