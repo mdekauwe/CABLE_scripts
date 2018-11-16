@@ -181,7 +181,23 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
         lai = fixed
     else:
         lai_fname = os.path.join(lai_dir, "%s_lai.csv" % (site))
-        lai = pd.read_csv(lai_fname)
+        df_lai = pd.read_csv(lai_fname)
+        if lai_dir is not None:
+            ds = xr.open_dataset(met_fname)
+            out_length = len(ds.Tair)
+
+            df_lai_out = pd.DataFrame(columns=['LAI'], index=range(out_length))
+
+            j = 0
+            for i in range(out_length):
+
+                if j > len(df_lai)-1:
+                    df_lai_out.loc[i].LAI = df_lai.LAI[j-1]
+                    j = 0
+                else:
+                    df_lai_out.loc[i].LAI = df_lai.LAI[j]
+
+                j += 1
 
     shutil.copyfile(met_fname, new_met_fname)
 
@@ -190,7 +206,10 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
 
     nc_var = nc.createVariable('LAI', 'f4', ('time', 'y', 'x'))
     nc.setncatts({'long_name': u"Leaf Area Index",})
-    nc.variables['LAI'][:,0,0] = lai
+    if lai_dir is not None:
+        nc.variables['LAI'][:,0,0] = df_lai_out.LAI.values
+    else:
+        nc.variables['LAI'][:,0,0] = lai
     nc.close()  # close the new file
 
     return new_met_fname
