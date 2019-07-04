@@ -47,7 +47,6 @@ class RunCable(object):
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
-        self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
         self.veg_fname = os.path.join(self.aux_dir, veg_fname)
         self.soil_fname = os.path.join(self.aux_dir, soil_fname)
         self.grid_fname = os.path.join(self.grid_dir, grid_fname)
