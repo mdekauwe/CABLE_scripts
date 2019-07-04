@@ -195,4 +195,4 @@ if __name__ == "__main__":
     # Setup initial namelist file and submit qsub job
     else:
         C.setup_nml_file()
-        #C.run_me(start_yr, end_yr)
+        C.run_me(start_yr, end_yr)
