@@ -11,7 +11,7 @@
 #PBS -q normal
 #PBS -l walltime=2:00:00
 #PBS -l mem=32GB
-#PBS -l ncpus=28
+#PBS -l ncpus=16
 #PBS -j oe
 #PBS -l wd
 #PBS -l other=gdata1
@@ -20,7 +20,7 @@ module load openmpi
 #module load intel-mpi/4.1.1.036
 module load netcdf/4.3.3.1
 
-cpus=28
+cpus=16
 exe="./cable-mpi"
 
 # variables passed to this script by the python script
