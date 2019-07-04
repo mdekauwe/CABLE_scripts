@@ -127,7 +127,7 @@ if __name__ == "__main__":
     met_dir = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
     output_dir = "outputs"
-    aux_dir = "/g/data1/w35/mrd561/CABLE/CABLE_AUX-dev/"
+    aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
     yearly_namelist_dir = "backup_namelists" # remove later
     restart_dir = "restarts"
     soil_fname = "def_soil_params.txt"
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     grid_fname = "CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc"
     mask_fname = "gswp3_landmask_nomissing.nc"
     nml_fname = "cable.nml"
-    qsub_template_fname = "qsub_scripts/run_cable_spatial_template.sh"
+    qsub_template_fname = "run_cable_spatial_template.sh"
     start_yr = 1950
     end_yr = 1951
     # ------------------------------------------- #
@@ -176,4 +176,4 @@ if __name__ == "__main__":
         shutil.copyfile(os.path.join(aux_dir, "offline/%s" % (nml_fname)),
                         nml_fname)
         C.setup_nml_file()
-        C.run_me(start_yr, end_yr)
+        #C.run_me(start_yr, end_yr)
