@@ -172,8 +172,6 @@ if __name__ == "__main__":
     end_yr = 1951
     # ------------------------------------------- #
 
-
-
     options, args = cmd_line_parser()
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,

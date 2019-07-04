@@ -7,10 +7,10 @@
 #
 
 #PBS -m ae
-#PBS -P dt6
-#PBS -q normalbw
+#PBS -P w35
+#PBS -q normal
 #PBS -l walltime=2:00:00
-#PBS -l mem=10GB
+#PBS -l mem=32GB
 #PBS -l ncpus=28
 #PBS -j oe
 #PBS -l wd
