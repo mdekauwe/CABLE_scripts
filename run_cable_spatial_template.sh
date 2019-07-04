@@ -21,7 +21,7 @@ module load openmpi
 module load netcdf/4.3.3.1
 
 cpus=16
-exe="./cable-mpi"
+exe="./cable"
 
 # variables passed to this script by the python script
 start_yr=$start_yr
