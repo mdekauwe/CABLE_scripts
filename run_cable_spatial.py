@@ -57,8 +57,10 @@ class RunCable(object):
         self.qsub_template_fname = qsub_template_fname
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
-        self.nml_fname  = os.path.join(self.grid_dir, "%s" % (nml_fname))
-
+        
+        base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
+        shutil.copyfile(base_nml_file, nml_fname)
+        self.nml_fname  = nml_fname
 
     def initialise_stuff(self):
 
@@ -105,8 +107,7 @@ class RunCable(object):
                     (start_yr, end_yr, self.co2_fname, self.qsub_template_fname)
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
-            print("Job failed to submit")
-            sys.exit()
+            raise("Job failed to submit\n")
 
     def create_new_nml_file(self, log_fname, out_fname, restart_in_fname,
                             restart_out_fname, year, co2_conc):
