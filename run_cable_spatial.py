@@ -88,7 +88,8 @@ class RunCable(object):
     def setup_nml_file(self):
 
         replace_dict = {
-                        "filename%met": "'%s'" % (self.met_dir),
+                        #"filename%met": "'%s'" % (self.met_dir),
+                        "filename%met": "''",  # not needed for GSWP3 run
                         "filename%type": "'%s'" % (self.grid_fname),
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
