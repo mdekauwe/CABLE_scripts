@@ -53,11 +53,12 @@ class RunCable(object):
         self.mask_fname = os.path.join(self.aux_dir,
                                        "offline/%s" % (mask_fname))
         self.namelist_dir = namelist_dir
-        self.nml_fname = nml_fname
         self.co2_fname = co2_fname
         self.qsub_template_fname = qsub_template_fname
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
+        self.nml_fname  = os.path.join(self.grid_dir, "%s" % (nml_fname))
+
 
     def initialise_stuff(self):
 
@@ -80,7 +81,7 @@ class RunCable(object):
         shutil.copy(self.cable_exe, local_exe)
         self.cable_exe = local_exe
 
-        return (met_files, url, rev)
+
 
     def setup_nml_file(self):
 
@@ -176,7 +177,8 @@ if __name__ == "__main__":
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, cable_src=cable_src)
-
+    C.initialise_stuff()
+    
     # qsub script is adjusting namelist file
     if options.a:
         log_fname = options.l
@@ -191,7 +193,5 @@ if __name__ == "__main__":
 
     # Setup initial namelist file and submit qsub job
     else:
-        shutil.copyfile(os.path.join(aux_dir, "offline/%s" % (nml_fname)),
-                        nml_fname)
         C.setup_nml_file()
         #C.run_me(start_yr, end_yr)
