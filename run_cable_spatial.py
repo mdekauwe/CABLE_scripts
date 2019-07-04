@@ -19,7 +19,8 @@ import glob
 import shutil
 import tempfile
 import optparse
-from adjust_namelist_files import adjust_nml_file
+
+from cable_utils import adjust_nml_file
 
 class RunCable(object):
 
