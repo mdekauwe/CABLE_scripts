@@ -31,11 +31,20 @@ activate nci
 cpus=16
 exe="./cable"
 
+
+
 # variables passed to this script by the python script
 start_yr=$start_yr
 prev_yr="$(($start_yr-1))"
 end_yr=$end_yr
 co2_fname=$co2_fname
+
+echo "*******"
+echo $start_yr
+echo $prev_yr
+echo $end_yr
+echo $co2_fname
+echo "*******"
 
 year=$start_yr
 while [ $year -le $end_yr ]
@@ -49,6 +58,12 @@ do
     outfile="cable_out_$year.nc"
     logfile="cable_log_$year.txt"
 
+    echo "++++++"
+    echo $restart_in
+    echo $restart_out
+    echo $outfile
+    echo $logfile
+    echo "++++++"
     python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
                                   -i $restart_in -r $restart_out -c $co2_conc
 

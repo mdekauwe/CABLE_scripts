@@ -89,6 +89,7 @@ class RunCable(object):
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
+                        "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
                         "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
                         "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
                         "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
@@ -130,6 +131,7 @@ class RunCable(object):
                         "filename%restart_in": "'%s'" % (restart_in_fname),
                         "filename%restart_out": "'%s'" % (restart_out_fname),
                         "fixedCO2": "%f" % (co2_conc),
+                        "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
                         "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
                         "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
                         "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
