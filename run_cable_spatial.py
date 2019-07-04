@@ -119,7 +119,7 @@ class RunCable(object):
 
         # i.e. if there is no restart file for the first year
         if year - 1 < self.start_yr:
-            restart_in_fname = "' '"
+            restart_in_fname = ""
         else:
             restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
         restart_out_fname = os.path.join(self.restart_dir, restart_out_fname)
