@@ -3,7 +3,7 @@
 # This is the template file, we shouldn't need to touch this, the
 # python script should set this off and submit the qsub job
 #
-# Martin De Kauwe, 27 July 2018
+# Martin De Kauwe, 4 July 2019
 #
 
 #PBS -m ae
@@ -16,8 +16,9 @@
 #PBS -l wd
 #PBS -l other=gdata1
 
-module load intel-mpi/4.1.1.036
-module load netcdf/4.2.1.1
+module load openmpi
+#module load intel-mpi/4.1.1.036
+module load netcdf/4.3.3.1
 
 cpus=28
 exe="./cable-mpi"
