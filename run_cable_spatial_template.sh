@@ -25,7 +25,8 @@ module load subversion/1.9.0
 
 #module load intel-mpi/4.1.1.036
 
-source activate nci
+#source activate nci
+activate nci
 
 cpus=16
 exe="./cable"
