@@ -25,7 +25,7 @@ from cable_utils import adjust_nml_file
 class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
-                 restart_dir=None, aux_dir=None,
+                 restart_dir=None, aux_dir=None, cable_src=None,
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
@@ -56,6 +56,7 @@ class RunCable(object):
         self.nml_fname = nml_fname
         self.co2_fname = co2_fname
         self.qsub_template_fname = qsub_template_fname
+        self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
 
     def initialise_stuff(self):
@@ -164,7 +165,7 @@ if __name__ == "__main__":
     output_dir = "outputs"
     restart_dir = "restarts"
     aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
-
+    cable_src = "../../src/trunk/trunk/"
     start_yr = 1950
     end_yr = 1951
     # ------------------------------------------- #
@@ -174,7 +175,7 @@ if __name__ == "__main__":
     options, args = cmd_line_parser()
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir)
+                 restart_dir=restart_dir, aux_dir=aux_dir, cable_src=cable_src)
 
     # qsub script is adjusting namelist file
     if options.a:
