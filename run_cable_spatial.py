@@ -81,7 +81,7 @@ class RunCable(object):
         shutil.copy(self.cable_exe, local_exe)
         self.cable_exe = local_exe
 
-    def setup_nml_file(self, year):
+    def setup_nml_file(self):
 
         replace_dict = {
                         "filename%met": "'%s'" % (self.met_dir),
@@ -89,15 +89,6 @@ class RunCable(object):
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
-                        "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
-                        "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
-                        "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
-                        "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
-                        "gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))),
-                        "gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))),
-                        "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
-                        "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
-                        "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
                         "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
@@ -184,7 +175,7 @@ if __name__ == "__main__":
                  restart_dir=restart_dir, aux_dir=aux_dir, cable_src=cable_src)
     C.initialise_stuff()
 
-    # qsub script is adjusting namelist file
+    # qsub script is adjusting namelist file, i.e. for a different year
     if options.a:
         log_fname = options.l
         out_fname = options.o
@@ -198,5 +189,5 @@ if __name__ == "__main__":
 
     # Setup initial namelist file and submit qsub job
     else:
-        C.setup_nml_file(start_yr)
+        C.setup_nml_file()
         C.run_me(start_yr, end_yr)
