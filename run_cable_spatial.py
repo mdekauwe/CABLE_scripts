@@ -24,10 +24,17 @@ from cable_utils import adjust_nml_file
 
 class RunCable(object):
 
-    def __init__(self, met_dir, log_dir, output_dir, aux_dir,
-                 yearly_namelist_dir, restart_dir, soil_fname, veg_fname,
-                 co2_fname, grid_fname, mask_fname, nml_fname,
-                 qsub_template_fname):
+    def __init__(self, met_dir=None, log_dir=None, output_dir=None,
+                 restart_dir=None, aux_dir=None,
+                 namelist_dir="namelists",
+                 soil_fname="def_soil_params.txt",
+                 veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
+                 co2_fname="Annual_CO2_concentration_until_2010.txt",
+                 grid_fname="CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc",
+                 mask_fname="gswp3_landmask_nomissing.nc",
+                 nml_fname="cable.nml",
+                 qsub_template_fname="run_cable_spatial_template.sh",
+                 cable_exe="cable"):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -37,15 +44,43 @@ class RunCable(object):
         self.veg_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.soil_fname = soil_fname
+        self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
+        self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
+        self.grid_dir = os.path.join(self.aux_dir, "offline")
+        self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
         self.veg_fname = os.path.join(self.aux_dir, veg_fname)
         self.soil_fname = os.path.join(self.aux_dir, soil_fname)
         self.grid_fname = os.path.join(self.grid_dir, grid_fname)
         self.mask_fname = os.path.join(self.aux_dir,
                                        "offline/%s" % (mask_fname))
-        self.yearly_namelist_dir = yearly_namelist_dir
+        self.namelist_dir = namelist_dir
         self.nml_fname = nml_fname
         self.co2_fname = co2_fname
         self.qsub_template_fname = qsub_template_fname
+        self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
+
+    def initialise_stuff(self):
+
+        if not os.path.exists(self.restart_dir):
+            os.makedirs(self.restart_dir)
+
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
+
+        if not os.path.exists(self.namelist_dir):
+            os.makedirs(self.namelist_dir)
+
+        # delete local executable, copy a local copy and use that
+        local_exe = "cable"
+        if os.path.isfile(local_exe):
+            os.remove(local_exe)
+        shutil.copy(self.cable_exe, local_exe)
+        self.cable_exe = local_exe
+
+        return (met_files, url, rev)
 
     def setup_nml_file(self):
 
@@ -102,7 +137,7 @@ class RunCable(object):
         adjust_nml_file(self.nml_fname, replace_dict)
 
         # save copy as we go for debugging - remove later
-        shutil.copyfile(self.nml_fname, os.path.join(self.yearly_namelist_dir,
+        shutil.copyfile(self.nml_fname, os.path.join(self.namelist_dir,
                                                      "cable_%d.nml" % (year)))
 
 def cmd_line_parser():
@@ -128,37 +163,19 @@ if __name__ == "__main__":
     met_dir = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
     output_dir = "outputs"
-    aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
-    yearly_namelist_dir = "backup_namelists" # remove later
     restart_dir = "restarts"
-    soil_fname = "def_soil_params.txt"
-    veg_fname = "def_veg_params_zr_clitt_albedo_fix.txt"
-    co2_fname = "Annual_CO2_concentration_until_2010.txt"
-    grid_fname = "CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc"
-    mask_fname = "gswp3_landmask_nomissing.nc"
-    nml_fname = "cable.nml"
-    qsub_template_fname = "run_cable_spatial_template.sh"
+    aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
+
     start_yr = 1950
     end_yr = 1951
     # ------------------------------------------- #
 
-    if not os.path.exists(restart_dir):
-        os.makedirs(restart_dir)
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
-    if not os.path.exists(yearly_namelist_dir):
-        os.makedirs(yearly_namelist_dir)
 
     options, args = cmd_line_parser()
 
-    C = RunCable(met_dir, log_dir, output_dir, aux_dir, yearly_namelist_dir,
-                 restart_dir, soil_fname, veg_fname, co2_fname, grid_fname,
-                 mask_fname, nml_fname, qsub_template_fname)
+    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir)
 
     # qsub script is adjusting namelist file
     if options.a:
