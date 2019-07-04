@@ -26,6 +26,7 @@ class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, cable_src=None,
+                 start_yr=None,
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
@@ -34,7 +35,6 @@ class RunCable(object):
                  mask_fname="gswp3_landmask_nomissing.nc",
                  nml_fname="cable.nml",
                  qsub_template_fname="run_cable_spatial_template.sh",
-                 start_yr=start_yr,
                  cable_exe="cable"):
 
         self.met_dir = met_dir
