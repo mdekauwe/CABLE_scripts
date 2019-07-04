@@ -51,14 +51,13 @@ while [ $year -le $end_yr ]
 do
 
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
-    echo $co2_conc
-    # adjust and make a new namelist file
-    restart_in="restart_$prev_year.nc"
+    restart_in="restart_$prev_yr.nc"
     restart_out="restart_$year.nc"
     outfile="cable_out_$year.nc"
     logfile="cable_log_$year.txt"
 
     echo "++++++"
+    echo $co2_conc
     echo $restart_in
     echo $restart_out
     echo $outfile
