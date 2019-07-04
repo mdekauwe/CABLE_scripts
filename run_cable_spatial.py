@@ -34,6 +34,7 @@ class RunCable(object):
                  mask_fname="gswp3_landmask_nomissing.nc",
                  nml_fname="cable.nml",
                  qsub_template_fname="run_cable_spatial_template.sh",
+                 start_yr=start_yr,
                  cable_exe="cable"):
 
         self.met_dir = met_dir
@@ -57,10 +58,11 @@ class RunCable(object):
         self.qsub_template_fname = qsub_template_fname
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
-        
+
         base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
         shutil.copyfile(base_nml_file, nml_fname)
         self.nml_fname  = nml_fname
+        self.start_yr = start_yr
 
     def initialise_stuff(self):
 
@@ -114,7 +116,12 @@ class RunCable(object):
 
         out_log_fname = os.path.join(self.log_dir, log_fname)
         out_fname = os.path.join(self.output_dir, out_fname)
-        restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
+
+        # i.e. if there is no restart file for the first year
+        if start_yr - 1 < start_yr:
+            restart_in_fname = "' '"
+        else:
+            restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
         restart_out_fname = os.path.join(self.restart_dir, restart_out_fname)
 
         replace_dict = {
@@ -173,7 +180,8 @@ if __name__ == "__main__":
     options, args = cmd_line_parser()
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir, cable_src=cable_src)
+                 restart_dir=restart_dir, aux_dir=aux_dir, cable_src=cable_src,
+                 start_yr=start_yr)
     C.initialise_stuff()
 
     # qsub script is adjusting namelist file, i.e. for a different year
