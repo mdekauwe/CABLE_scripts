@@ -31,7 +31,8 @@ class RunCable(object):
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
-                 grid_fname="CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc",
+                 #grid_fname="CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc",
+                 grid_fname=None,
                  mask_fname="gswp3_landmask_nomissing.nc",
                  nml_fname="cable.nml",
                  qsub_template_fname="run_cable_spatial_template.sh",
@@ -202,4 +203,4 @@ if __name__ == "__main__":
     # Setup initial namelist file and submit qsub job
     else:
         C.setup_nml_file()
-        C.run_me(start_yr, end_yr)
+        #C.run_me(start_yr, end_yr)
