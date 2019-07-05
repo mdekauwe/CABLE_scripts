@@ -60,10 +60,15 @@ class RunCable(object):
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
 
-        base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
-        shutil.copyfile(base_nml_file, nml_fname)
-        self.nml_fname = nml_fname
+        if nml_fname is None:
+            base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
+            shutil.copyfile(base_nml_file, nml_fname)
+            self.nml_fname = nml_fname
+        else:
+            self.nml_fname = nml_fname
+
         self.start_yr = start_yr
+
 
     def initialise_stuff(self):
 
@@ -168,6 +173,7 @@ def cmd_line_parser():
     p.add_option("-i", default="", help="restart in filename")
     p.add_option("-r", default="", help="restart out filename")
     p.add_option("-c", default="400.0", help="CO2 concentration")
+    p.add_option("-n", default=None, help="onml_fname")
 
     return p.parse_args()
 
@@ -182,13 +188,21 @@ if __name__ == "__main__":
     cable_src = "../../src/trunk/trunk/"
     start_yr = 1950
     end_yr = 1951
+    nml_fname = None # set it up
     # ------------------------------------------- #
 
     options, args = cmd_line_parser()
+    log_fname = options.l
+    out_fname = options.o
+    restart_in_fname = options.i
+    restart_out_fname = options.r
+    year = int(options.y)
+    co2_conc = float(options.c)
+    nml_fname = options.n
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, cable_src=cable_src,
-                 start_yr=start_yr)
+                 start_yr=start_yr, nml_fname=nml_fname)
     C.initialise_stuff()
 
     # qsub script is adjusting namelist file, i.e. for a different year
