@@ -58,7 +58,8 @@ class RunCable(object):
         self.cable_exe = cable_exe
 
         if nml_fname is None:
-            base_nml_file = os.path.join(self.grid_dir, "cable.nml")
+            nml_fname = "cable.nml"
+            base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
             shutil.copyfile(base_nml_file, nml_fname)
             self.nml_fname = nml_fname
         else:
