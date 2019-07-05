@@ -66,7 +66,7 @@ do
     python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
                                   -i $restart_in -r $restart_out -c $co2_conc
 
-    mpirun -n $cpus $exe $nml
+    #mpirun -n $cpus $exe $nml
 
     year=$[$year+1]
     prev_yr=$[$prev_yr+1]
