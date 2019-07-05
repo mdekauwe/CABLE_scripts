@@ -62,7 +62,7 @@ class RunCable(object):
 
         base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
         shutil.copyfile(base_nml_file, nml_fname)
-        self.nml_fname  = nml_fname
+        self.nml_fname = nml_fname
         self.start_yr = start_yr
 
     def initialise_stuff(self):
@@ -203,4 +203,4 @@ if __name__ == "__main__":
     # Setup initial namelist file and submit qsub job
     else:
         C.setup_nml_file()
-        C.run_me(start_yr, end_yr)
+        #C.run_me(start_yr, end_yr)
