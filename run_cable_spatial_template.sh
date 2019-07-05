@@ -31,7 +31,7 @@ activate nci
 cpus=16
 exe="./cable"
 nml="cable.nml"
-
+nml_fname="cable.nml"
 
 # variables passed to this script by the python script
 start_yr=$start_yr
@@ -64,7 +64,8 @@ do
     echo $logfile
     echo "++++++"
     python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \
-                                  -i $restart_in -r $restart_out -c $co2_conc
+                                  -i $restart_in -r $restart_out -c $co2_conc \
+                                  -n $nml_fname
 
     #mpirun -n $cpus $exe $nml
 
