@@ -26,7 +26,7 @@ class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, cable_exe=None,
-                 start_yr=None, setup_exe=None,
+                 start_yr=None, setup_exe=None, nml_fname=None,
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
@@ -34,7 +34,6 @@ class RunCable(object):
                  #grid_fname="CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc",
                  grid_fname=None,
                  mask_fname="gswp3_landmask_nomissing.nc",
-                 nml_fname="cable.nml",
                  qsub_template_fname="run_cable_spatial_template.sh"):
 
         self.met_dir = met_dir
@@ -59,7 +58,7 @@ class RunCable(object):
         self.cable_exe = cable_exe
 
         if nml_fname is None:
-            base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
+            base_nml_file = os.path.join(self.grid_dir, "cable.nml")
             shutil.copyfile(base_nml_file, nml_fname)
             self.nml_fname = nml_fname
         else:
