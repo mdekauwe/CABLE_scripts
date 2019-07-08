@@ -20,10 +20,10 @@ module load dot
 module add intel-cc
 module add intel-fc
 module load netcdf/4.3.3.1
-module load openmpi
+#module load openmpi
+module load intel-mpi
 module load subversion/1.9.0
 
-#module load intel-mpi/4.1.1.036
 
 #source activate nci
 activate nci
