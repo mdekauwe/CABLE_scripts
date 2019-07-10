@@ -67,7 +67,7 @@ do
                                   -i $restart_in -r $restart_out -c $co2_conc \
                                   -n $nml_fname
 
-    #mpirun -n $cpus $exe $nml
+    mpirun -n $cpus $exe $nml
 
     year=$[$year+1]
     prev_yr=$[$prev_yr+1]
