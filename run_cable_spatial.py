@@ -194,13 +194,13 @@ if __name__ == "__main__":
 
     # qsub script is adjusting namelist file, i.e. for a different year
     if options.a:
-        cable_exe = "./cable"
+        cable_exe = "./cable-mpi"
         C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, cable_exe=cable_exe,
                  start_yr=start_yr, nml_fname=nml_fname)
 
     else:
-        cable_exe = os.path.join(cable_src, "offline/cable")
+        cable_exe = os.path.join(cable_src, "offline/cable-mpi")
         # delete local executable, copy a local copy and use that
         local_exe = "cable"
         if os.path.isfile(local_exe):

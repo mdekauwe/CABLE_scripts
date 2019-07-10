@@ -29,7 +29,7 @@ module load subversion/1.9.0
 activate nci
 
 cpus=16
-exe="./cable"
+exe="./cable-mpi"
 nml="cable.nml"
 nml_fname="cable.nml"
 
