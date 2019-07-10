@@ -50,7 +50,9 @@ class RunCable(object):
         self.soil_fname = os.path.join(self.aux_dir, soil_fname)
         #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
         self.grid_fname = "/short/w35/mm3972/cable/src/CABLE-AUX/offline/gridinfo_mmy_MD_elev_orig_std_avg-sand_mask.nc"
-        self.mask_fname = os.path.join(self.aux_dir,
+        #self.mask_fname = os.path.join(self.aux_dir,
+        #                               "offline/%s" % (mask_fname))
+        self.mask_fname = os.path.join("/short/w35/mm3972/cable/src/CABLE-AUX/",
                                        "offline/%s" % (mask_fname))
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
