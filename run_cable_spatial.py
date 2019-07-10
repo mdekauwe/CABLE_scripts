@@ -202,7 +202,7 @@ if __name__ == "__main__":
     else:
         cable_exe = os.path.join(cable_src, "offline/cable-mpi")
         # delete local executable, copy a local copy and use that
-        local_exe = "cable"
+        local_exe = "cable-mpi"
         if os.path.isfile(local_exe):
             os.remove(local_exe)
         shutil.copy(cable_exe, local_exe)
