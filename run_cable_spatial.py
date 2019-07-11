@@ -100,7 +100,7 @@ class RunCable(object):
                         "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
                         "cable_user%GS_SWITCH": "'medlyn'",
                         "cable_user%GW_MODEL": ".FALSE.",
-                        "cable_user%or_evap": ".TRUE.",
+                        "cable_user%or_evap": ".FALSE.",
                         "cable_user%GSWP3": ".TRUE.",
                         "cable_user%MetType": "'gswp3'",
         }
