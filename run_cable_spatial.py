@@ -111,7 +111,6 @@ class RunCable(object):
 
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
                     (start_yr, end_yr, self.co2_fname, self.qsub_template_fname)
-        print(qs_cmd)
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
             raise("Job failed to submit\n")
@@ -146,8 +145,6 @@ class RunCable(object):
                         "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
 
         }
-        print("******\n")
-        print(self.nml_fname)
         adjust_nml_file(self.nml_fname, replace_dict)
 
         # save copy as we go for debugging - remove later
@@ -224,7 +221,6 @@ if __name__ == "__main__":
         restart_out_fname = options.r
         year = int(options.y)
         co2_conc = float(options.c)
-        print(out_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
                               restart_out_fname, year, co2_conc)
 
