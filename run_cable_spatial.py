@@ -91,7 +91,6 @@ class RunCable(object):
     def setup_nml_file(self):
 
         replace_dict = {
-                        #"filename%met": "'%s'" % (self.met_dir),
                         "filename%met": "''",  # not needed for GSWP3 run
                         "filename%type": "'%s'" % (self.grid_fname),
                         "filename%veg": "'%s'" % (self.veg_fname),
@@ -99,7 +98,7 @@ class RunCable(object):
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
                         "output%averaging": "'monthly'",
                         "spinup": ".FALSE.",
-                        "cable_user%FWSOIL_SWITCH": "'Haverd2013'",
+                        "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
                         "cable_user%GW_MODEL": ".FALSE.",
                         "cable_user%or_evap": ".FALSE.",
@@ -181,7 +180,7 @@ if __name__ == "__main__":
     aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
     start_yr = 1950
-    end_yr = 1951
+    end_yr = 1950
     # ------------------------------------------- #
 
     options, args = cmd_line_parser()
@@ -218,5 +217,3 @@ if __name__ == "__main__":
                  start_yr=start_yr, nml_fname=nml_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
                               restart_out_fname, year, co2_conc)
-
-    
