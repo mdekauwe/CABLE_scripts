@@ -9,7 +9,7 @@
 #PBS -m ae
 #PBS -P w35
 #PBS -q normal
-#PBS -l walltime=4:00:00
+#PBS -l walltime=0:30:00
 #PBS -l mem=64GB
 #PBS -l ncpus=32
 #PBS -j oe
@@ -26,7 +26,7 @@ module load subversion/1.9.0
 #source activate nci
 activate nci
 
-cpus=16
+cpus=32
 exe="./cable-mpi"
 nml="cable.nml"
 nml_fname="cable.nml"

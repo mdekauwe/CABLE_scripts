@@ -33,7 +33,8 @@ class RunCable(object):
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
                  #grid_fname="CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc",
                  grid_fname=None,
-                 mask_fname="gswp3_landmask_nomissing.nc",
+                 #mask_fname="gswp3_landmask_nomissing.nc",
+                 mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
                  qsub_template_fname="run_cable_spatial_template.sh"):
 
         self.met_dir = met_dir
@@ -52,8 +53,9 @@ class RunCable(object):
         self.grid_fname = "/short/w35/mm3972/cable/src/CABLE-AUX/offline/gridinfo_mmy_MD_elev_orig_std_avg-sand_mask.nc"
         #self.mask_fname = os.path.join(self.aux_dir,
         #                               "offline/%s" % (mask_fname))
-        self.mask_fname = os.path.join("/short/w35/mm3972/cable/src/CABLE-AUX/",
-                                       "offline/%s" % (mask_fname))
+        #self.mask_fname = os.path.join("/short/w35/mm3972/cable/src/CABLE-AUX/",
+        #                               "offline/%s" % (mask_fname))
+        self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
         self.qsub_template_fname = qsub_template_fname
