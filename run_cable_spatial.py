@@ -193,14 +193,9 @@ if __name__ == "__main__":
     co2_conc = float(options.c)
     nml_fname = options.n
 
-    # qsub script is adjusting namelist file, i.e. for a different year
-    if options.a:
-        cable_exe = "./cable-mpi"
-        C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir, cable_exe=cable_exe,
-                 start_yr=start_yr, nml_fname=nml_fname)
+    # Setup initial namelist file and submit qsub job
+    if options.a == False:
 
-    else:
         cable_exe = os.path.join(cable_src, "offline/cable-mpi")
         # delete local executable, copy a local copy and use that
         local_exe = "cable-mpi"
@@ -208,25 +203,20 @@ if __name__ == "__main__":
             os.remove(local_exe)
         shutil.copy(cable_exe, local_exe)
         C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir, cable_exe=local_exe,
-                 start_yr=start_yr, nml_fname=None)
+                     restart_dir=restart_dir, aux_dir=aux_dir,
+                     cable_exe=local_exe, start_yr=start_yr, nml_fname=None)
         C.initialise_stuff()
-
-
-
+        C.setup_nml_file()
+        C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
-    if options.a:
-        log_fname = options.l
-        out_fname = options.o
-        restart_in_fname = options.i
-        restart_out_fname = options.r
-        year = int(options.y)
-        co2_conc = float(options.c)
+    else:
+
+        cable_exe = "./cable-mpi"
+        C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir, cable_exe=cable_exe,
+                 start_yr=start_yr, nml_fname=nml_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
                               restart_out_fname, year, co2_conc)
 
-    # Setup initial namelist file and submit qsub job
-    else:
-        C.setup_nml_file()
-        C.run_me(start_yr, end_yr)
+    
