@@ -5,11 +5,15 @@ Run CABLE spatially.
 
 This script sets various things within a qsub script and then submits the run.
 
+Ensure you run it with "-s" if you want to spinup the run, i.e.
+
+./run_cable_spatial.py -s
+
 That's all folks.
 """
 
 __author__ = "Martin De Kauwe"
-__version__ = "1.0 (27.07.2018)"
+__version__ = "1.0 (13.07.2019)"
 __email__ = "mdekauwe@gmail.com"
 
 import subprocess
@@ -114,7 +118,7 @@ class RunCable(object):
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def generate_qsub_script(self):
+    def generate_qsub_script(self, walltime, mem, ncpus):
 
         ofname = self.qsub_fname
         if os.path.exists(ofname):
@@ -194,7 +198,6 @@ class RunCable(object):
         print(" ", end="\n", file=f)
 
         f.close()
-        sys.exit()
 
     def run_me(self, start_yr, end_yr):
 
@@ -278,9 +281,15 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = 1901
         end_yr = 1910
+        walltime = "3:00:00"
+        mem = "64GB"
+        ncpus = "32"
     else:
         start_yr = 1901
         end_yr = 2010
+        walltime = "16:00:00"
+        mem = "64GB"
+        ncpus = "32"
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
@@ -290,7 +299,7 @@ if __name__ == "__main__":
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
-        C.generate_qsub_script()
+        C.generate_qsub_script(walltime, mem, ncpus)
         C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
