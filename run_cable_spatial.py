@@ -125,9 +125,6 @@ class RunCable(object):
             os.remove(ofname)
         f = open(ofname, "w")
 
-        walltime = "0:10:00"
-        mem = "64GB"
-        ncpus = "32"
         print("#!/bin/bash", end="\n", file=f)
         print(" ", end="\n", file=f)
 
