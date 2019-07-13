@@ -297,6 +297,7 @@ if __name__ == "__main__":
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, start_yr=start_yr, nml_fname=None)
 
+    print("Adjust_nml:", adjust_nml)
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
@@ -306,5 +307,8 @@ if __name__ == "__main__":
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
+        print("HERE")
+        print(year, co2_conc)
+        print(out_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
                               restart_out_fname, year, co2_conc)
