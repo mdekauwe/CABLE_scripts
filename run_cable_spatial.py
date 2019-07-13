@@ -169,7 +169,7 @@ class RunCable(object):
         print("    logfile='cable_log_$year.txt'", end="\n", file=f)
         print(" ", end="\n", file=f)
 
-        print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)"
+        print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
         print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
         print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
         print(" ", end="\n", file=f)
