@@ -26,7 +26,7 @@ class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, start_yr=None,
-                 cable_src=None, nml_fname=None, spin_up=spin_up,
+                 cable_src=None, nml_fname=None, spin_up=False,
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
@@ -63,7 +63,7 @@ class RunCable(object):
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
         self.spin_up = spin_up
-        
+
         if nml_fname is None:
             nml_fname = "cable.nml"
             base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
