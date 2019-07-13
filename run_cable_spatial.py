@@ -169,7 +169,7 @@ def cmd_line_parser():
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, int(options.y),
-            float(options.c), options.n, options.s)
+            float(options.c), options.n, options.s, options.a)
 
 
 if __name__ == "__main__":
@@ -187,10 +187,10 @@ if __name__ == "__main__":
 
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
-     nml_fname, spin_up) = cmd_line_parser()
+     nml_fname, spin_up, adjust_nml) = cmd_line_parser()
 
     # Setup initial namelist file and submit qsub job
-    if options.a == False:
+    if adjust_nml == False:
 
         cable_exe = os.path.join(cable_src, "offline/cable-mpi")
         # delete local executable, copy a local copy and use that
