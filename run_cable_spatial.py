@@ -35,7 +35,7 @@ class RunCable(object):
                  grid_fname=None,
                  #mask_fname="gswp3_landmask_nomissing.nc",
                  mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
-                 qsub_template_fname="run_cable_spatial_template.sh",
+                 qsub_fname="qsub_wrapper_script.sh",
                  cable_exe="cable-mpi"):
 
         self.met_dir = met_dir
@@ -59,7 +59,7 @@ class RunCable(object):
         self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
-        self.qsub_template_fname = qsub_template_fname
+        self.qsub_fname = qsub_fname
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
 
@@ -151,7 +151,7 @@ class RunCable(object):
     def run_me(self, start_yr, end_yr):
 
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
-                    (start_yr, end_yr, self.co2_fname, self.qsub_template_fname)
+                    (start_yr, end_yr, self.co2_fname, self.qsub_fname)
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
             raise("Job failed to submit\n")
