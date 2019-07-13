@@ -154,7 +154,7 @@ class RunCable(object):
         print(" ", end="\n", file=f)
 
         print("start_yr=$start_yr", end="\n", file=f)
-        print("prev_yr='$(($start_yr-1))'", end="\n", file=f)
+        print("prev_yr=\"$(($start_yr-1))\"", end="\n", file=f)
         print("end_yr=$end_yr", end="\n", file=f)
         print("co2_fname=$co2_fname", end="\n", file=f)
         print(" ", end="\n", file=f)
@@ -297,17 +297,16 @@ if __name__ == "__main__":
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, start_yr=start_yr, nml_fname=None)
 
-    print("Adjust_nml:", adjust_nml)
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
         C.generate_qsub_script(walltime, mem, ncpus)
+        sys.exit()
         C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
-        print("HERE")
         print(year, co2_conc)
         print(out_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
