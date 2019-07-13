@@ -26,7 +26,7 @@ class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, start_yr=None,
-                 cable_src=None, nml_fname=None,
+                 cable_src=None, nml_fname=None, spin_up=spin_up,
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
@@ -62,7 +62,8 @@ class RunCable(object):
         self.qsub_fname = qsub_fname
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
-
+        self.spin_up = spin_up
+        
         if nml_fname is None:
             nml_fname = "cable.nml"
             base_nml_file = os.path.join(self.grid_dir, "%s" % (nml_fname))
@@ -163,7 +164,18 @@ class RunCable(object):
         print("do", end="\n", file=f)
 
         print("    co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)", end="\n", file=f)
-        print("    restart_in='restart_$prev_yr.nc'", end="\n", file=f)
+        print(" ", end="\n", file=f)
+
+        if self.spin_up:
+            print("    if [ $start_yr == $year ]", end="\n", file=f)
+            print("    then", end="\n", file=f)
+            print("        restart_in=''", end="\n", file=f)
+            print("    else", end="\n", file=f)
+            print("        restart_in='restart_$prev_yr.nc'", end="\n", file=f)
+            print("    fi", end="\n", file=f)
+            print(" ", end="\n", file=f)
+        else:
+            print("    restart_in='restart_$prev_yr.nc'", end="\n", file=f)
         print("    restart_out='restart_$year.nc'", end="\n", file=f)
         print("    outfile='cable_out_$year.nc'", end="\n", file=f)
         print("    logfile='cable_log_$year.txt'", end="\n", file=f)
@@ -271,7 +283,7 @@ if __name__ == "__main__":
         end_yr = 2010
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, start_yr=start_yr, nml_fname=None)
 
     # Setup initial namelist file and submit qsub job

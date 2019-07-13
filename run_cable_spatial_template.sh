@@ -41,7 +41,14 @@ while [ $year -le $end_yr ]
 do
 
     co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)
-    restart_in="restart_$prev_yr.nc"
+
+    if [ $start_yr == $year ]
+    then
+        restart_in=""
+    else
+        restart_in="restart_$prev_yr.nc"
+    fi
+
     restart_out="restart_$year.nc"
     outfile="cable_out_$year.nc"
     logfile="cable_log_$year.txt"
