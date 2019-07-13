@@ -167,8 +167,11 @@ def cmd_line_parser():
     p.add_option("-r", default="", help="restart out filename")
     p.add_option("-c", default="400.0", help="CO2 concentration")
     p.add_option("-n", default=None, help="onml_fname")
+    options, args = p.parse_args()
 
-    return p.parse_args()
+    return (options.l, options.o, options.i,  options.r, int(options.y),
+            float(options.c), options.n, options.s)
+
 
 if __name__ == "__main__":
 
@@ -184,16 +187,15 @@ if __name__ == "__main__":
     # ------------------------------------------- #
 
     options, args = cmd_line_parser()
-    log_fname = options.l
-    out_fname = options.o
-    restart_in_fname = options.i
-    restart_out_fname = options.r
-    year = int(options.y)
-    co2_conc = float(options.c)
-    nml_fname = options.n
-    spin_up = options.s
 
-    print(spin_up)
+    (log_fname, out_fname, restart_in_fname,
+     restart_out_fname, year, co2_conc,
+     nml_fname, spin_up) = cmd_line_parser()
+
+    print(log_fname, out_fname, restart_in_fname,
+     restart_out_fname, year, co2_conc,
+     nml_fname, spin_up)
+    
     sys.exit()
 
     # Setup initial namelist file and submit qsub job
