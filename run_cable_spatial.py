@@ -144,6 +144,18 @@ class RunCable(object):
         print("module load intel-mpi", end="\n", file=f)
         print("module load subversion/1.9.0", end="\n", file=f)
         print("source activate nci", end="\n", file=f)
+        print(" ", end="\n", file=f)
+
+        print("cpus=%s" % (ncpus), end="\n", file=f)
+        print("exe='./cable-mpi'", end="\n", file=f)
+        print("nml='cable.nml'", end="\n", file=f)
+        print("nml_fname="cable.nml"", end="\n", file=f)
+        print(" ", end="\n", file=f)
+
+        print("start_yr=$start_yr", end="\n", file=f)
+        print("prev_yr='$(($start_yr-1))'", end="\n", file=f)
+        print("end_yr=$end_yr", end="\n", file=f)
+        print("co2_fname=$co2_fname", end="\n", file=f)
 
         f.close()
         sys.exit()
