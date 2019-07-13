@@ -181,10 +181,6 @@ class RunCable(object):
         print("    logfile=\"cable_log_$year.txt\"", end="\n", file=f)
         print(" ", end="\n", file=f)
 
-
-        print("echo $year $co2_conc $nml_fname", end="\n", file=f)
-
-
         print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
         print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
         print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
@@ -203,7 +199,6 @@ class RunCable(object):
 
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
                     (start_yr, end_yr, self.co2_fname, self.qsub_fname)
-        print(qs_cmd)
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
             raise("Job failed to submit\n")
@@ -282,8 +277,8 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = 1901
         end_yr = 1910
-        #walltime = "3:00:00"
-        walltime = "0:10:00"
+        walltime = "3:00:00"
+        #walltime = "0:10:00"
         mem = "64GB"
         ncpus = "32"
     else:
@@ -302,12 +297,9 @@ if __name__ == "__main__":
         C.initialise_stuff()
         C.setup_nml_file()
         C.generate_qsub_script(walltime, mem, ncpus)
-        sys.exit()
         C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
-        print(year, co2_conc)
-        print(out_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
                               restart_out_fname, year, co2_conc)
