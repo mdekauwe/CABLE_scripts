@@ -90,8 +90,6 @@ class RunCable(object):
 
         # delete local executable, copy a local copy and use that
         local_exe = os.path.basename(self.cable_exe)
-        print(local_exe)
-        sys.exit()
         if os.path.isfile(local_exe):
             os.remove(local_exe)
         shutil.copy(self.cable_exe, local_exe)
@@ -114,6 +112,38 @@ class RunCable(object):
                         "cable_user%MetType": "'gswp3'",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
+
+    def generate_qsub_script(self):
+
+        ofname = "run_cable_spatial_template.sh")
+        if os.path.exists(ofname):
+            os.remove(ofname)
+        f = open(ofname, "w")
+
+        print("#!/bin/bash", end="\n", file=f)
+        print(" ", end="\n", file=f)
+
+        print("#PBS -m ae", end="\n", file=f)
+        print("#PBS -P w35", end="\n", file=f)
+        print("#PBS -q normal", end="\n", file=f)
+        print("#PBS -l walltime=0:10:00", end="\n", file=f)
+        print("#PBS -l mem=64GB", end="\n", file=f)
+        print("#PBS -l ncpus=32", end="\n", file=f)
+        print("#PBS -j oe", end="\n", file=f)
+        print("#PBS -l wd", end="\n", file=f)
+        print("#PBS -l other=gdata1", end="\n", file=f)
+        print(" ", end="\n", file=f)
+
+        print("module load dot", end="\n", file=f)
+        print("module add intel-cc", end="\n", file=f)
+        print("module add intel-fc", end="\n", file=f)
+        print("module load netcdf/4.3.3.1", end="\n", file=f)
+        print("module load intel-mpi", end="\n", file=f)
+        print("module load subversion/1.9.0", end="\n", file=f)
+        print("source activate nci", end="\n", file=f)
+
+        f.close()
+        sys.exit()
 
     def run_me(self, start_yr, end_yr):
 
@@ -188,13 +218,18 @@ if __name__ == "__main__":
     restart_dir = "restarts"
     aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
-    start_yr = 1950
-    end_yr = 1950
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
      nml_fname, spin_up, adjust_nml) = cmd_line_parser()
+
+    if spin_up:
+        start_yr = 1901
+        end_yr = 1910
+    else:
+        start_yr = 1901
+        end_yr = 2010
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir,
@@ -202,9 +237,9 @@ if __name__ == "__main__":
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
-
         C.initialise_stuff()
         C.setup_nml_file()
+        C.generate_qsub_script()
         C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
