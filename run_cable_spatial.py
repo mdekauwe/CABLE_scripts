@@ -150,7 +150,6 @@ class RunCable(object):
 
         print("cpus=%s" % (ncpus), end="\n", file=f)
         print("exe='./cable-mpi'", end="\n", file=f)
-        print("nml='cable.nml'", end="\n", file=f)
         print("nml_fname='cable.nml'", end="\n", file=f)
         print(" ", end="\n", file=f)
 
@@ -186,7 +185,7 @@ class RunCable(object):
         print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
         print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
         print(" ", end="\n", file=f)
-        print("    mpirun -n $cpus $exe $nml", end="\n", file=f)
+        print("    mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
         print(" ", end="\n", file=f)
         print("    year=$[$year+1]", end="\n", file=f)
         print("    prev_yr=$[$prev_yr+1]", end="\n", file=f)
