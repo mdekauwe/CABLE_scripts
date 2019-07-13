@@ -120,15 +120,18 @@ class RunCable(object):
             os.remove(ofname)
         f = open(ofname, "w")
 
+        walltime = "0:10:00"
+        mem = "64GB"
+        ncpus = "32"
         print("#!/bin/bash", end="\n", file=f)
         print(" ", end="\n", file=f)
 
         print("#PBS -m ae", end="\n", file=f)
         print("#PBS -P w35", end="\n", file=f)
         print("#PBS -q normal", end="\n", file=f)
-        print("#PBS -l walltime=0:10:00", end="\n", file=f)
-        print("#PBS -l mem=64GB", end="\n", file=f)
-        print("#PBS -l ncpus=32", end="\n", file=f)
+        print("#PBS -l walltime=%s" % (walltime), end="\n", file=f)
+        print("#PBS -l mem=%s" % (mem), end="\n", file=f)
+        print("#PBS -l ncpus=%s" % (ncpus), end="\n", file=f)
         print("#PBS -j oe", end="\n", file=f)
         print("#PBS -l wd", end="\n", file=f)
         print("#PBS -l other=gdata1", end="\n", file=f)
