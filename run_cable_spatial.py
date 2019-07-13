@@ -26,7 +26,7 @@ class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, cable_exe=None,
-                 start_yr=None, setup_exe=None, nml_fname=None,
+                 start_yr=None, cable_src=None, nml_fname=None,
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
@@ -35,7 +35,8 @@ class RunCable(object):
                  grid_fname=None,
                  #mask_fname="gswp3_landmask_nomissing.nc",
                  mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
-                 qsub_template_fname="run_cable_spatial_template.sh"):
+                 qsub_template_fname="run_cable_spatial_template.sh",
+                 cable_exe="cable-mpi"):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -59,7 +60,8 @@ class RunCable(object):
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
         self.qsub_template_fname = qsub_template_fname
-        self.cable_exe = cable_exe
+        self.cable_src = cable_src
+        self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
 
         if nml_fname is None:
             nml_fname = "cable.nml"
@@ -86,7 +88,13 @@ class RunCable(object):
         if not os.path.exists(self.namelist_dir):
             os.makedirs(self.namelist_dir)
 
-
+        # delete local executable, copy a local copy and use that
+        local_exe = os.path.basename(self.cable_exe)
+        print(local_exe)
+        sys.exit()
+        if os.path.isfile(local_exe):
+            os.remove(local_exe)
+        shutil.copy(self.cable_exe, local_exe)
 
     def setup_nml_file(self):
 
@@ -106,7 +114,6 @@ class RunCable(object):
                         "cable_user%MetType": "'gswp3'",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
-
 
     def run_me(self, start_yr, end_yr):
 
@@ -189,28 +196,18 @@ if __name__ == "__main__":
      restart_out_fname, year, co2_conc,
      nml_fname, spin_up, adjust_nml) = cmd_line_parser()
 
+    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir,
+                 cable_src=cable_src, start_yr=start_yr, nml_fname=None)
+
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
 
-        cable_exe = os.path.join(cable_src, "offline/cable-mpi")
-        # delete local executable, copy a local copy and use that
-        local_exe = "cable-mpi"
-        if os.path.isfile(local_exe):
-            os.remove(local_exe)
-        shutil.copy(cable_exe, local_exe)
-        C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                     restart_dir=restart_dir, aux_dir=aux_dir,
-                     cable_exe=local_exe, start_yr=start_yr, nml_fname=None)
         C.initialise_stuff()
         C.setup_nml_file()
         C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
-
-        cable_exe = "./cable-mpi"
-        C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir, cable_exe=cable_exe,
-                 start_yr=start_yr, nml_fname=nml_fname)
         C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
                               restart_out_fname, year, co2_conc)
