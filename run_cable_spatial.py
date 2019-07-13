@@ -149,7 +149,7 @@ class RunCable(object):
         print("cpus=%s" % (ncpus), end="\n", file=f)
         print("exe='./cable-mpi'", end="\n", file=f)
         print("nml='cable.nml'", end="\n", file=f)
-        print("nml_fname="cable.nml"", end="\n", file=f)
+        print("nml_fname='cable.nml'", end="\n", file=f)
         print(" ", end="\n", file=f)
 
         print("start_yr=$start_yr", end="\n", file=f)
