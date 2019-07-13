@@ -115,7 +115,7 @@ class RunCable(object):
 
     def generate_qsub_script(self):
 
-        ofname = "run_cable_spatial_template.sh"
+        ofname = self.qsub_fname
         if os.path.exists(ofname):
             os.remove(ofname)
         f = open(ofname, "w")
