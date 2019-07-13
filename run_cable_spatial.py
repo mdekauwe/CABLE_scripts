@@ -157,7 +157,7 @@ def cmd_line_parser():
     p = optparse.OptionParser()
     p.add_option('--person', '-p', default="world")
     p.add_option("-s", action="store_true", default=False,
-                   help="Setup namelist file")
+                   help="Spinup model")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
     p.add_option("-y", default="0", help="year")
@@ -191,6 +191,10 @@ if __name__ == "__main__":
     year = int(options.y)
     co2_conc = float(options.c)
     nml_fname = options.n
+    spin_up = options.s
+
+    print(spin_up)
+    sys.exit()
 
     # Setup initial namelist file and submit qsub job
     if options.a == False:
