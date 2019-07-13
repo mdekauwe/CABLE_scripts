@@ -155,18 +155,17 @@ class RunCable(object):
 def cmd_line_parser():
 
     p = optparse.OptionParser()
-    p.add_option('--person', '-p', default="world")
     p.add_option("-s", action="store_true", default=False,
                    help="Spinup model")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
-    p.add_option("-y", default="0", help="year")
+    p.add_option("-y", default="1900", help="year")
     p.add_option("-l", default="", help="log filename")
     p.add_option("-o", default="", help="out filename")
     p.add_option("-i", default="", help="restart in filename")
     p.add_option("-r", default="", help="restart out filename")
     p.add_option("-c", default="400.0", help="CO2 concentration")
-    p.add_option("-n", default=None, help="onml_fname")
+    p.add_option("-n", default=None, help="nml_fname")
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, int(options.y),
@@ -189,12 +188,6 @@ if __name__ == "__main__":
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
      nml_fname, spin_up) = cmd_line_parser()
-
-    print(log_fname, out_fname, restart_in_fname,
-     restart_out_fname, year, co2_conc,
-     nml_fname, spin_up)
-
-    sys.exit()
 
     # Setup initial namelist file and submit qsub job
     if options.a == False:
