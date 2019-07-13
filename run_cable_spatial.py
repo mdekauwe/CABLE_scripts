@@ -186,8 +186,6 @@ if __name__ == "__main__":
     end_yr = 1950
     # ------------------------------------------- #
 
-    options, args = cmd_line_parser()
-
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
      nml_fname, spin_up) = cmd_line_parser()
@@ -195,7 +193,7 @@ if __name__ == "__main__":
     print(log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
      nml_fname, spin_up)
-    
+
     sys.exit()
 
     # Setup initial namelist file and submit qsub job
