@@ -25,8 +25,8 @@ from cable_utils import adjust_nml_file
 class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
-                 restart_dir=None, aux_dir=None, cable_exe=None,
-                 start_yr=None, cable_src=None, nml_fname=None,
+                 restart_dir=None, aux_dir=None, start_yr=None,
+                 cable_src=None, nml_fname=None,
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
