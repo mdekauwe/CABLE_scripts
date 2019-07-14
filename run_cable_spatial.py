@@ -53,7 +53,7 @@ class RunCable(object):
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, cable_src=None, nml_fname=None,
                  spin_up=False,
-                 spinup_dir="spinup_restart"
+                 spinup_dir="spinup_restart",
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
