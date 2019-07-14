@@ -114,9 +114,6 @@ class RunCable(object):
         if not os.path.exists(self.namelist_dir):
             os.makedirs(self.namelist_dir)
 
-        if not os.path.exists(self.spinup_dir):
-            os.makedirs(self.spinup_dir)
-
         # delete local executable, copy a local copy and use that
         local_exe = os.path.basename(self.cable_exe)
         if os.path.isfile(local_exe):
@@ -184,26 +181,29 @@ class RunCable(object):
 
     def sort_restart_files(self, start_yr, end_yr):
 
-        # Copy the last spinup restart file to the backup dir and rename
-        # it as if it was the first year
-        fn_in = "restart_%d.nc" % (end_yr)
-        fn_out = "restart_%d.nc" % (start_yr)
+        if not os.path.exists(self.spinup_dir):
+            os.makedirs(self.spinup_dir)
 
-        restart_in_fname = os.path.join(self.restart_dir, fn_in)
-        restart_out_fname = os.path.join(self.spinup_dir, fn_out)
+            # Copy the last spinup restart file to the backup dir and rename
+            # it as if it was the first year
+            fn_in = "restart_%d.nc" % (end_yr)
+            fn_out = "restart_%d.nc" % (start_yr)
 
-        shutil.copyfile(restart_in_fname, restart_out_fname)
+            restart_in_fname = os.path.join(self.restart_dir, fn_in)
+            restart_out_fname = os.path.join(self.spinup_dir, fn_out)
 
-        # remove the restart dir and remake it with the equilibrium file
-        shutil.rmtree(self.restart_dir, ignore_errors=True)
+            shutil.copyfile(restart_in_fname, restart_out_fname)
 
-        if not os.path.exists(self.restart_dir):
-            os.makedirs(self.restart_dir)
+            # remove the restart dir and remake it with the equilibrium file
+            shutil.rmtree(self.restart_dir, ignore_errors=True)
 
-        fn_in = "restart_%d.nc" % (start_yr)
-        restart_in_fname = os.path.join(self.spinup_dir, fn_in)
-        restart_out_fname = os.path.join(self.restart_dir, fn_in)
-        shutil.copyfile(restart_in_fname, restart_out_fname)
+            if not os.path.exists(self.restart_dir):
+                os.makedirs(self.restart_dir)
+
+            fn_in = "restart_%d.nc" % (start_yr)
+            restart_in_fname = os.path.join(self.spinup_dir, fn_in)
+            restart_out_fname = os.path.join(self.restart_dir, fn_in)
+            shutil.copyfile(restart_in_fname, restart_out_fname)
 
 
 
