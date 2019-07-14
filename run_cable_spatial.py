@@ -53,6 +53,7 @@ class RunCable(object):
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, cable_src=None, nml_fname=None,
                  spin_up=False,
+                 spinup_dir="spinup_restart"
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
@@ -69,6 +70,7 @@ class RunCable(object):
         self.output_dir = output_dir
         self.aux_dir = aux_dir
         self.restart_dir = restart_dir
+        self.spinup_dir = spinup_dir
         self.veg_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.soil_fname = soil_fname
@@ -111,6 +113,9 @@ class RunCable(object):
 
         if not os.path.exists(self.namelist_dir):
             os.makedirs(self.namelist_dir)
+
+        if not os.path.exists(self.spinup_dir):
+            os.makedirs(self.spinup_dir)
 
         # delete local executable, copy a local copy and use that
         local_exe = os.path.basename(self.cable_exe)
@@ -179,21 +184,16 @@ class RunCable(object):
 
     def sort_restart_files(self, start_yr, end_yr):
 
-        spinup_dir = "spinup_restart"
-        if not os.path.exists(spinup_dir):
-            os.makedirs(spinup_dir)
+        # Copy the last spinup restart file to the backup dir and rename
+        # it as if it was the first year
+        fn_in = "restart_%d.nc" % (end_yr)
+        fn_out = "restart_%d.nc" % (start_yr)
 
-            # Copy the last spinup restart file to the backup dir and rename
-            # it as if it was the first year
-            fn_in = "restart_%d.nc" % (end_yr)
-            fn_out = "restart_%d.nc" % (start_yr)
+        restart_in_fname = os.path.join(self.restart_dir, fn_in)
+        restart_out_fname = os.path.join(spinup_dir, fn_out)
 
-            restart_in_fname = os.path.join(self.restart_dir, fn_in)
-            restart_out_fname = os.path.join(spinup_dir, fn_out)
+        shutil.copyfile(restart_in_fname, restart_out_fname)
 
-            shutil.copyfile(restart_in_fname, restart_out_fname)
-
-        sys.exit()
         # remove the restart dir and remake it with the equilibrium file
         shutil.rmtree(self.restart_dir, ignore_errors=True)
 
