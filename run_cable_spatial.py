@@ -217,6 +217,10 @@ if __name__ == "__main__":
     aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
     qsub_fname = "qsub_wrapper_script.sh"
+    spinup_start_yr = 1901
+    spinup_end_yr = 1910
+    run_start_yr = 1901
+    run_end_yr = 2010
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
@@ -229,18 +233,18 @@ if __name__ == "__main__":
                  nml_fname=nml_fname)
 
     if spin_up:
-        start_yr = 1901
-        end_yr = 1910
+        start_yr = spinup_start_yr
+        end_yr = spinup_end_yr
         walltime = "3:00:00"
         mem = "64GB"
         ncpus = "32"
     else:
-        start_yr = 1901
-        end_yr = 2010
+        start_yr = run_start_yr
+        end_yr = run_end_yr
         walltime = "16:00:00"
         mem = "64GB"
         ncpus = "32"
-        C.sort_restart_files(start_yr, end_yr)
+        C.sort_restart_files(spinup_start_yr, spinup_end_yr)
         sys.exit()
     sys.exit()
 
