@@ -205,7 +205,7 @@ if __name__ == "__main__":
         start_yr = 1901
         end_yr = 1901
         #walltime = "3:00:00"
-        walltime = "0:5:00"
+        walltime = "0:05:00"
         mem = "64GB"
         ncpus = "32"
     else:
