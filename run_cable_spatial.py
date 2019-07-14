@@ -118,16 +118,14 @@ class RunCable(object):
                         "cable_user%MetType": "'gswp3'",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
-        print(self.nml_fname)
 
     def run_me(self, start_yr, end_yr):
 
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
                     (start_yr, end_yr, self.co2_fname, self.qsub_fname)
-        print("*****", qs_cmd)
-        #error = subprocess.call(qs_cmd, shell=True)
-        #if error is 1:
-        #    raise("Job failed to submit\n")
+        error = subprocess.call(qs_cmd, shell=True)
+        if error is 1:
+            raise("Job failed to submit\n")
 
     def create_new_nml_file(self, log_fname, out_fname, restart_in_fname,
                             restart_out_fname, year, co2_conc):
@@ -135,11 +133,7 @@ class RunCable(object):
         out_log_fname = os.path.join(self.log_dir, log_fname)
         out_fname = os.path.join(self.output_dir, out_fname)
 
-        # i.e. if there is no restart file for the first year
-        if year - 1 < self.start_yr:
-            restart_in_fname = ""
-        else:
-            restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
+        restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
         restart_out_fname = os.path.join(self.restart_dir, restart_out_fname)
 
         replace_dict = {
@@ -205,7 +199,7 @@ if __name__ == "__main__":
         start_yr = 1901
         end_yr = 1901
         #walltime = "3:00:00"
-        walltime = "0:05:00"
+        walltime = "0:10:00"
         mem = "64GB"
         ncpus = "32"
     else:
@@ -221,7 +215,7 @@ if __name__ == "__main__":
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, start_yr=start_yr, qsub_fname=qsub_fname,
-                 nml_fname=None)
+                 nml_fname=nml_fname)
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
