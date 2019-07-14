@@ -25,6 +25,7 @@ import tempfile
 import optparse
 
 from cable_utils import adjust_nml_file
+from cable_utils import generate_spatial_qsub_script
 
 class RunCable(object):
 
@@ -118,86 +119,6 @@ class RunCable(object):
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def generate_qsub_script(self, walltime, mem, ncpus):
-
-        ofname = self.qsub_fname
-        if os.path.exists(ofname):
-            os.remove(ofname)
-        f = open(ofname, "w")
-
-        print("#!/bin/bash", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        print("#PBS -m ae", end="\n", file=f)
-        print("#PBS -P w35", end="\n", file=f)
-        print("#PBS -q normal", end="\n", file=f)
-        print("#PBS -l walltime=%s" % (walltime), end="\n", file=f)
-        print("#PBS -l mem=%s" % (mem), end="\n", file=f)
-        print("#PBS -l ncpus=%s" % (ncpus), end="\n", file=f)
-        print("#PBS -j oe", end="\n", file=f)
-        print("#PBS -l wd", end="\n", file=f)
-        print("#PBS -l other=gdata1", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        print("module load dot", end="\n", file=f)
-        print("module add intel-cc", end="\n", file=f)
-        print("module add intel-fc", end="\n", file=f)
-        print("module load netcdf/4.3.3.1", end="\n", file=f)
-        print("module load intel-mpi", end="\n", file=f)
-        print("module load subversion/1.9.0", end="\n", file=f)
-        print("source activate nci", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        print("cpus=%s" % (ncpus), end="\n", file=f)
-        print("exe='./cable-mpi'", end="\n", file=f)
-        print("nml_fname='cable.nml'", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        print("start_yr=$start_yr", end="\n", file=f)
-        print("prev_yr=\"$(($start_yr-1))\"", end="\n", file=f)
-        print("end_yr=$end_yr", end="\n", file=f)
-        print("co2_fname=$co2_fname", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        print("year=$start_yr", end="\n", file=f)
-        print("while [ $year -le $end_yr ]", end="\n", file=f)
-        print("do", end="\n", file=f)
-
-        print("    co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        if self.spin_up:
-            print("    if [ $start_yr == $year ]", end="\n", file=f)
-            print("    then", end="\n", file=f)
-            print("        restart_in=''", end="\n", file=f)
-            print("    else", end="\n", file=f)
-            print("        restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
-            print("    fi", end="\n", file=f)
-            print(" ", end="\n", file=f)
-        else:
-            print("    restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
-        print("    restart_out=\"restart_$year.nc\"", end="\n", file=f)
-        print("    outfile=\"cable_out_$year.nc\"", end="\n", file=f)
-        print("    logfile=\"cable_log_$year.txt\"", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        print("echo $co2_conc $year $start_yr $prev_yr $end_yr $restart_in $restart_out $nml_fname $outfile", end="\n", file=f)
-
-
-        print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
-        print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
-        print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
-        print(" ", end="\n", file=f)
-        print("    mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
-        print(" ", end="\n", file=f)
-        print("    year=$[$year+1]", end="\n", file=f)
-        print("    prev_yr=$[$prev_yr+1]", end="\n", file=f)
-        print(" ", end="\n", file=f)
-        print("done", end="\n", file=f)
-        print(" ", end="\n", file=f)
-
-        f.close()
-
     def run_me(self, start_yr, end_yr):
 
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
@@ -272,6 +193,7 @@ if __name__ == "__main__":
     restart_dir = "restarts"
     aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
+    qsub_fname = "qsub_wrapper_script.sh"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
@@ -292,15 +214,18 @@ if __name__ == "__main__":
         mem = "64GB"
         ncpus = "32"
 
+    generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
+                                 spin_up=spin_up)
+
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
-                 cable_src=cable_src, start_yr=start_yr, nml_fname=None)
+                 cable_src=cable_src, start_yr=start_yr, qsub_fname=qsub_fname,
+                 nml_fname=None)
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
-        C.generate_qsub_script(walltime, mem, ncpus)
         C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
