@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 
 """
-Run CABLE spatially.
+Run CABLE spatially, i.e. global GSWP3 run.
 
-This script sets various things within a qsub script and then submits the run.
-
-Ensure you run it with "-s" if you want to spinup the run, i.e.
+Ensure you run it with "-s" if you want to do a spin-up run, i.e.
 
 ./run_cable_spatial.py -s
+
+Once this is complete just run without the "-s" flag
+
+The script does a few things internally:
+- creates a qsub script.
+- after the spin-up step it renames the final restart file to be the first
+  simulation year restart file so that we can run a longer simulation
+- submits the qsub script
 
 That's all folks.
 """
 
 __author__ = "Martin De Kauwe"
-__version__ = "1.0 (13.07.2019)"
+__version__ = "1.0 (14.07.2019)"
 __email__ = "mdekauwe@gmail.com"
 
 import subprocess
@@ -221,6 +227,8 @@ if __name__ == "__main__":
     spinup_end_yr = 1910
     run_start_yr = 1901
     run_end_yr = 2010
+    mem = "64GB"
+    ncpus = "32"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
@@ -236,16 +244,13 @@ if __name__ == "__main__":
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
         walltime = "1:00:00"
-        mem = "64GB"
-        ncpus = "32"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
         walltime = "10:00:00"
-        mem = "64GB"
-        ncpus = "32"
         C.sort_restart_files(spinup_start_yr, spinup_end_yr)
 
+    # Create a qsub script for global simulation
     generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
                                  spin_up=spin_up)
 
