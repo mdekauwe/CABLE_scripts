@@ -125,9 +125,9 @@ class RunCable(object):
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
                     (start_yr, end_yr, self.co2_fname, self.qsub_fname)
         print("*****", qs_cmd)
-        error = subprocess.call(qs_cmd, shell=True)
-        if error is 1:
-            raise("Job failed to submit\n")
+        #error = subprocess.call(qs_cmd, shell=True)
+        #if error is 1:
+        #    raise("Job failed to submit\n")
 
     def create_new_nml_file(self, log_fname, out_fname, restart_in_fname,
                             restart_out_fname, year, co2_conc):
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
-        #C.run_me(start_yr, end_yr)
+        C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
