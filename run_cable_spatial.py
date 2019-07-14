@@ -224,12 +224,12 @@ if __name__ == "__main__":
     aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
     qsub_fname = "qsub_wrapper_script.sh"
-    spinup_start_yr = 1901
-    spinup_end_yr = 1910
-    run_start_yr = 1901
+    spinup_start_yr = 1941
+    spinup_end_yr = 1950
+    run_start_yr = 1950
     run_end_yr = 2010
-    mem = "64GB"
-    ncpus = "32"
+    mem = "16GB"
+    ncpus = "28"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
@@ -248,7 +248,7 @@ if __name__ == "__main__":
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
-        walltime = "10:00:00"
+        walltime = "16:00:00"
         C.sort_restart_files(spinup_start_yr, spinup_end_yr)
 
     # Create a qsub script for global simulation
