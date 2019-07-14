@@ -79,7 +79,6 @@ class RunCable(object):
 
         self.start_yr = start_yr
 
-
     def initialise_stuff(self):
 
         if not os.path.exists(self.restart_dir):
@@ -159,6 +158,36 @@ class RunCable(object):
         shutil.copyfile(self.nml_fname, os.path.join(self.namelist_dir,
                                                      "cable_%d.nml" % (year)))
 
+    def sort_restart_files(self, start_yr, end_yr):
+
+        spinup_dir = "spinup_restart"
+        if not os.path.exists(spinup_dir):
+            os.makedirs(spinup_dir)
+
+            # Copy the last spinup restart file to the backup dir and rename
+            # it as if it was the first year
+            fn_in = "restart_%d.nc" % (end_yr)
+            fn_out = "restart_%d.nc" % (start_yr)
+
+            restart_in_fname = os.path.join(self.restart_dir, fn_in)
+            restart_out_fname = os.path.join(spinup_dir, restart_out_fname)
+
+            shutil.copyfile(restart_in_fname, restart_out_fname)
+
+            # remove the restart dir and remake it
+            shutil.rmtree(self.restart_dir, ignore_errors=True)
+
+            if not os.path.exists(self.restart_dir):
+                os.makedirs(self.restart_dir)
+
+            fn_in = "restart_%d.nc" % (start_yr)
+            restart_in_fname = os.path.join(spinup_dir, fn_in)
+            restart_out_fname = os.path.join(self.restart_dir, fn_in)
+            shutil.copyfile(restart_in_fname, restart_out_fname)
+
+
+
+
 def cmd_line_parser():
 
     p = optparse.OptionParser()
@@ -195,6 +224,11 @@ if __name__ == "__main__":
      restart_out_fname, year, co2_conc,
      nml_fname, spin_up, adjust_nml) = cmd_line_parser()
 
+    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
+                 cable_src=cable_src, start_yr=start_yr, qsub_fname=qsub_fname,
+                 nml_fname=nml_fname)
+
     if spin_up:
         start_yr = 1901
         end_yr = 1910
@@ -207,14 +241,12 @@ if __name__ == "__main__":
         walltime = "16:00:00"
         mem = "64GB"
         ncpus = "32"
+        C.sort_restart_files(self, start_yr, end_yr):
+        sys.exit()
+    sys.exit()
 
     generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
                                  spin_up=spin_up)
-
-    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
-                 cable_src=cable_src, start_yr=start_yr, qsub_fname=qsub_fname,
-                 nml_fname=nml_fname)
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
