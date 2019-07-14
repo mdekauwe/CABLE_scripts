@@ -189,20 +189,20 @@ class RunCable(object):
             fn_out = "restart_%d.nc" % (start_yr)
 
             restart_in_fname = os.path.join(self.restart_dir, fn_in)
-            restart_out_fname = os.path.join(spinup_dir, restart_out_fname)
+            restart_out_fname = os.path.join(spinup_dir, fn_out)
 
             shutil.copyfile(restart_in_fname, restart_out_fname)
 
-            # remove the restart dir and remake it
-            shutil.rmtree(self.restart_dir, ignore_errors=True)
+        # remove the restart dir and remake it with the equilibrium file
+        shutil.rmtree(self.restart_dir, ignore_errors=True)
 
-            if not os.path.exists(self.restart_dir):
-                os.makedirs(self.restart_dir)
+        if not os.path.exists(self.restart_dir):
+            os.makedirs(self.restart_dir)
 
-            fn_in = "restart_%d.nc" % (start_yr)
-            restart_in_fname = os.path.join(spinup_dir, fn_in)
-            restart_out_fname = os.path.join(self.restart_dir, fn_in)
-            shutil.copyfile(restart_in_fname, restart_out_fname)
+        fn_in = "restart_%d.nc" % (start_yr)
+        restart_in_fname = os.path.join(spinup_dir, fn_in)
+        restart_out_fname = os.path.join(self.restart_dir, fn_in)
+        shutil.copyfile(restart_in_fname, restart_out_fname)
 
 
 
