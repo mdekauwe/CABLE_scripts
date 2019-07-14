@@ -241,7 +241,7 @@ if __name__ == "__main__":
         walltime = "16:00:00"
         mem = "64GB"
         ncpus = "32"
-        C.sort_restart_files(self, start_yr, end_yr):
+        C.sort_restart_files(self, start_yr, end_yr)
         sys.exit()
     sys.exit()
 
