@@ -246,10 +246,10 @@ if __name__ == "__main__":
                  nml_fname=nml_fname)
 
     if spin_up == False:
-        C.sort_restart_files(self, start_yr, end_yr)
+        C.sort_restart_files(start_yr, end_yr)
         sys.exit()
     sys.exit()
-    
+
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
