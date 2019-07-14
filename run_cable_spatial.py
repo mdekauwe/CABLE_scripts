@@ -224,11 +224,6 @@ if __name__ == "__main__":
      restart_out_fname, year, co2_conc,
      nml_fname, spin_up, adjust_nml) = cmd_line_parser()
 
-    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
-                 cable_src=cable_src, start_yr=start_yr, qsub_fname=qsub_fname,
-                 nml_fname=nml_fname)
-
     if spin_up:
         start_yr = 1901
         end_yr = 1910
@@ -241,13 +236,20 @@ if __name__ == "__main__":
         walltime = "16:00:00"
         mem = "64GB"
         ncpus = "32"
-        C.sort_restart_files(self, start_yr, end_yr)
-        sys.exit()
-    sys.exit()
 
     generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
                                  spin_up=spin_up)
 
+    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
+                 cable_src=cable_src, start_yr=start_yr, qsub_fname=qsub_fname,
+                 nml_fname=nml_fname)
+
+    if spin_up == False:
+        C.sort_restart_files(self, start_yr, end_yr)
+        sys.exit()
+    sys.exit()
+    
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
