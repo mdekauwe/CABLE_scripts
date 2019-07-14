@@ -197,9 +197,8 @@ if __name__ == "__main__":
 
     if spin_up:
         start_yr = 1901
-        end_yr = 1901
-        #walltime = "3:00:00"
-        walltime = "0:10:00"
+        end_yr = 1910
+        walltime = "3:00:00"
         mem = "64GB"
         ncpus = "32"
     else:
