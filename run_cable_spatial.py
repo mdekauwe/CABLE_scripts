@@ -27,6 +27,27 @@ import optparse
 from cable_utils import adjust_nml_file
 from cable_utils import generate_spatial_qsub_script
 
+
+def cmd_line_parser():
+
+    p = optparse.OptionParser()
+    p.add_option("-s", action="store_true", default=False,
+                   help="Spinup model")
+    p.add_option("-a", action="store_true", default=False,
+                   help="Adjust namelist file")
+    p.add_option("-y", default="1900", help="year")
+    p.add_option("-l", default="", help="log filename")
+    p.add_option("-o", default="", help="out filename")
+    p.add_option("-i", default="", help="restart in filename")
+    p.add_option("-r", default="", help="restart out filename")
+    p.add_option("-c", default="400.0", help="CO2 concentration")
+    p.add_option("-n", default=None, help="nml_fname")
+    options, args = p.parse_args()
+
+    return (options.l, options.o, options.i,  options.r, int(options.y),
+            float(options.c), options.n, options.s, options.a)
+
+
 class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
@@ -183,24 +204,6 @@ class RunCable(object):
             restart_out_fname = os.path.join(self.restart_dir, fn_in)
             shutil.copyfile(restart_in_fname, restart_out_fname)
 
-    def cmd_line_parser(self):
-
-        p = optparse.OptionParser()
-        p.add_option("-s", action="store_true", default=False,
-                       help="Spinup model")
-        p.add_option("-a", action="store_true", default=False,
-                       help="Adjust namelist file")
-        p.add_option("-y", default="1900", help="year")
-        p.add_option("-l", default="", help="log filename")
-        p.add_option("-o", default="", help="out filename")
-        p.add_option("-i", default="", help="restart in filename")
-        p.add_option("-r", default="", help="restart out filename")
-        p.add_option("-c", default="400.0", help="CO2 concentration")
-        p.add_option("-n", default=None, help="nml_fname")
-        options, args = p.parse_args()
-
-        return (options.l, options.o, options.i,  options.r, int(options.y),
-                float(options.c), options.n, options.s, options.a)
 
 
 if __name__ == "__main__":
@@ -215,14 +218,14 @@ if __name__ == "__main__":
     qsub_fname = "qsub_wrapper_script.sh"
     # ------------------------------------------- #
 
+    (log_fname, out_fname, restart_in_fname,
+     restart_out_fname, year, co2_conc,
+     nml_fname, spin_up, adjust_nml) = cmd_line_parser()
+
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, qsub_fname=qsub_fname,
                  nml_fname=nml_fname)
-
-    (log_fname, out_fname, restart_in_fname,
-     restart_out_fname, year, co2_conc,
-     nml_fname, spin_up, adjust_nml) = C.cmd_line_parser()
 
     if spin_up:
         start_yr = 1901
