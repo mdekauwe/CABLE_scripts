@@ -235,18 +235,16 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        walltime = "3:00:00"
+        walltime = "1:00:00"
         mem = "64GB"
         ncpus = "32"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
-        walltime = "16:00:00"
+        walltime = "10:00:00"
         mem = "64GB"
         ncpus = "32"
         C.sort_restart_files(spinup_start_yr, spinup_end_yr)
-        sys.exit()
-    sys.exit()
 
     generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
                                  spin_up=spin_up)
