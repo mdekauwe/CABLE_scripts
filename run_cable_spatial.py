@@ -193,6 +193,7 @@ class RunCable(object):
 
             shutil.copyfile(restart_in_fname, restart_out_fname)
 
+        sys.exit()
         # remove the restart dir and remake it with the equilibrium file
         shutil.rmtree(self.restart_dir, ignore_errors=True)
 
