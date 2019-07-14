@@ -190,7 +190,7 @@ class RunCable(object):
         fn_out = "restart_%d.nc" % (start_yr)
 
         restart_in_fname = os.path.join(self.restart_dir, fn_in)
-        restart_out_fname = os.path.join(spinup_dir, fn_out)
+        restart_out_fname = os.path.join(self.spinup_dir, fn_out)
 
         shutil.copyfile(restart_in_fname, restart_out_fname)
 
@@ -201,7 +201,7 @@ class RunCable(object):
             os.makedirs(self.restart_dir)
 
         fn_in = "restart_%d.nc" % (start_yr)
-        restart_in_fname = os.path.join(spinup_dir, fn_in)
+        restart_in_fname = os.path.join(self.spinup_dir, fn_in)
         restart_out_fname = os.path.join(self.restart_dir, fn_in)
         shutil.copyfile(restart_in_fname, restart_out_fname)
 
