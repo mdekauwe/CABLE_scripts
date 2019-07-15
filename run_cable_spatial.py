@@ -224,7 +224,7 @@ if __name__ == "__main__":
     aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
     qsub_fname = "qsub_wrapper_script.sh"
-    spinup_start_yr = 1941
+    spinup_start_yr = 1940
     spinup_end_yr = 1950
     run_start_yr = 1950
     run_end_yr = 2010
@@ -244,7 +244,7 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        walltime = "1:00:00"
+        walltime = "0:45:00"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
