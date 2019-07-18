@@ -244,7 +244,7 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        walltime = "0:45:00"
+        walltime = "0:30:00"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
