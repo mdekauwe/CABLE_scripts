@@ -248,7 +248,7 @@ if __name__ == "__main__":
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
-        walltime = "8:00:00"
+        walltime = "1:00:00"
         C.sort_restart_files(spinup_start_yr, spinup_end_yr)
 
     # Create a qsub script for global simulation
