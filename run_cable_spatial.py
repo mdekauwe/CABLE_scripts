@@ -221,7 +221,7 @@ if __name__ == "__main__":
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restarts"
-    aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/trunk/CABLE-AUX"
+    aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
     qsub_fname = "qsub_wrapper_script.sh"
     spinup_start_yr = 1995
@@ -246,9 +246,12 @@ if __name__ == "__main__":
         end_yr = spinup_end_yr
         walltime = "0:30:00"
     else:
-        start_yr = run_start_yr
-        end_yr = run_end_yr
-        walltime = "1:00:00"
+        #start_yr = run_start_yr
+        #end_yr = run_end_yr
+        #walltime = "1:00:00"
+        start_yr = 2000
+        end_yr = 2000
+        walltime = "0:05:00"
         C.sort_restart_files(spinup_start_yr, spinup_end_yr)
 
     # Create a qsub script for global simulation
