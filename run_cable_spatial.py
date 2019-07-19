@@ -256,9 +256,12 @@ if __name__ == "__main__":
                  nml_fname=nml_fname)
 
     if spin_up:
-        start_yr = spinup_start_yr
-        end_yr = spinup_end_yr
-        walltime = "0:30:00"
+        #start_yr = spinup_start_yr
+        #end_yr = spinup_end_yr
+        #walltime = "0:30:00"
+        start_yr = 1995
+        end_yr = 1996
+        walltime = "0:05:00"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
