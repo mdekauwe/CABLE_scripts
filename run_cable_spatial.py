@@ -166,7 +166,11 @@ class RunCable(object):
         out_log_fname = os.path.join(self.log_dir, log_fname)
         out_fname = os.path.join(self.output_dir, out_fname)
 
-        restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
+        # i.e. no restart file for first spinup year
+        if restart_in_fname == "missing"
+            restart_in_fname = ""
+        else:
+            restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
         restart_out_fname = os.path.join(self.restart_dir, restart_out_fname)
 
         replace_dict = {

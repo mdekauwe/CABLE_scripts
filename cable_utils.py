@@ -363,7 +363,7 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     if spin_up:
         print("    if [ $start_yr == $year ]", end="\n", file=f)
         print("    then", end="\n", file=f)
-        print("        restart_in=''", end="\n", file=f)
+        print("        restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
         print("    else", end="\n", file=f)
         print("        restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
         print("    fi", end="\n", file=f)
