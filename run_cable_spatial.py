@@ -171,6 +171,8 @@ class RunCable(object):
                         "filename%restart_out": "'%s'" % (restart_out_fname),
                         "fixedCO2": "%f" % (co2_conc),
                         "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
+                        "CABLE_USER%YearStart": "0", # needs to be 0 so the ncciy is set
+                        "CABLE_USER%YearEnd": "0",   # needs to be 0 so the ncciy is set
                         "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
                         "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
                         "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
@@ -179,6 +181,7 @@ class RunCable(object):
                         "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
                         "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
                         "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
+
 
         }
         adjust_nml_file(self.nml_fname, replace_dict)
