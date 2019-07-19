@@ -263,7 +263,7 @@ if __name__ == "__main__":
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
-        C.run_me(start_yr, end_yr)
+        #C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
