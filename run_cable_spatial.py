@@ -39,6 +39,8 @@ def cmd_line_parser():
     p = optparse.OptionParser()
     p.add_option("-s", action="store_true", default=False,
                    help="Spinup model")
+    p.add_option("-q", action="store_true", default=False,
+                   help="Generate qsub script")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
     p.add_option("-y", default="1900", help="year")
@@ -51,7 +53,7 @@ def cmd_line_parser():
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, int(options.y),
-            float(options.c), options.n, options.s, options.a)
+            float(options.c), options.n, options.s, options.a, options.q)
 
 
 class RunCable(object):
@@ -238,7 +240,8 @@ if __name__ == "__main__":
 
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
-     nml_fname, spin_up, adjust_nml) = cmd_line_parser()
+     nml_fname, spin_up, adjust_nml,
+     generate_qsub) = cmd_line_parser()
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
@@ -255,14 +258,19 @@ if __name__ == "__main__":
         walltime = "1:00:00"
         C.sort_restart_files(spinup_start_yr, spinup_end_yr)
 
-    # Create a qsub script for global simulation
-    generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
-                                 spin_up=spin_up)
+    if generate_qsub:
+        # Create a qsub script for global simulation
+        generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
+                                     spin_up=spin_up)
+
+    if not os.path.exists(qsub_fname):
+        raise("No qsub script, you need to generate one -q")
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
+        print(start_yr, end_yr)
         #C.run_me(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
