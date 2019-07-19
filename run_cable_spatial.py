@@ -264,7 +264,7 @@ if __name__ == "__main__":
                                      spin_up=spin_up)
 
     if not os.path.exists(qsub_fname):
-        raise("No qsub script, you need to generate one -q")
+        raise ValueError("No qsub script, you need to generate one -q")
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
