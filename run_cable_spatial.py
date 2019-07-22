@@ -235,7 +235,7 @@ if __name__ == "__main__":
     run_start_yr = 2000
     run_end_yr = 2010
     mem = "16GB"
-    ncpus = "32"
+    ncpus = "28"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
