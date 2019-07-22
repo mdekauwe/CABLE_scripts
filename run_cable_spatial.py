@@ -266,6 +266,9 @@ if __name__ == "__main__":
         walltime = "1:00:00"
         qsub_fname = "qsub_wrapper_script_simulation.sh"
 
+    print(spin_up)
+    sys.exit()
+    
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, qsub_fname=qsub_fname,
