@@ -258,7 +258,7 @@ if __name__ == "__main__":
 
     # Create a qsub script for simulations if missing, there is one of spinup
     # and one for simulations, so two qsub_fnames
-    if not os.path.isfile(self.qsub_fname):
+    if not os.path.isfile(qsub_fname):
         generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
                                      spin_up=spin_up)
 
