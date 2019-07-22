@@ -68,7 +68,7 @@ class RunCable(object):
                  grid_fname=None,
                  #mask_fname="gswp3_landmask_nomissing.nc",
                  mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
-                 cable_exe="cable-mpi"):
+                 cable_exe="cable-mpi", walltime=None, mem="16GB", ncpus="28"):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -104,6 +104,11 @@ class RunCable(object):
             self.nml_fname = nml_fname
         else:
             self.nml_fname = nml_fname
+
+        # qsub stuff
+        self.walltime = walltime
+        self.mem = mem
+        self.ncpus = ncpus
 
     def initialise_stuff(self):
 
@@ -146,8 +151,16 @@ class RunCable(object):
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def run_me(self, start_yr, end_yr):
+    def run_qsub_script(self, start_yr, end_yr):
 
+        # Create a qsub script for simulations if missing, there is one of spinup
+        # and one for simulations, so two qsub_fnames
+        if not os.path.isfile(self.qsub_fname):
+            generate_spatial_qsub_script(self.qsub_fname, self.walltime,
+                                         self.mem, self.ncpus,
+                                         spin_up=self.spin_up)
+
+        # Run qsub script
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
                     (start_yr, end_yr, self.co2_fname, self.qsub_fname)
         error = subprocess.call(qs_cmd, shell=True)
@@ -234,8 +247,6 @@ if __name__ == "__main__":
     spinup_end_yr = 2000
     run_start_yr = 2000
     run_end_yr = 2010
-    mem = "16GB"
-    ncpus = "28"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
@@ -245,7 +256,7 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        walltime = "0:30:00"
+        walltime = "4:00:00"
         #start_yr = 1995
         #end_yr = 1996
         #walltime = "0:05:00"
@@ -256,16 +267,10 @@ if __name__ == "__main__":
         walltime = "1:00:00"
         qsub_fname = "qsub_wrapper_script_simulation.sh"
 
-    # Create a qsub script for simulations if missing, there is one of spinup
-    # and one for simulations, so two qsub_fnames
-    if not os.path.isfile(qsub_fname):
-        generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
-                                     spin_up=spin_up)
-
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, qsub_fname=qsub_fname,
-                 nml_fname=nml_fname)
+                 nml_fname=nml_fname, walltime=walltime)
 
     # Sort the restart files out before we run simulations
     if spin_up == False:
@@ -275,7 +280,7 @@ if __name__ == "__main__":
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
-        C.run_me(start_yr, end_yr)
+        C.run_qsub_script(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
