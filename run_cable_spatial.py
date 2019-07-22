@@ -145,8 +145,7 @@ class RunCable(object):
                         "cable_user%GW_MODEL": ".FALSE.",
                         "cable_user%or_evap": ".FALSE.",
                         "cable_user%GSWP3": ".TRUE.",
-                        #"cable_user%MetType": "'gswp3'",
-                        "cable_user%MetType": "'gswp'",
+                        "cable_user%MetType": "'gswp3'",
                         "verbose": ".FALSE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
