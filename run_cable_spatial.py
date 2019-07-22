@@ -41,6 +41,8 @@ def cmd_line_parser():
                    help="Spinup model")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
+    p.add_option("-t", action="store_true", default=False,
+                   help="Sort restart files")
     p.add_option("-y", default="1900", help="year")
     p.add_option("-l", default="", help="log filename")
     p.add_option("-o", default="", help="out filename")
@@ -51,7 +53,7 @@ def cmd_line_parser():
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, int(options.y),
-            float(options.c), options.n, options.s, options.a)
+            float(options.c), options.n, options.s, options.a, options.t)
 
 
 class RunCable(object):
@@ -250,7 +252,7 @@ if __name__ == "__main__":
 
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
-     nml_fname, spin_up, adjust_nml) = cmd_line_parser()
+     nml_fname, spin_up, adjust_nml, sort_restarts) = cmd_line_parser()
 
     if spin_up:
         start_yr = spinup_start_yr
@@ -266,17 +268,15 @@ if __name__ == "__main__":
         walltime = "1:00:00"
         qsub_fname = "qsub_wrapper_script_simulation.sh"
 
-    print(spin_up)
-    sys.exit()
-    
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, qsub_fname=qsub_fname,
                  nml_fname=nml_fname, walltime=walltime)
 
-    # Sort the restart files out before we run simulations
-    if spin_up == False:
+    # Sort the restart files out before we run simulations "-t"
+    if sort_restarts:
         C.sort_restart_files(spinup_start_yr, spinup_end_yr)
+        sys.exit('Restart files fixed up, run simulation')
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
