@@ -340,7 +340,7 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     print("module load netcdf/4.3.3.1", end="\n", file=f)
     print("module load intel-mpi", end="\n", file=f)
     print("module load subversion/1.9.0", end="\n", file=f)
-    print("source activate nci", end="\n", file=f)
+    print("source activate sci", end="\n", file=f)
     print(" ", end="\n", file=f)
 
     print("cpus=%s" % (ncpus), end="\n", file=f)
