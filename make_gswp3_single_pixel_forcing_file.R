@@ -11,8 +11,8 @@ library(ncdf4)
 rm(list=ls(all=TRUE))
 
 year <- 1995
-xx <- 302 + 1 # for R
-yy <- 121 + 1 # for R
+xx <- 303
+yy <- 239
 
 indir <- "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
 met_vars <- c("LWdown",	"PSurf", "SWdown", "Tair",
