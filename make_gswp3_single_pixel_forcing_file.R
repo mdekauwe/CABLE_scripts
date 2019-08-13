@@ -19,6 +19,11 @@ met_vars <- c("LWdown",	"PSurf", "SWdown", "Tair",
               "Qair", "Rainf", "Snowf", "Wind")
 units <- c("W/m2", "Pa", "W/m2", "K", "kg/kg", "kg/m2/s", "kg/m2/s", "m/s")
 
+#Read met data
+met_data <- lapply(met_vars, function(x) brick(list.files(paste0(indir, "/", x),
+                                               pattern=as.character(year),
+                                               full.names = TRUE)))
+
 coords <- coordinates(met_data[[4]][[1]])
 ind1 <- which(coords[,1] == x)
 ind2 <- which(coords[,2] == y)
