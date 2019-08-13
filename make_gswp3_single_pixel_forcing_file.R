@@ -11,7 +11,7 @@ library(ncdf4)
 rm(list=ls(all=TRUE))
 
 year <- 1995
-xx <- 662 + 1 # for R
+xx <- 302 + 1 # for R
 yy <- 121 + 1 # for R
 
 indir <- "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
