@@ -1,6 +1,13 @@
 #!/usr/bin/Rscript
 
 # Generate the GSWP3 forcing to run a single CABLE pixel
+#
+# $ module load gdal
+# $ module load proj
+# $ module load R/3.3.2
+# $ R
+# $ install.packages("raster")
+#
 
 library(raster)
 library(ncdf4)
@@ -28,9 +35,7 @@ pixel <- lapply(met_data, function(x) x[xx,yy])
 
 # Create lon and lat vectors
 lat <- rev(seq(-89.75, 89.75, by=0.5))[yy]
-lon <- (seq(0.25, 359.75, by=0.5))[xxx]#(seq(0.25, 359.75, by=0.5)-180)[100]
-
-
+lon <- (seq(0.25, 359.75, by=0.5))[xx]#(seq(0.25, 359.75, by=0.5)-180)[100]
 
 # Create new nc_file
 time <- seq(0, by=60*60*3, length.out=length(pixel[[1]]))
