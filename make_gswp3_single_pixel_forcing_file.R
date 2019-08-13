@@ -1,12 +1,7 @@
 #!/usr/bin/Rscript
 
-# Generate the GSWP3 forcing to run a single CABLE pixel
 #
-# $ module load gdal
-# $ module load proj
-# $ module load R/3.3.2
-# $ R
-# $ install.packages("raster")
+# Generate the GSWP3 forcing to run a single CABLE pixel
 #
 
 library(raster)
