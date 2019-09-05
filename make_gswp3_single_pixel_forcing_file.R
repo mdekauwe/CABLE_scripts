@@ -11,8 +11,10 @@ library(ncdf4)
 rm(list=ls(all=TRUE))
 
 year <- 1995
-y <- -29.75
-x <- 151.25
+#y <- -29.75
+#x <- 151.25
+y <- -37.25
+x <- 146.25
 
 indir <- "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
 met_vars <- c("LWdown",	"PSurf", "SWdown", "Tair",
