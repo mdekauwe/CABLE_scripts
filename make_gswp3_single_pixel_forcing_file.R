@@ -14,7 +14,7 @@ year <- 1995
 #y <- -29.75
 #x <- 151.25
 y <- -37.25
-x <- 146.25 
+x <- 146.25
 
 indir <- "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
 met_vars <- c("LWdown",	"PSurf", "SWdown", "Tair",
@@ -38,7 +38,7 @@ lon <- x#(seq(0.25, 359.75, by=0.5))[x]#(seq(0.25, 359.75, by=0.5)-180)[100]
 
 # Create new nc_file
 time <- seq(0, by=60*60*3, length.out=length(pixel[[1]]))
-time_unit <- "seconds since 1995-01-01 00:00:00"
+time_unit <- "seconds since 1995-01-01 00:03:00"
 
 xd = ncdim_def('x',vals=c(1),units='')
 yd = ncdim_def('y',vals=c(1),units='')
