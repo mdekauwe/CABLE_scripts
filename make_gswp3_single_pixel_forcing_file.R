@@ -38,7 +38,8 @@ lat <- y #rev(seq(-89.75, 89.75, by=0.5))[y]
 lon <- x#(seq(0.25, 359.75, by=0.5))[x]#(seq(0.25, 359.75, by=0.5)-180)[100]
 
 # Create new nc_file
-time <- seq(0, by=60*60*3, length.out=length(pixel[[1]]))
+#time <- seq(0, by=60*60*3, length.out=length(pixel[[1]])) # 3hr
+time <- seq(0, by=1800, length.out=length(pixel[[1]])) # 30 min
 time_unit <- "seconds since 1995-01-01 00:00:00"
 
 xd = ncdim_def('x',vals=c(1),units='')
