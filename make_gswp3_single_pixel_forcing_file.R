@@ -16,7 +16,8 @@ year <- 1995
 y <- -37.25
 x <- 146.25
 
-indir <- "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
+#indir <- "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
+indir <- "/g/data1a/w35/mgk576/research/GSWP3_interpolation/interpolated"
 met_vars <- c("LWdown",	"PSurf", "SWdown", "Tair",
               "Qair", "Rainf", "Snowf", "Wind")
 units <- c("W/m2", "Pa", "W/m2", "K", "kg/kg", "kg/m2/s", "kg/m2/s", "m/s")
