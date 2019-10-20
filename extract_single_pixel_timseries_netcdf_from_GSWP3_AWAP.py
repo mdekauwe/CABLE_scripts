@@ -197,7 +197,8 @@ if __name__ == "__main__":
     sys.exit()
     """
 
-    fdir = "/Users/mdekauwe/Desktop/interpolated"
+    #fdir = "/Users/mdekauwe/Desktop/interpolated"
+    fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
     vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
     start_yr = 1995
     end_yr = 2000
