@@ -70,8 +70,8 @@ def main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname):
         times.append(secs)
         secs += 1800.
 
-    plt.plot(Tair_out)
-    plt.show()
+    #plt.plot(Tair_out)
+    #plt.show()
 
     ndim = 1
 
