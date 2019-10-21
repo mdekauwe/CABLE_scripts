@@ -34,7 +34,10 @@ def main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname):
 
         for i, var in enumerate(vars):
 
-            fname = "%s/%s.BC.%s.3hrMap.%d.nc" % (var, data_type, var, yr)
+            if data_type == "GSWP3":
+                fname = "%s/%s.BC.%s.3hrMap.%d.nc" % (var, data_type, var, yr)
+            else:
+                fname = "%s/%s.BC.%s.3hr.%d.nc" % (var, data_type, var, yr)
             fpath = os.path.join(fdir, fname)
             ds = xr.open_dataset(fpath)
             vals = ds[var][:,row,col].values
