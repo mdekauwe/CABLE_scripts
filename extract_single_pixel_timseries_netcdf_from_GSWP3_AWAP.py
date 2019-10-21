@@ -41,6 +41,8 @@ def main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname):
             fpath = os.path.join(fdir, fname)
             ds = xr.open_dataset(fpath)
             vals = ds[var][:,row,col].values
+            lat = ds["lat"][row].values
+            lon = ds["lon"][col].values
 
             if var == "LWdown":
                 LWdown_out = np.append(LWdown_out, vals)
@@ -59,9 +61,7 @@ def main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname):
             elif var == "Wind":
                 Wind_out = np.append(Wind_out, vals)
 
-    # get lat, lon from final file in loop
-    lat = ds["lat"][row].values
-    lon = ds["lon"][col].values
+            ds.close()
 
     times = []
     secs = 0.0
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
     vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
     start_yr = 1995
-    end_yr = 1995
+    end_yr = 1996
     row = 292
     col = 590
     data_type = "AWAP"
