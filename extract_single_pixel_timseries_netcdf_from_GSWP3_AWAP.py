@@ -91,7 +91,7 @@ def main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname):
 
     # create variables
     time = f.createVariable('time', 'f8', ('time',))
-    time.units = "seconds since %s 00:00:00" % (start_yr)
+    time.units = "seconds since %s-01-01 00:00:00" % (start_yr)
     time.long_name = "time"
     time.calendar = "standard"
 
