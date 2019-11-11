@@ -272,7 +272,7 @@ def get_years(met_fname, nyear_spinup):
     return (st_yr, en_yr, st_yr_transient, en_yr_transient,
             st_yr_spin, en_yr_spin)
 
-def check_steady_state(experiment_id, output_dir, num, debug=True):
+def check_steady_state(experiment_id, restart_dir, num, debug=False):
     """
     Check whether the plant (leaves, wood and roots) and soil
     (fast, slow and active) carbon pools have reached equilibrium. To do
@@ -286,17 +286,17 @@ def check_steady_state(experiment_id, output_dir, num, debug=True):
         prev_cplant = 99999.9
         prev_csoil = 99999.9
     else:
-        fname = "%s_out_CASA_ccp%d.nc" % (experiment_id, num-1)
-        fname = os.path.join(output_dir, fname)
+        casa_rst_ofname = "%s_casa_rst_%d.nc" % (experiment_id, num-1)
+        fname = os.path.join(restart_dir, casa_rst_ofname)
         ds = xr.open_dataset(fname)
-        prev_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
-        prev_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
+        prev_cplant = np.sum(ds.cplant.values) * g_2_kg
+        prev_csoil = np.sum(ds.csoil.values) * g_2_kg
 
-    fname = "%s_out_CASA_ccp%d.nc" % (experiment_id, num)
-    fname = os.path.join(output_dir, fname)
+    casa_rst_ofname = "%s_casa_rst_%d.nc" % (experiment_id, num)
+    fname = os.path.join(restart_dir, casa_rst_ofname)
     ds = xr.open_dataset(fname)
-    new_cplant = ds.cplant[:,:,0].values[-1].sum() * g_2_kg
-    new_csoil = ds.csoil[:,:,0].values[-1].sum() * g_2_kg
+    new_cplant = np.sum(ds.cplant.values) * g_2_kg
+    new_csoil = np.sum(ds.csoil.values) * g_2_kg
 
     if ( np.fabs(prev_cplant - new_cplant) < tol and
          np.fabs(prev_csoil - new_csoil) < tol ):
@@ -306,11 +306,10 @@ def check_steady_state(experiment_id, output_dir, num, debug=True):
 
     if debug:
         print("*", num, not_in_equilibrium,
-              "*cplant", np.fabs(prev_cplant - new_cplant),
-              "*csoil", np.fabs(prev_csoil - new_csoil))
+              "*cplant", new_cplant, np.fabs(prev_cplant - new_cplant),
+              "*csoil", new_csoil, np.fabs(prev_csoil - new_csoil))
 
     return not_in_equilibrium
-
 
 def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
                                  spin_up=False):
