@@ -64,7 +64,7 @@ def run_and_unpack_cable(param_values, param_names):
 
     return mod
 
-obs_dir = "../../flux_files//plumber"
+obs_dir = "../../flux_files/plumber"
 fn = os.path.join(obs_dir, 'TumbaFluxnet.1.4_flux.nc')
 ds = xr.open_dataset(fn)
 obs = ds.Qle.values[:,0,0]
