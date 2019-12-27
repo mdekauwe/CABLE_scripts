@@ -64,7 +64,7 @@ def run_and_unpack_cable(params, param_names):
                  cable_src=cable_src, mpi=mpi, num_cores=num_cores,
                  adjust_params=adjust_params)
 
-    id = str(uuid.uuid4())
+    id = str(uuid.uuid4())[0:10]
     osite = "Tumba_%s" % (id)
     out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
     out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
