@@ -247,10 +247,6 @@ def change_params(met_fname, site, param_names, param_values):
     nc = netCDF4.Dataset(new_met_fname, 'r+')
     (nc_attrs, nc_dims, nc_vars) = ncdump(nc)
     for name, value in zip(param_names, param_values):
-
-        print("=========")
-        print(name, value)
-        print("\n")
         name = nc.createVariable(name, 'f8', ('y', 'x'))
 
         if name == "g1":
