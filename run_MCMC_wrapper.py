@@ -68,7 +68,7 @@ def run_and_unpack_cable(params, param_names):
     id = randomString()
     osite = "Tumba_%s" % (id)
     out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
-    out_log_fname = os.path.join(log_dir, "%s_log.txt" % (osite))
+    out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
     C.main(param_names, params, out_fname=out_log_fname,
            out_log_fname=out_log_fname)
