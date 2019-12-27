@@ -68,6 +68,11 @@ class RunCable(object):
         self.fixed_lai = fixed_lai
         self.adjust_params = adjust_params
 
+        if self.adjust_params:
+            self.soil_moisture_spinup = ".FALSE.",
+        else:
+            self.soil_moisture_spinup = ".TRUE.",
+
     def main(self, param_names=None, param_values=None):
 
         (met_files, url, rev) = self.initialise_stuff()
@@ -135,6 +140,7 @@ class RunCable(object):
                             "cable_user%GS_SWITCH": "'medlyn'",
                             "cable_user%GW_MODEL": ".FALSE.",
                             "cable_user%or_evap": ".FALSE.",
+                            "spinup":"%s" % (self.soil_moisture_spinup),
                             #"elev_fname": "'%s'" % (self.elev_fname),
             }
             adjust_nml_file(nml_fname, replace_dict)
@@ -223,7 +229,7 @@ if __name__ == "__main__":
     # MCMC
     adjust_params = False
     #param_names = ["g1", "vcmax"]
-    #param_values = [2.0, 50.0 * 1e6]
+    #param_values = [2.0, 50.0]
 
     # ------------------------------------------- #
 

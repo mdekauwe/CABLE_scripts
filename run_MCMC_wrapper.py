@@ -74,9 +74,6 @@ uncert = np.sqrt(np.abs(obs))
 # Define the modeling function as a callable, comparing Qle.
 func = run_and_unpack_cable
 
-# List of additional arguments of func (if necessary):
-indparams = [param_names]
-
 # Array of initial-guess values of fitting parameters:
 param_names = ["g1", "vcmax"]
 params = np.array([2.0, 50.0])
@@ -95,6 +92,9 @@ priorup  = np.array([0.0, 0.0])
 # Parameter names:
 pnames   = ['g1', 'vcmax']
 texnames = [r'$g_{1}$', r'$V_{cmax}$']
+
+# List of additional arguments of func (if necessary):
+indparams = [param_names]
 
 # Sampler algorithm, choose from: 'snooker', 'demc' or 'mrw'.
 sampler = 'snooker'
