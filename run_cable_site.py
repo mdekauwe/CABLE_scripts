@@ -122,6 +122,7 @@ class RunCable(object):
 
             # For MCMC
             if self.adjust_params:
+                print("here")
                 fname = change_params(fname, site, param_names, param_values)
 
             replace_dict = {

@@ -246,17 +246,16 @@ def change_params(met_fname, site, param_names, param_values):
 
     nc = netCDF4.Dataset(new_met_fname, 'r+')
     (nc_attrs, nc_dims, nc_vars) = ncdump(nc)
-    for name, value in zip(param_names, param_values):
-        name = nc.createVariable(name, 'f8', ('y', 'x'))
 
+    for i, name in enumerate(param_names):
+        value = float(param_values[i])
+        print("*", i, name, value)
         if name == "g1":
-            name.long_name = "g1 term in Medlyn model"
-            name:units = "kPa^0.5"
-            name[:] = value
+            g1 = nc.createVariable('g1', 'f8', ('y', 'x'))
+            g1[:] = value
         elif name == "vcmax":
-            name.long_name = "Maximum RuBP carboxylation rate top leaf"
-            name:units = "mol/m^2/s"
-            name[:] = value * 1e6
+            vcmax = nc.createVariable('vcmax', 'f8', ('y', 'x'))
+            vcmax[:] = value * 1e6
 
             # Also change Jmax.
             ejmax = nc.createVariable('ejmax', 'f8', ('y', 'x'))
