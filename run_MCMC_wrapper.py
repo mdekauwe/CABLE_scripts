@@ -31,6 +31,11 @@ from cable_utils import add_attributes_to_output_file
 
 from run_cable_site import RunCable
 
+def randomString(stringLength=10):
+    """Generate a random string of fixed length """
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
+
 def run_and_unpack_cable(params, param_names):
 
     #------------- Change stuff ------------- #
@@ -60,9 +65,8 @@ def run_and_unpack_cable(params, param_names):
                  cable_src=cable_src, mpi=mpi, num_cores=num_cores,
                  adjust_params=adjust_params)
 
-    random = ''.join([random.choice(string.ascii_letters
-            + string.digits) for n in range(32)])
-    osite = "Tumba_%s" % (random)
+    id = randomString()
+    osite = "Tumba_%s" % (id)
     out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
     out_log_fname = os.path.join(log_dir, "%s_log.txt" % (osite))
 
@@ -112,7 +116,7 @@ indparams = [param_names]
 sampler = 'snooker'
 
 # MCMC setup:
-nsamples = 1e4
+nsamples = 14#1e4
 burnin   = nsamples * 0.1
 nchains  = 6
 ncpu     = 3
