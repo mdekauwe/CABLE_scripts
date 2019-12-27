@@ -52,7 +52,6 @@ def run_and_unpack_cable(param_values, param_names):
     print("\n")
 
     # ------------------------------------------- #
-
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir,
                  namelist_dir=namelist_dir, met_subset=met_subset,
@@ -72,8 +71,6 @@ ds = xr.open_dataset(fn)
 obs = ds.Qle.values[:,0,0]
 uncert = np.sqrt(np.abs(obs))
 
-param_names = ["g1", "vcmax"]
-
 # Define the modeling function as a callable, comparing Qle.
 func = run_and_unpack_cable
 
@@ -81,11 +78,12 @@ func = run_and_unpack_cable
 indparams = [param_names]
 
 # Array of initial-guess values of fitting parameters:
+param_names = ["g1", "vcmax"]
 params = np.array([2.0, 50.0])
 
 # Lower and upper boundaries for the MCMC exploration:
-pmin = np.array([0.0, 10.0])
-pmax = np.array([8.0, 120.0])
+pmin = np.array([0.0, 10.0])   # kPa^0.5, umol/m2/s
+pmax = np.array([8.0, 120.0])  # kPa^0.5, umol/m2/s
 pstep = np.array([1.0, 1.0])
 
 # Parameter prior probability distributions:
