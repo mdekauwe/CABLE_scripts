@@ -46,7 +46,6 @@ def run_and_unpack_cable(param_values, param_names):
 
     # MCMC
     adjust_params = True
-    param_names = ["g1", "vcmax"]
     print("======")
     print(param_values)
     print("======")
