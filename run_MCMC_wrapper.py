@@ -58,7 +58,7 @@ def run_and_unpack_cable(param_values, param_names):
                  adjust_params=adjust_params)
     C.main(param_names, param_values)
 
-    ofname = "outputs/standard.nc"
+    ofname = "outputs/TumbaFluxnet_out.nc"
     ds = xr.open_dataset(ofname)
     mod = ds.Qle.values[:,0,0]
 
