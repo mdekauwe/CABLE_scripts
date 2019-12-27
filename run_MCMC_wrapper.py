@@ -47,7 +47,8 @@ def run_and_unpack_cable(param_values, param_names):
     # MCMC
     adjust_params = True
     param_names = ["g1", "vcmax"]
-    param_values = [2.0, 50.0]
+    print("*****")
+    print(param_values)
 
     # ------------------------------------------- #
 
@@ -59,7 +60,7 @@ def run_and_unpack_cable(param_values, param_names):
     C.main(param_names, param_values)
 
     ofname = "outputs/TumbaFluxnet_out.nc"
-    ds = xr.open_dataset(ofname)
+    ds = xr.open_dataset(ofname, decode_times=False)
     mod = ds.Qle.values[:,0,0]
 
     return mod
