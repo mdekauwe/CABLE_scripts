@@ -253,7 +253,7 @@ def change_params(met_fname, site, param_names, param_values):
             name.long_name = "g1 term in Medlyn model"
             name:units = "kPa^0.5"
             name[:] = value
-        elif name.lower() == "vcmax":
+        elif name == "vcmax":
             name.long_name = "Maximum RuBP carboxylation rate top leaf"
             name:units = "mol/m^2/s"
             name[:] = value * 1e6
