@@ -79,7 +79,7 @@ func = run_and_unpack_cable
 indparams = [param_names]
 
 # Array of initial-guess values of fitting parameters:
-params = np.array([ 2.0, 50.0])
+params = np.array([2.0, 50.0])
 
 # Lower and upper boundaries for the MCMC exploration:
 pmin = np.array([0.0, 10.0])
