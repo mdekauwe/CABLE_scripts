@@ -207,8 +207,8 @@ if __name__ == "__main__":
     output_dir = "outputs"
     restart_dir = "restart_files"
     namelist_dir = "namelists"
-    aux_dir = "../../src/CMIP6-MOSRS/CABLE-AUX/"
-    cable_src = "../../src/CMIP6-MOSRS/CMIP6-MOSRS"
+    aux_dir = "../../src/CABLE-AUX/"
+    cable_src = "../../src/trunk/trunk"
     mpi = False
     num_cores = 4 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
