@@ -23,7 +23,7 @@ import numpy as np
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
-from cable_utils import change_LAI
+from cable_utils import change_LAI, change_params
 from cable_utils import add_attributes_to_output_file
 
 class RunCable(object):
@@ -38,8 +38,8 @@ class RunCable(object):
                  cnpbiome_fname="pftlookup_csiro_v16_17tiles.csv",
                  elev_fname="GSWP3_gwmodel_parameters.nc",
                  lai_dir=None, fixed_lai=None, co2_conc=400.0,
-                 met_subset=[], cable_src=None, cable_exe="cable", mpi=True,
-                 num_cores=None, verbose=True):
+                 adjust_params=False, met_subset=[], cable_src=None,
+                 cable_exe="cable", mpi=True, num_cores=None, verbose=True):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -66,8 +66,9 @@ class RunCable(object):
         self.num_cores = num_cores
         self.lai_dir = lai_dir
         self.fixed_lai = fixed_lai
+        self.adjust_params = adjust_params
 
-    def main(self):
+    def main(self, param_names=None, param_values=None):
 
         (met_files, url, rev) = self.initialise_stuff()
 
@@ -87,16 +88,17 @@ class RunCable(object):
 
                 # setup a list of processes that we want to run
                 p = mp.Process(target=self.worker,
-                               args=(met_files[start:end], url, rev, ))
+                               args=(met_files[start:end], url, rev,
+                                     param_names, param_values, ))
                 processes.append(p)
 
             # Run processes
             for p in processes:
                 p.start()
         else:
-            self.worker(met_files, url, rev)
+            self.worker(met_files, url, rev, param_names, param_values)
 
-    def worker(self, met_files, url, rev):
+    def worker(self, met_files, url, rev, param_names, param_values):
 
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
@@ -112,6 +114,10 @@ class RunCable(object):
             if self.fixed_lai is not None or self.lai_dir is not None:
                 fname = change_LAI(fname, site, fixed=self.fixed_lai,
                                    lai_dir=self.lai_dir)
+
+            # For MCMC
+            if self.adjust_params:
+                fname = change_params(fname, site, param_names, param_values)
 
             replace_dict = {
                             "filename%met": "'%s'" % (fname),
@@ -213,10 +219,17 @@ if __name__ == "__main__":
     num_cores = 4 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
     met_subset = ['TumbaFluxnet.1.4_met.nc']
+
+    # MCMC
+    adjust_params = True
+    param_names = ["g1", "vcmax"]
+    param_values = [2.0, 50.0 * 1e6]
+
     # ------------------------------------------- #
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir,
                  namelist_dir=namelist_dir, met_subset=met_subset,
-                 cable_src=cable_src, mpi=mpi, num_cores=num_cores)
-    C.main()
+                 cable_src=cable_src, mpi=mpi, num_cores=num_cores,
+                 adjust_params=adjust_params)
+    C.main(param_names, param_values)

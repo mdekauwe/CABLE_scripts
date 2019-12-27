@@ -238,6 +238,36 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
 
     return new_met_fname
 
+def change_params(met_fname, site, param_names, param_values):
+
+    new_met_fname = "%s_tmp.nc" % (site)
+
+    shutil.copyfile(met_fname, new_met_fname)
+
+    nc = netCDF4.Dataset(new_met_fname, 'r+')
+    (nc_attrs, nc_dims, nc_vars) = ncdump(nc)
+    for name, value in zip(param_names, param_values):
+
+        print(name, value)
+        name = nc.createVariable(name, 'f8', ('y', 'x'))
+
+        if name == "g1":
+            name.long_name = "g1 term in Medlyn model"
+            name:units = "kPa^0.5"
+        elif name == "Vcmax":
+            name.long_name = "Maximum RuBP carboxylation rate top leaf"
+            name:units = "mol/m^2/s"
+
+            # Also change Jmax.
+            ejmax = nc.createVariable('ejmax', 'f8', ('y', 'x'))
+            ejmax[:] = value * 1.67
+
+        name[:] = value
+
+    nc.close()  # close the new file
+
+    return new_met_fname
+
 def get_years(met_fname, nyear_spinup):
     """
     Figure out the start and end of the met file, the number of times we
