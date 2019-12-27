@@ -113,7 +113,7 @@ indparams = [param_names]
 sampler = 'snooker'
 
 # MCMC setup:
-nsamples = 14#1e4
+nsamples = 20#1e4
 burnin   = nsamples * 0.1
 nchains  = 6
 ncpu     = 3
