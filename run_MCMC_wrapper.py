@@ -21,6 +21,8 @@ import numpy as np
 import mc3
 import matplotlib.pyplot as plt
 import xarray as xr
+import random
+import string
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
@@ -57,7 +59,15 @@ def run_and_unpack_cable(params, param_names):
                  namelist_dir=namelist_dir, met_subset=met_subset,
                  cable_src=cable_src, mpi=mpi, num_cores=num_cores,
                  adjust_params=adjust_params)
-    C.main(param_names, params)
+
+    random = ''.join([random.choice(string.ascii_letters
+            + string.digits) for n in range(32)])
+    osite = "Tumba_%s" % (random)
+    out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
+    out_log_fname = os.path.join(log_dir, "%s_log.txt" % (osite))
+
+    C.main(param_names, params, out_fname=out_log_fname,
+           out_log_fname=out_log_fname)
 
     ofname = "outputs/TumbaFluxnet_out.nc"
     ds = xr.open_dataset(ofname, decode_times=False)

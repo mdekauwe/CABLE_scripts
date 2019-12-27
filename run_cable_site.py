@@ -73,7 +73,8 @@ class RunCable(object):
         else:
             self.soil_moisture_spinup = ".TRUE.",
 
-    def main(self, param_names=None, param_values=None):
+    def main(self, param_names=None, param_values=None, out_fname=None,
+             out_log_fname=None):
 
         (met_files, url, rev) = self.initialise_stuff()
 
@@ -94,16 +95,19 @@ class RunCable(object):
                 # setup a list of processes that we want to run
                 p = mp.Process(target=self.worker,
                                args=(met_files[start:end], url, rev,
-                                     param_names, param_values, ))
+                                     param_names, param_values,
+                                     out_fname, out_log_fname, ))
                 processes.append(p)
 
             # Run processes
             for p in processes:
                 p.start()
         else:
-            self.worker(met_files, url, rev, param_names, param_values)
+            self.worker(met_files, url, rev, param_names, param_values,
+                        out_fname, out_log_fname)
 
-    def worker(self, met_files, url, rev, param_names, param_values):
+    def worker(self, met_files, url, rev, param_names, param_values,
+               out_fname, out_log_fname):
 
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
@@ -113,7 +117,9 @@ class RunCable(object):
             nml_fname = "cable_%s.nml" % (site)
             shutil.copy(base_nml_fn, nml_fname)
 
-            (out_fname, out_log_fname) = self.clean_up_old_files(site)
+            # If MCMC these are passed.
+            if self.adjust_params == False:
+                (out_fname, out_log_fname) = self.clean_up_old_files(site)
 
             # Add LAI to met file?
             if self.fixed_lai is not None or self.lai_dir is not None:
