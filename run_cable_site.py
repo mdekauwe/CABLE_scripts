@@ -221,9 +221,9 @@ if __name__ == "__main__":
     met_subset = ['TumbaFluxnet.1.4_met.nc']
 
     # MCMC
-    adjust_params = True
-    param_names = ["g1", "vcmax"]
-    param_values = [2.0, 50.0 * 1e6]
+    adjust_params = False
+    #param_names = ["g1", "vcmax"]
+    #param_values = [2.0, 50.0 * 1e6]
 
     # ------------------------------------------- #
 

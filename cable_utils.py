@@ -248,21 +248,23 @@ def change_params(met_fname, site, param_names, param_values):
     (nc_attrs, nc_dims, nc_vars) = ncdump(nc)
     for name, value in zip(param_names, param_values):
 
+        print("=========")
         print(name, value)
+        print("\n")
         name = nc.createVariable(name, 'f8', ('y', 'x'))
 
         if name == "g1":
             name.long_name = "g1 term in Medlyn model"
             name:units = "kPa^0.5"
+            name[:] = value
         elif name == "Vcmax":
             name.long_name = "Maximum RuBP carboxylation rate top leaf"
             name:units = "mol/m^2/s"
+            name[:] = value * 1e6
 
             # Also change Jmax.
             ejmax = nc.createVariable('ejmax', 'f8', ('y', 'x'))
-            ejmax[:] = value * 1.67
-
-        name[:] = value
+            ejmax[:] = value * 1.67 * 1e6
 
     nc.close()  # close the new file
 
