@@ -73,8 +73,7 @@ def run_and_unpack_cable(params, param_names):
     C.main(param_names, params, out_fname=out_log_fname,
            out_log_fname=out_log_fname)
 
-    ofname = "outputs/TumbaFluxnet_out.nc"
-    ds = xr.open_dataset(ofname, decode_times=False)
+    ds = xr.open_dataset(out_fname, decode_times=False)
     mod = ds.Qle.values[:,0,0]
     print("model:", np.mean(mod), np.min(mod), np.max(mod))
 
