@@ -119,6 +119,8 @@ def get_svn_info(here, there):
 def add_attributes_to_output_file(nml_fname, fname, url, rev):
 
     # Add SVN info to output file
+    print(fname)
+    print("\n")
     nc = netCDF4.Dataset(fname, 'r+')
     nc.setncattr('cable_branch', url)
     nc.setncattr('svn_revision_number', rev)

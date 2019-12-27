@@ -64,12 +64,12 @@ def run_and_unpack_cable(params, param_names):
                  cable_src=cable_src, mpi=mpi, num_cores=num_cores,
                  adjust_params=adjust_params)
 
-    id = str(uuid.uuid4())[0:10]
+    id = str(uuid.uuid4())[0:10].strip()
     osite = "Tumba_%s" % (id)
     out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
     out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
-    C.main(param_names, params, out_log_fname, out_log_fname)
+    C.main(param_names, params, out_fname, out_log_fname)
 
     ds = xr.open_dataset(out_fname, decode_times=False)
     mod = ds.Qle.values[:,0,0]
