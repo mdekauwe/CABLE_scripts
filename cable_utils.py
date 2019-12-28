@@ -249,7 +249,7 @@ def change_params(met_fname, site, param_names, param_values):
 
     for i, name in enumerate(param_names):
         value = float(param_values[i])
-        print("*", i, name, value)
+
         if name == "g1":
             g1 = nc.createVariable('g1', 'f8', ('y', 'x'))
             g1[:] = value
