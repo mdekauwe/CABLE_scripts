@@ -122,8 +122,8 @@ indparams = [param_names]
 sampler = 'snooker'
 
 # MCMC setup:
-nsamples = 1000
-burnin = 100
+nsamples = 5000
+burnin = 500
 nchains = 6 # set to a multiple of ncups
 ncpu = 3
 thinning = 1
