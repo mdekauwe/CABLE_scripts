@@ -95,7 +95,7 @@ params = np.array([2.0, 50.0])
 # Lower and upper boundaries for the MCMC exploration:
 pmin = np.array([0.0, 10.0])   # kPa^0.5, umol/m2/s
 pmax = np.array([8.0, 120.0])  # kPa^0.5, umol/m2/s
-#pstep = np.array([1.0, 1.0])
+pstep = np.array([1.0, 1.0])
 
 # Parameter prior probability distributions:
 # uniform priors
@@ -153,7 +153,7 @@ rms      = True
 # Run the MCMC:
 mc3_output = mc3.sample(data=obs, uncert=uncert, func=func, params=params,
                         indparams=indparams, pmin=pmin, pmax=pmax,
-                        pnames=pnames, texnames=texnames,
+                        pstep=pstep, pnames=pnames, texnames=texnames,
                         prior=prior, priorlow=priorlow, priorup=priorup,
                         sampler=sampler, nsamples=nsamples,  nchains=nchains,
                         ncpu=ncpu, burnin=burnin, thinning=thinning,
