@@ -69,7 +69,8 @@ def run_and_unpack_cable(params, param_names):
     out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
     out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
-    C.main(param_names, params, out_fname, out_log_fname)
+    C.main(param_names=param_names, param_values=params, out_fname=out_fname,
+           out_log_fname=out_log_fname)
 
     ds = xr.open_dataset(out_fname, decode_times=False)
     mod = ds.Qle.values[:,0,0]
