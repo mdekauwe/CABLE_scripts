@@ -122,8 +122,8 @@ indparams = [param_names]
 sampler = 'snooker'
 
 # MCMC setup:
-nsamples = 20 #10000
-burnin = 2 #1000
+nsamples = 1000
+burnin = 100
 nchains = 6 # set to a multiple of ncups
 ncpu = 3
 thinning = 1
@@ -151,10 +151,10 @@ fgamma = 1.0  # Scale factor for DEMC's gamma jump.
 fepsilon = 0.0  # Jump scale factor for DEMC's "e" distribution
 
 # Logging:
-log = 'MCMC_tutorial.log'
+log = 'MCMC_CABLE.log'
 
 # File outputs:
-savefile = 'MCMC_tutorial.npz'
+savefile = 'MCMC_CABLE.npz'
 plots = True
 rms = True
 
