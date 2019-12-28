@@ -116,7 +116,7 @@ sampler = 'snooker'
 # MCMC setup:
 nsamples = 20 #10000
 burnin   = 2 #1000
-nchains  = 3
+nchains  = 6
 ncpu     = 3
 thinning = 1
 
