@@ -21,7 +21,8 @@ import numpy as np
 import mc3
 import matplotlib.pyplot as plt
 import xarray as xr
-import uuid
+#import uuid
+import tempfile
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
@@ -64,10 +65,17 @@ def run_and_unpack_cable(params, param_names):
                  cable_src=cable_src, mpi=mpi, num_cores=num_cores,
                  adjust_params=adjust_params)
 
-    id = str(uuid.uuid4())[0:10].strip()
-    osite = "Tumba_%s" % (id)
-    out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
-    out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
+
+
+    temp = tempfile.NamedTemporaryFile(suffix=".nc")
+    out_fname = temp.name
+    temp = tempfile.NamedTemporaryFile(suffix=".txt")
+    out_log_fname = temp.name
+
+    #id = str(uuid.uuid4())[0:10].strip()
+    #osite = "Tumba_%s" % (id)
+    #out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
+    #out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
     C.main(param_names=param_names, param_values=params, out_fname=out_fname,
            out_log_fname=out_log_fname)
@@ -99,12 +107,12 @@ pstep = np.array([1.0, 1.0])
 
 # Parameter prior probability distributions:
 # uniform priors
-prior    = np.array([0.0, 0.0])
+prior = np.array([0.0, 0.0])
 priorlow = np.array([0.0, 0.0])
-priorup  = np.array([0.0, 0.0])
+priorup = np.array([0.0, 0.0])
 
 # Parameter names:
-pnames   = ['g1', 'vcmax']
+pnames = ['g1', 'vcmax']
 texnames = [r'$g_{1}$', r'$V_{cmax}$']
 
 # List of additional arguments of func (if necessary):
@@ -115,20 +123,20 @@ sampler = 'snooker'
 
 # MCMC setup:
 nsamples = 20 #10000
-burnin   = 2 #1000
-nchains  = 6 # set to a multiple of ncups
-ncpu     = 3
+burnin = 2 #1000
+nchains = 6 # set to a multiple of ncups
+ncpu = 3
 thinning = 1
 
 # MCMC initial draw, choose from: 'normal' or 'uniform'
 kickoff = 'normal'
 
 # DEMC snooker pre-MCMC sample size:
-hsize   = 10
+hsize = 10
 
 # Optimization before MCMC, choose from: 'lm' or 'trf':
 # Levenberg-Marquardt = lm
-leastsq    = 'lm'
+leastsq = 'lm'
 chisqscale = False
 
 # MCMC Convergence:
@@ -139,7 +147,7 @@ grnmin  = 0.5
 # Carter & Winn (2009) Wavelet-likelihood method:
 wlike = False
 
-fgamma   = 1.0  # Scale factor for DEMC's gamma jump.
+fgamma = 1.0  # Scale factor for DEMC's gamma jump.
 fepsilon = 0.0  # Jump scale factor for DEMC's "e" distribution
 
 # Logging:
@@ -147,8 +155,8 @@ log = 'MCMC_tutorial.log'
 
 # File outputs:
 savefile = 'MCMC_tutorial.npz'
-plots    = True
-rms      = True
+plots = True
+rms = True
 
 # Run the MCMC:
 mc3_output = mc3.sample(data=obs, uncert=uncert, func=func, params=params,
