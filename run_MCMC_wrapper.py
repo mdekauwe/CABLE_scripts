@@ -118,7 +118,11 @@ obs = df.Qle.values
 
 #ds = xr.open_dataset(fn)
 #obs = ds.Qle.values[:,0,0]
-uncert = np.sqrt(np.abs(obs))
+#uncert = np.sqrt(np.abs(obs))
+uncert = 0.1 * np.abs(obs)
+#plt.plot(uncert)
+#plt.show()
+#sys.exit()
 #print("obs:", np.mean(obs), np.min(obs), np.max(obs))
 
 # Define the modeling function as a callable, comparing Qle.
