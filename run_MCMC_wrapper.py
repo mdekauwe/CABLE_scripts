@@ -21,8 +21,8 @@ import numpy as np
 import mc3
 import matplotlib.pyplot as plt
 import xarray as xr
-#import uuid
-import tempfile
+import uuid
+#import tempfile
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
@@ -67,15 +67,15 @@ def run_and_unpack_cable(params, param_names):
 
 
 
-    temp = tempfile.NamedTemporaryFile(suffix=".nc")
-    out_fname = temp.name
-    temp = tempfile.NamedTemporaryFile(suffix=".txt")
-    out_log_fname = temp.name
+    #temp = tempfile.NamedTemporaryFile(suffix=".nc")
+    #out_fname = temp.name
+    ##temp = tempfile.NamedTemporaryFile(suffix=".txt")
+    #out_log_fname = temp.name
 
-    #id = str(uuid.uuid4())[0:10].strip()
-    #osite = "Tumba_%s" % (id)
-    #out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
-    #out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
+    id = str(uuid.uuid4())
+    osite = "Tumba_%s" % (id)
+    out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
+    out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
     C.main(param_names=param_names, param_values=params, out_fname=out_fname,
            out_log_fname=out_log_fname)
