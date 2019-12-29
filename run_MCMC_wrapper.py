@@ -20,9 +20,10 @@ import multiprocessing as mp
 import numpy as np
 import mc3
 import matplotlib.pyplot as plt
-import xarray as xr
+import netCDF4 as nc
 import uuid
 #import tempfile
+import pandas as pd
 
 from cable_utils import adjust_nml_file
 from cable_utils import get_svn_info
@@ -81,16 +82,42 @@ def run_and_unpack_cable(params, param_names):
     C.main(param_names=param_names, param_values=params, out_fname=out_fname,
            out_log_fname=out_log_fname)
 
-    ds = xr.open_dataset(out_fname, decode_times=False)
-    mod = ds.Qle.values[:,0,0]
+    f = nc.Dataset(out_fname)
+    time = nc.num2date(f.variables['time'][:],
+                       f.variables['time'].units)
+    df = pd.DataFrame(f.variables['Qle'][:,0,0], columns=['Qle'])
+    df['date'] = time
+    df = df.set_index('date')
+    df = df.between_time('5:00', '20:00')
+    df = df[df.index.year == 2002]
+    df = df.resample("D").agg("mean")
+    mod = df.Qle.values
+    #plt.plot(mod)
+    #plt.show()
+    #sys.exit()
+    #ds = xr.open_dataset(out_fname, decode_times=False)
+    #mod = ds.Qle.values[:,0,0]
     #print("model:", np.mean(mod), np.min(mod), np.max(mod))
 
     return mod
 
 obs_dir = "../../flux_files/plumber"
 fn = os.path.join(obs_dir, 'TumbaFluxnet.1.4_flux.nc')
-ds = xr.open_dataset(fn)
-obs = ds.Qle.values[:,0,0]
+f = nc.Dataset(fn)
+time = nc.num2date(f.variables['time'][:],
+                   f.variables['time'].units)
+df = pd.DataFrame(f.variables['Qle'][:,0,0], columns=['Qle'])
+df['date'] = time
+df = df.set_index('date')
+df = df.between_time('5:00', '20:00')
+df = df[df.index.year == 2002]
+df = df.resample("D").agg("mean")
+obs = df.Qle.values
+#plt.plot(obs)
+#plt.show()
+
+#ds = xr.open_dataset(fn)
+#obs = ds.Qle.values[:,0,0]
 uncert = np.sqrt(np.abs(obs))
 #print("obs:", np.mean(obs), np.min(obs), np.max(obs))
 
