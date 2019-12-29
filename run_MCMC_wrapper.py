@@ -55,9 +55,9 @@ def run_and_unpack_cable(params, param_names):
     adjust_params = True
 
     print("\n")
-    print("======")
+    print("===========")
     print(params)
-    print("======")
+    print("===========")
     print("\n")
 
     # ------------------------------------------- #
@@ -75,8 +75,7 @@ def run_and_unpack_cable(params, param_names):
     #out_log_fname = temp.name
 
     id = str(uuid.uuid4())
-    osite = "Tumba_%s" % (id)
-    out_fname = os.path.join(output_dir, "%s_out.nc" % (osite))
+    out_fname = os.path.join(output_dir, "%s.nc" % (id))
     out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
     C.main(param_names=param_names, param_values=params, out_fname=out_fname,
