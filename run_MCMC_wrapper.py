@@ -53,6 +53,8 @@ def run_and_unpack_cable(params, param_names):
 
     # MCMC
     adjust_params = True
+
+    print("\n")
     print("======")
     print(params)
     print("======")
@@ -82,7 +84,7 @@ def run_and_unpack_cable(params, param_names):
 
     ds = xr.open_dataset(out_fname, decode_times=False)
     mod = ds.Qle.values[:,0,0]
-    print("model:", np.mean(mod), np.min(mod), np.max(mod))
+    #print("model:", np.mean(mod), np.min(mod), np.max(mod))
 
     return mod
 
@@ -91,7 +93,7 @@ fn = os.path.join(obs_dir, 'TumbaFluxnet.1.4_flux.nc')
 ds = xr.open_dataset(fn)
 obs = ds.Qle.values[:,0,0]
 uncert = np.sqrt(np.abs(obs))
-print("obs:", np.mean(obs), np.min(obs), np.max(obs))
+#print("obs:", np.mean(obs), np.min(obs), np.max(obs))
 
 # Define the modeling function as a callable, comparing Qle.
 func = run_and_unpack_cable
