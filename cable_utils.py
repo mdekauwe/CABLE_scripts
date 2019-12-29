@@ -255,11 +255,11 @@ def change_params(met_fname, site, param_names, param_values):
             g1[:] = value
         elif name == "vcmax":
             vcmax = nc.createVariable('vcmax', 'f8', ('y', 'x'))
-            vcmax[:] = value * 1e6
+            vcmax[:] = value * 1e-6
 
             # Also change Jmax.
             ejmax = nc.createVariable('ejmax', 'f8', ('y', 'x'))
-            ejmax[:] = value * 1.67 * 1e6
+            ejmax[:] = value * 1.67 * 1e-6
 
     nc.close()  # close the new file
 
