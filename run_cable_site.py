@@ -147,6 +147,7 @@ class RunCable(object):
                             "cable_user%GW_MODEL": ".FALSE.",
                             "cable_user%or_evap": ".FALSE.",
                             "spinup":"%s" % (self.soil_moisture_spinup),
+                            "verbose": ".FALSE.",
                             #"elev_fname": "'%s'" % (self.elev_fname),
             }
             adjust_nml_file(nml_fname, replace_dict)
