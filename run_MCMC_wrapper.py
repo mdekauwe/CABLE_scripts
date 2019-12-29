@@ -89,7 +89,7 @@ def run_and_unpack_cable(params, param_names):
     df['date'] = time
     df = df.set_index('date')
     df = df.between_time('5:00', '20:00')
-    df = df[df.index.year == 2002]
+    #df = df[df.index.year == 2002]
     df = df.resample("D").agg("mean")
     mod = df.Qle.values
     #plt.plot(mod)
@@ -110,7 +110,7 @@ df = pd.DataFrame(f.variables['Qle'][:,0,0], columns=['Qle'])
 df['date'] = time
 df = df.set_index('date')
 df = df.between_time('5:00', '20:00')
-df = df[df.index.year == 2002]
+#df = df[df.index.year == 2002]
 df = df.resample("D").agg("mean")
 obs = df.Qle.values
 #plt.plot(obs)
