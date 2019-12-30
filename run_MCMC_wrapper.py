@@ -48,8 +48,7 @@ def run_and_unpack_cable(params, param_names):
     aux_dir = "../../src/CABLE-AUX/"
     cable_src = "../../src/trunk/trunk"
     mpi = False
-    num_cores = 4 # set to a number, if None it will use all cores...!
-    # if empty...run all the files in the met_dir
+    num_cores = 1 # set to a number, if None it will use all cores...!
     met_subset = ['TumbaFluxnet.1.4_met.nc']
 
     # MCMC
@@ -158,8 +157,8 @@ indparams = [param_names]
 sampler = 'snooker'
 
 # MCMC setup:
-nsamples = 1000
-burnin = 100
+nsamples = 500
+burnin = 50
 nchains = 6 # set to a multiple of ncups
 ncpu = 3
 thinning = 1

@@ -37,7 +37,7 @@ def randomString(stringLength=10):
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
-#------------- Change stuff ------------- #
+#------------- Setup paths...------------- #
 met_dir = "../../met_data/plumber_met"
 log_dir = "logs"
 output_dir = "outputs"
@@ -46,16 +46,12 @@ namelist_dir = "namelists"
 aux_dir = "../../src/CABLE-AUX/"
 cable_src = "../../src/trunk/trunk"
 mpi = False
-num_cores = 4 # set to a number, if None it will use all cores...!
-# if empty...run all the files in the met_dir
+num_cores = 1
 met_subset = ['TumbaFluxnet.1.4_met.nc']
-
-# MCMC
-adjust_params = True
-
+adjust_params = True # do MCMC with CABLE
 param_names = ["g1", "vcmax"]
 
-# set up obs
+# set up Observations...
 obs_dir = "../../flux_files/plumber"
 fn = os.path.join(obs_dir, 'TumbaFluxnet.1.4_flux.nc')
 f = nc.Dataset(fn)
@@ -76,13 +72,20 @@ obs = df.Qle.values
 #uncert = np.sqrt(np.abs(obs))
 uncert = 0.1 * np.abs(obs)
 
+
+
+
+
 niter = 1000
 with pm.Model() as model:
     g1 = pm.Uniform('g1', lower=0, upper=8)
     vcmax = pm.Uniform('vcmax', lower=10., upper=120)
     sigma = pm.Uniform('sigma', lower=0, upper=20)
 
-    # define likelihood, i.e. call CABLE...
+    # define likelihood, i.e. call CABLE...would be better as a func if we
+    # can work that out
+
+    # unpack proposed values and call cable...
     print("\n")
     print("===========")
     print(g1)
@@ -104,6 +107,7 @@ with pm.Model() as model:
     C.main(param_names=param_names, param_values=params, out_fname=out_fname,
            out_log_fname=out_log_fname)
 
+    # Unpack model output...
     f = nc.Dataset(out_fname)
     time = nc.num2date(f.variables['time'][:],
                        f.variables['time'].units)
@@ -120,10 +124,13 @@ with pm.Model() as model:
     if os.path.exists(out_log_fname):
         os.remove(out_log_fname)
 
+
+
     y_obs = pm.Normal('Y_obs', mu=mod, sd=sigma, observed=obs)
 
     # inference
     start = pm.find_MAP()
-    step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
+    #step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
+    step = pm.Metropolis()
     trace = pm.sample(niter, step, start, random_seed=123, progressbar=True)
     pm.traceplot(trace)
