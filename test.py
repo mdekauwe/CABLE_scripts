@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 """
-Wrapper script to do MCMC param estimation on CABLE. For info on MCMC see lib
-documentation -> https://mc3.readthedocs.io/en/latest/mcmc_tutorial.html
+Wrapper script to do MCMC param estimation on CABLE. This is using PYMC3,
+everything needs to be cast to float 64
+
+THEANO_FLAGS='floatX=float64' ./run_pymc_wrapper.py
 
 That's all folks.
 """
@@ -155,6 +157,7 @@ def run_and_unpack_cable(theta):
     #df = df[df.index.year == 2002]
     df = df.resample("D").agg("mean")
     mod = df.Qle.values
+    mod = mod.astype(np.float64)
     #plt.plot(mod)
     #plt.show()
     #sys.exit()
@@ -185,6 +188,7 @@ df = df.between_time('5:00', '20:00')
 #df = df[df.index.year == 2002]
 df = df.resample("D").agg("mean")
 obs = df.Qle.values
+obs = obs.astype(np.float64)
 #plt.plot(obs)
 #plt.show()
 
@@ -192,6 +196,7 @@ obs = df.Qle.values
 #obs = ds.Qle.values[:,0,0]
 #uncert = np.sqrt(np.abs(obs))
 uncert = 0.1 * np.abs(obs) # not using, letting pymc fit this below...
+uncert = uncert.astype(np.float64)
 
 # create our Op
 logl = LogLike(my_likelihood, obs, uncert)
