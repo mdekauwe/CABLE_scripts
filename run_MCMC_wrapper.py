@@ -98,6 +98,10 @@ def run_and_unpack_cable(params, param_names):
     #ds = xr.open_dataset(out_fname, decode_times=False)
     #mod = ds.Qle.values[:,0,0]
     #print("model:", np.mean(mod), np.min(mod), np.max(mod))
+    if os.path.exists(out_fname):
+        os.remove(out_fname)
+    if os.path.exists(out_log_fname):
+        os.remove(out_log_fname)
 
     return mod
 
