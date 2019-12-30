@@ -109,10 +109,9 @@ with pm.Model() as model:
         out_fname = os.path.join(output_dir, "%s.nc" % (id))
         out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
-        print(out_fname)
         C.main(param_names=param_names, param_values=params,
                out_fname=out_fname, out_log_fname=out_log_fname)
-        print(out_fname)
+
         f = nc.Dataset(out_fname)
         time = nc.num2date(f.variables['time'][:],
                            f.variables['time'].units)
@@ -130,7 +129,7 @@ with pm.Model() as model:
         #mod = ds.Qle.values[:,0,0]
         #print("model:", np.mean(mod), np.min(mod), np.max(mod))
 
-        
+
         if os.path.exists(out_fname):
             os.remove(out_fname)
         if os.path.exists(out_log_fname):
@@ -148,7 +147,7 @@ with pm.Model() as model:
     #trace = pm.sample(niter, step=step, progressbar=True)
     #pm.traceplot(trace)
 
-    trace = pm.sample(10, step=pm.Metropolis())
-
+    #trace = pm.sample(10, chains=1, step=pm.Metropolis())
+    trace = pm.sample(10, chains=1)
 _ = pm.traceplot(trace)
 pm.summary(trace)

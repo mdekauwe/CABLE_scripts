@@ -154,10 +154,6 @@ class RunCable(object):
 
             self.run_me(nml_fname)
 
-            print(nml_fname)
-            print(out_fname)
-            print(url)
-            print(rev)
             add_attributes_to_output_file(nml_fname, out_fname, url, rev)
             shutil.move(nml_fname, os.path.join(self.namelist_dir, nml_fname))
 
@@ -196,7 +192,7 @@ class RunCable(object):
             self.cable_exe = local_exe
         else:
             # Otherwise multi-core runs may clean up cable exe when we need it
-            local_exe = "cable"
+            local_exe = "./cable"
             if not os.path.exists(local_exe):
                 shutil.copy(self.cable_exe, local_exe)
             self.cable_exe = local_exe
