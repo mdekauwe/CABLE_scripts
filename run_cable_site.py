@@ -154,6 +154,10 @@ class RunCable(object):
 
             self.run_me(nml_fname)
 
+            print(nml_fname)
+            print(out_fname)
+            print(url)
+            print(rev)
             add_attributes_to_output_file(nml_fname, out_fname, url, rev)
             shutil.move(nml_fname, os.path.join(self.namelist_dir, nml_fname))
 
@@ -183,12 +187,19 @@ class RunCable(object):
         cwd = os.getcwd()
         (url, rev) = get_svn_info(cwd, os.path.join(self.cable_src, "offline"))
 
-        # delete local executable, copy a local copy and use that
-        local_exe = "cable"
-        if os.path.isfile(local_exe):
-            os.remove(local_exe)
-        shutil.copy(self.cable_exe, local_exe)
-        self.cable_exe = local_exe
+        if self.adjust_params == False:
+            # delete local executable, copy a local copy and use that
+            local_exe = "cable"
+            if os.path.isfile(local_exe):
+                os.remove(local_exe)
+            shutil.copy(self.cable_exe, local_exe)
+            self.cable_exe = local_exe
+        else:
+            # Otherwise multi-core runs may clean up cable exe when we need it
+            local_exe = "cable"
+            if not os.path.exists(local_exe):
+                shutil.copy(self.cable_exe, local_exe)
+            self.cable_exe = local_exe
 
         return (met_files, url, rev)
 

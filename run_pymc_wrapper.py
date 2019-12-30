@@ -35,19 +35,6 @@ def randomString(stringLength=10):
 
 
 
-#------------- Setup paths...------------- #
-met_dir = "../../met_data/plumber_met"
-log_dir = "logs"
-output_dir = "outputs"
-restart_dir = "restart_files"
-namelist_dir = "namelists"
-aux_dir = "../../src/CABLE-AUX/"
-cable_src = "../../src/trunk/trunk"
-mpi = False
-num_cores = 1
-met_subset = ['TumbaFluxnet.1.4_met.nc']
-adjust_params = True # do MCMC with CABLE
-
 # set up Observations...
 obs_dir = "../../flux_files/plumber"
 fn = os.path.join(obs_dir, 'TumbaFluxnet.1.4_flux.nc')
@@ -122,9 +109,10 @@ with pm.Model() as model:
         out_fname = os.path.join(output_dir, "%s.nc" % (id))
         out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
 
-        C.main(param_names=param_names, param_values=params, out_fname=out_fname,
-               out_log_fname=out_log_fname)
-
+        print(out_fname)
+        C.main(param_names=param_names, param_values=params,
+               out_fname=out_fname, out_log_fname=out_log_fname)
+        print(out_fname)
         f = nc.Dataset(out_fname)
         time = nc.num2date(f.variables['time'][:],
                            f.variables['time'].units)
@@ -142,12 +130,13 @@ with pm.Model() as model:
         #mod = ds.Qle.values[:,0,0]
         #print("model:", np.mean(mod), np.min(mod), np.max(mod))
 
+        
         if os.path.exists(out_fname):
             os.remove(out_fname)
         if os.path.exists(out_log_fname):
             os.remove(out_log_fname)
 
-        return np.array(mod)
+        return mod
 
 
     mod = pm.Deterministic('mod', run_and_unpack_cable(g1, vcmax))
