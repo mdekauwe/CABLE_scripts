@@ -101,7 +101,7 @@ def run_and_unpack_cable(g1, vcmax):
     if os.path.exists(out_log_fname):
         os.remove(out_log_fname)
 
-    return np.array(mod)
+    return mod
 
 
 
@@ -129,9 +129,9 @@ uncert = 0.1 * np.abs(obs) # not using, letting pymc fit this below...
 
 niter = 1000
 with pm.Model() as model:
-    g1 = pm.Uniform('g1', lower=0, upper=8)
-    vcmax = pm.Uniform('vcmax', lower=10., upper=120)
-    sigma = pm.Uniform('sigma', lower=0, upper=20) # fit error?
+    g1 = pm.Uniform('g1', lower=0.0, upper=8.0)
+    vcmax = pm.Uniform('vcmax', lower=10.0, upper=120.0)
+    sigma = pm.Uniform('sigma', lower=0.0, upper=20.0) # fit error?
 
     # define likelihood, i.e. call CABLE...
     #mod = pm.Deterministic('mod', run_and_unpack_cable(g1, vcmax))
@@ -145,6 +145,7 @@ with pm.Model() as model:
     #pm.traceplot(trace)
 
     trace = pm.sample(10, chains=1, step=pm.Metropolis())
+    #trace = pm.sample(10, chains=1, step=pm.Slice())
     #trace = pm.sample(10, chains=1)
 _ = pm.traceplot(trace)
 pm.summary(trace)
