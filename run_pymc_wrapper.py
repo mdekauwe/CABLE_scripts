@@ -71,8 +71,6 @@ def run_and_unpack_cable(g1, vcmax):
                  cable_src=cable_src, mpi=mpi, num_cores=num_cores,
                  adjust_params=adjust_params)
 
-
-
     #temp = tempfile.NamedTemporaryFile(suffix=".nc")
     #out_fname = temp.name
     ##temp = tempfile.NamedTemporaryFile(suffix=".txt")
@@ -121,7 +119,6 @@ mpi = False
 num_cores = 1
 met_subset = ['TumbaFluxnet.1.4_met.nc']
 adjust_params = True # do MCMC with CABLE
-param_names = ["g1", "vcmax"]
 
 # set up Observations...
 obs_dir = "../../flux_files/plumber"
@@ -143,9 +140,6 @@ obs = df.Qle.values
 #obs = ds.Qle.values[:,0,0]
 #uncert = np.sqrt(np.abs(obs))
 uncert = 0.1 * np.abs(obs) # not using, letting pymc fit this below...
-
-
-
 
 
 niter = 1000
