@@ -201,8 +201,8 @@ fgamma = 1.0  # Scale factor for DEMC's gamma jump.
 fepsilon = 0.0  # Jump scale factor for DEMC's "e" distribution
 
 # Logging:
-#log = 'MCMC_CABLE.log'
-log = None
+log = 'MCMC_CABLE.log'
+#log = None
 
 # File outputs:
 savefile = 'MCMC_CABLE.npz'
