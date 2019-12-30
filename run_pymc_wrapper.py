@@ -77,8 +77,8 @@ uncert = 0.1 * np.abs(obs)
 
 niter = 1000
 with pm.Model() as model:
-    g1 = pm.Uniform('g1', lower=0, upper=8, shape=_g1.shape)
-    vcmax = pm.Uniform('vcmax', lower=10., upper=120, shape=_vcmax.shape)
+    g1 = pm.Uniform('g1', lower=0, upper=8)
+    vcmax = pm.Uniform('vcmax', lower=10., upper=120)
     sigma = pm.Uniform('sigma', lower=0, upper=20)
 
     # define likelihood
