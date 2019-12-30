@@ -38,7 +38,8 @@ def randomString(stringLength=10):
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
-@theano.as_op([theano.tensor.dscalar, theano.tensor.dscalar], [theano.tensor.dvector])
+@theano.as_op(itypes=[theano.tensor.dscalar, theano.tensor.dscalar],
+              otypes=[theano.dvector])
 def run_and_unpack_cable(g1, vcmax):
     params = np.array([g1, vcmax])
     print(params)
@@ -98,7 +99,7 @@ def run_and_unpack_cable(g1, vcmax):
     #sys.exit()
     #ds = xr.open_dataset(out_fname, decode_times=False)
     #mod = ds.Qle.values[:,0,0]
-    #print("model:", np.mean(mod), np.min(mod), np.max(mod))
+    print("model:", np.mean(mod), np.min(mod), np.max(mod))
     if os.path.exists(out_fname):
         os.remove(out_fname)
     if os.path.exists(out_log_fname):
@@ -155,7 +156,7 @@ with pm.Model() as model:
 
     # inference
     start = pm.find_MAP()
-    #step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
-    step = pm.Metropolis()
+    step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
+    #step = pm.Metropolis()
     trace = pm.sample(niter, step, start, progressbar=True)
     pm.traceplot(trace)
