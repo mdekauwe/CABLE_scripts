@@ -114,7 +114,11 @@ class RunCable(object):
             print(site)
 
             base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
-            nml_fname = "cable_%s.nml" % (site)
+
+            if mcmc_tag is None:
+                nml_fname = "cable_%s.nml" % (site, nml)
+            else:
+                nml_fname = "cable_%s_%s.nml" % (site, nml, mcmc_tag)
             shutil.copy(base_nml_fn, nml_fname)
 
             # If MCMC these are passed.
