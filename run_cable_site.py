@@ -132,7 +132,8 @@ class RunCable(object):
 
             # For MCMC
             if self.adjust_params:
-                fname = change_params(fname, site, param_names, param_values)
+                fname = change_params(fname, site, param_names, param_values,
+                                      mcmc_tag)
 
             replace_dict = {
                             "filename%met": "'%s'" % (fname),
@@ -163,6 +164,14 @@ class RunCable(object):
 
             if self.fixed_lai is not None or self.lai_dir is not None:
                 os.remove("%s_tmp.nc" % (site))
+
+            if self.adjust_params:
+                if mcmc_tag is not None:
+                    os.remove("%s_%s_tmp.nc" % (site, mcmc_tag))
+                else:
+                    os.remove("%s_tmp.nc" % (site))
+                os.remove(out_fname)
+                os.remove(out_log_fname)
 
     def initialise_stuff(self):
 

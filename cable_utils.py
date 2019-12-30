@@ -242,7 +242,7 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
     return new_met_fname
 
 def change_params(met_fname, site, param_names, param_values, mcmc_tag=None):
-
+    
     if mcmc_tag is not None:
         new_met_fname = "%s_%s_tmp.nc" % (site, mcmc_tag)
     else:
