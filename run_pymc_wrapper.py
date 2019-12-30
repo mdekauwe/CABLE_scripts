@@ -24,6 +24,7 @@ import netCDF4 as nc
 import uuid
 import pandas as pd
 import theano
+import theano.tensor as t
 
 from run_cable_site import RunCable
 
@@ -32,9 +33,7 @@ def randomString(stringLength=10):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
-
-@theano.as_op(itypes=[theano.tensor.dscalar, theano.tensor.dscalar],
-              otypes=[theano.tensor.dvector])
+@theano.compile.ops.as_op(itypes=[t.dscalar, t.dscalar], otypes=[t.dvector])
 def run_and_unpack_cable(g1, vcmax):
     params = np.array([g1, vcmax])
     param_names = ["g1", "vcmax"]
@@ -101,7 +100,7 @@ def run_and_unpack_cable(g1, vcmax):
     if os.path.exists(out_log_fname):
         os.remove(out_log_fname)
 
-    return mod
+    return np.array(mod)
 
 
 
@@ -134,7 +133,8 @@ with pm.Model() as model:
     sigma = pm.Uniform('sigma', lower=0, upper=20) # fit error?
 
     # define likelihood, i.e. call CABLE...
-    mod = pm.Deterministic('mod', run_and_unpack_cable(g1, vcmax))
+    #mod = pm.Deterministic('mod', run_and_unpack_cable(g1, vcmax))
+    mod = run_and_unpack_cable(g1, vcmax)
     y_obs = pm.Normal('Y_obs', mu=mod, sd=sigma, observed=obs)
 
     # inference
