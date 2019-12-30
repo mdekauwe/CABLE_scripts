@@ -94,7 +94,7 @@ def replace_keys(text, replacements_dict):
 
     return '\n'.join(lines) + '\n'
 
-def get_svn_info(here, there):
+def get_svn_info(here, there, mcmc_tag=None):
     """
     Add SVN info and cable namelist file to the output file
     """
@@ -103,8 +103,13 @@ def get_svn_info(here, there):
     os.chdir(there)
     #print(os.system("svn info"))
     #print(os.getcwd())
-    os.system("svn info > tmp_svn")
-    fname = 'tmp_svn'
+    if mcmc_tag is not None:
+        os.system("svn info > tmp_svn_%s" % (mcmc_tag))
+        fname = 'tmp_svn_%s' % (mcmc_tag)
+    else:
+        os.system("svn info > tmp_svn")
+        fname = 'tmp_svn'
+    
     fp = open(fname, "r")
     svn = fp.readlines()
     fp.close()
@@ -242,7 +247,7 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
     return new_met_fname
 
 def change_params(met_fname, site, param_names, param_values, mcmc_tag=None):
-    
+
     if mcmc_tag is not None:
         new_met_fname = "%s_%s_tmp.nc" % (site, mcmc_tag)
     else:

@@ -76,7 +76,7 @@ class RunCable(object):
     def main(self, param_names=None, param_values=None, out_fname=None,
              out_log_fname=None, mcmc_tag=None):
 
-        (met_files, url, rev) = self.initialise_stuff()
+        (met_files, url, rev) = self.initialise_stuff(mcmc_tag)
 
         # Setup multi-processor jobs
         if self.mpi:
@@ -165,14 +165,14 @@ class RunCable(object):
             if self.fixed_lai is not None or self.lai_dir is not None:
                 os.remove("%s_tmp.nc" % (site))
 
-            if self.adjust_params:
-                if mcmc_tag is not None:
-                    os.remove("%s_%s_tmp.nc" % (site, mcmc_tag))
-                else:
-                    os.remove("%s_tmp.nc" % (site))
-                os.remove(nml_fname)
+            #if self.adjust_params:
+            #    if mcmc_tag is not None:
+            #        os.remove("%s_%s_tmp.nc" % (site, mcmc_tag))
+            #    else:
+            #        os.remove("%s_tmp.nc" % (site))
+            #    os.remove(nml_fname)
 
-    def initialise_stuff(self):
+    def initialise_stuff(self, mcmc_tag):
 
         if not os.path.exists(self.restart_dir):
             os.makedirs(self.restart_dir)
@@ -193,7 +193,8 @@ class RunCable(object):
             met_files = [os.path.join(self.met_dir, i) for i in self.met_subset]
 
         cwd = os.getcwd()
-        (url, rev) = get_svn_info(cwd, os.path.join(self.cable_src, "offline"))
+        (url, rev) = get_svn_info(cwd, os.path.join(self.cable_src, "offline"),
+                                  mcmc_tag)
 
         if self.adjust_params == False:
             # delete local executable, copy a local copy and use that
