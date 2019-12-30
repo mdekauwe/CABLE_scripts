@@ -181,7 +181,7 @@ class RunCable(object):
             met_files = [os.path.join(self.met_dir, i) for i in self.met_subset]
 
         cwd = os.getcwd()
-        (url, rev) = get_svn_info(cwd, self.cable_src)
+        (url, rev) = get_svn_info(cwd, os.path.join(self.cable_src, "offline"))
 
         # delete local executable, copy a local copy and use that
         local_exe = "cable"
