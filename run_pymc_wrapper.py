@@ -88,6 +88,8 @@ def run_and_unpack_cable(g1, vcmax):
     #df = df[df.index.year == 2002]
     df = df.resample("D").agg("mean")
     mod = df.Qle.values
+    mod = mod.astype(np.float64)
+
     #plt.plot(mod)
     #plt.show()
     #sys.exit()
@@ -118,6 +120,8 @@ df = df.between_time('5:00', '20:00')
 #df = df[df.index.year == 2002]
 df = df.resample("D").agg("mean")
 obs = df.Qle.values
+obs = obs.astype(np.float64)
+
 #plt.plot(obs)
 #plt.show()
 
@@ -125,16 +129,17 @@ obs = df.Qle.values
 #obs = ds.Qle.values[:,0,0]
 #uncert = np.sqrt(np.abs(obs))
 uncert = 0.1 * np.abs(obs) # not using, letting pymc fit this below...
+uncert = uncert.astype(np.float64)
 
 with pm.Model() as model:
     g1 = pm.Uniform('g1', lower=0.0, upper=8.0)
     vcmax = pm.Uniform('vcmax', lower=10.0, upper=120.0)
-    sigma = pm.Uniform('sigma', lower=0.0, upper=20.0) # fit error?
+    #sigma = pm.Uniform('sigma', lower=0.0, upper=20.0) # fit error?
 
     # define likelihood, i.e. call CABLE...
     #mod = pm.Deterministic('mod', run_and_unpack_cable(g1, vcmax))
     mod = run_and_unpack_cable(g1, vcmax)
-    y_obs = pm.Normal('Y_obs', mu=mod, sd=sigma, observed=obs)
+    y_obs = pm.Normal('Y_obs', mu=mod, sd=uncert, observed=obs)
 
     # inference
     #step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler

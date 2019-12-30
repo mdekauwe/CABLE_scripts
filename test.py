@@ -38,7 +38,9 @@ class LogLike(tt.Op):
     log-likelihood)
     """
     itypes = [tt.dvector] # expects a vector of parameter values when called
-    otypes = [tt.dscalar] # outputs a single scalar value (the log likelihood)
+    #otypes = [tt.dscalar] # outputs a single scalar value (the log likelihood)
+    otypes = [tt.dvector] # outputs a vector for the log likelihood)
+
 
     def __init__(self, loglike, obs, sigma):
         """
@@ -80,10 +82,15 @@ def my_likelihood(theta, obs, sigma):
 
     model = run_and_unpack_cable(theta)
 
-    print(model.shape, obs.shape)
-    print("\n")
-    print(-(0.5/sigma**2)*np.sum((obs - model)**2))
     return -(0.5/sigma**2)*np.sum((obs - model)**2)
+    #return np.sum(-(0.5/sigma**2)*np.sum((obs - model)**2))
+
+def my_loglikelihood(theta, obs, sigma):
+
+    model = run_and_unpack_cable(theta)
+
+    return -np.sum(0.5 * \
+            (np.log(2. * np.pi * sigma ** 2.) + ((obs - model) / sigma) ** 2))
 
 def randomString(stringLength=10):
     """Generate a random string of fixed length """
@@ -188,30 +195,19 @@ uncert = 0.1 * np.abs(obs) # not using, letting pymc fit this below...
 
 # create our Op
 logl = LogLike(my_likelihood, obs, uncert)
-
+#logl = LogLike(my_loglikelihood, obs, uncert)
 with pm.Model() as model:
     g1 = pm.Uniform('g1', lower=0.0, upper=8.0)
     vcmax = pm.Uniform('vcmax', lower=10.0, upper=120.0)
-    sigma = pm.Uniform('sigma', lower=0.0, upper=20.0) # fit error?
+    #sigma = pm.Uniform('sigma', lower=0.0, upper=20.0) # fit error?
 
     theta = tt.as_tensor_variable([g1, vcmax])
 
     # use a DensityDist (use a lamdba function to "call" the Op)
     pm.DensityDist('likelihood', lambda v: logl(v), observed={'v': theta})
 
-    # define likelihood, i.e. call CABLE...
-    #mod = pm.Deterministic('mod', run_and_unpack_cable(g1, vcmax))
-    #mod = run_and_unpack_cable(g1, vcmax)
-    #y_obs = pm.Normal('Y_obs', mu=mod, sd=sigma, observed=obs)
-
-    # inference
-    #step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
-    #step = pm.Metropolis()
-    #trace = pm.sample(niter, step=step, progressbar=True)
-    #pm.traceplot(trace)
-
-    #trace = pm.sample(10, chains=1, step=pm.Metropolis())
-    trace = pm.sample(10, chains=1, step=pm.Slice())
+    trace = pm.sample(10, chains=1, step=pm.Metropolis())
+    #trace = pm.sample(10, chains=1, step=pm.Slice())
     #trace = pm.sample(10, chains=1)
 _ = pm.traceplot(trace)
 pm.summary(trace)

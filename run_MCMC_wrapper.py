@@ -91,6 +91,7 @@ def run_and_unpack_cable(params, param_names):
     #df = df[df.index.year == 2002]
     df = df.resample("D").agg("mean")
     mod = df.Qle.values
+    
     #plt.plot(mod)
     #plt.show()
     #sys.exit()
@@ -116,6 +117,7 @@ df = df.between_time('5:00', '20:00')
 #df = df[df.index.year == 2002]
 df = df.resample("D").agg("mean")
 obs = df.Qle.values
+
 #plt.plot(obs)
 #plt.show()
 
