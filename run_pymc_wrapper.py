@@ -53,6 +53,7 @@ met_subset = ['TumbaFluxnet.1.4_met.nc']
 # MCMC
 adjust_params = True
 
+param_names = ["g1", "vcmax"]
 
 # set up obs
 obs_dir = "../../flux_files/plumber"
@@ -81,9 +82,7 @@ with pm.Model() as model:
     vcmax = pm.Uniform('vcmax', lower=10., upper=120)
     sigma = pm.Uniform('sigma', lower=0, upper=20)
 
-    # define likelihood
-
-
+    # define likelihood, i.e. call CABLE...
     print("\n")
     print("===========")
     print(g1)
