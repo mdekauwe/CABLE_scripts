@@ -42,7 +42,6 @@ def randomString(stringLength=10):
               otypes=[theano.tensor.dvector])
 def run_and_unpack_cable(g1, vcmax):
     params = np.array([g1, vcmax])
-    print(params)
     param_names = ["g1", "vcmax"]
 
     met_dir = "../../met_data/plumber_met"
