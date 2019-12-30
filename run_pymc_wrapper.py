@@ -24,7 +24,7 @@ import netCDF4 as nc
 import uuid
 import pandas as pd
 import theano
-import theano.tensor as t
+import theano.tensor as tt
 
 from run_cable_site import RunCable
 
@@ -33,7 +33,8 @@ def randomString(stringLength=10):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
-@theano.compile.ops.as_op(itypes=[t.dscalar, t.dscalar], otypes=[t.dvector])
+#@theano.compile.ops.as_op(itypes=[tt.dscalar, tt.dscalar], otypes=[tt.dvector])
+@theano.as_op(itypes=[tt.dscalar, tt.dscalar], otypes=[tt.dvector])
 def run_and_unpack_cable(g1, vcmax):
     params = np.array([g1, vcmax])
     param_names = ["g1", "vcmax"]
@@ -143,7 +144,7 @@ with pm.Model() as model:
     #trace = pm.sample(niter, step=step, progressbar=True)
     #pm.traceplot(trace)
 
-    #trace = pm.sample(10, chains=1, step=pm.Metropolis())
-    trace = pm.sample(10, chains=1)
+    trace = pm.sample(10, chains=1, step=pm.Metropolis())
+    #trace = pm.sample(10, chains=1)
 _ = pm.traceplot(trace)
 pm.summary(trace)
