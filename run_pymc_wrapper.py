@@ -39,7 +39,7 @@ def randomString(stringLength=10):
 
 
 @theano.as_op(itypes=[theano.tensor.dscalar, theano.tensor.dscalar],
-              otypes=[theano.dvector])
+              otypes=[theano.tensor.dvector])
 def run_and_unpack_cable(g1, vcmax):
     params = np.array([g1, vcmax])
     print(params)
@@ -155,8 +155,7 @@ with pm.Model() as model:
     y_obs = pm.Normal('Y_obs', mu=mod, sd=sigma, observed=obs)
 
     # inference
-    start = pm.find_MAP()
     step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
     #step = pm.Metropolis()
-    trace = pm.sample(niter, step, start, progressbar=True)
+    trace = pm.sample(niter, step=step, progressbar=True)
     pm.traceplot(trace)
