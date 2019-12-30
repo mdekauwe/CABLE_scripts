@@ -99,7 +99,10 @@ def get_svn_info(here, there):
     Add SVN info and cable namelist file to the output file
     """
 
+    #print(there)
     os.chdir(there)
+    #print(os.system("svn info"))
+    #print(os.getcwd())
     os.system("svn info > tmp_svn")
     fname = 'tmp_svn'
     fp = open(fname, "r")
@@ -238,9 +241,12 @@ def change_LAI(met_fname, site, fixed=None, lai_dir=None):
 
     return new_met_fname
 
-def change_params(met_fname, site, param_names, param_values):
+def change_params(met_fname, site, param_names, param_values, mcmc_tag=None):
 
-    new_met_fname = "%s_tmp.nc" % (site)
+    if mcmc_tag is not None:
+        new_met_fname = "%s_%s_tmp.nc" % (site, mcmc_tag)
+    else:
+        new_met_fname = "%s_tmp.nc" % (site)
 
     shutil.copyfile(met_fname, new_met_fname)
 

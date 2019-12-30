@@ -74,7 +74,7 @@ class RunCable(object):
             self.soil_moisture_spinup = ".TRUE.",
 
     def main(self, param_names=None, param_values=None, out_fname=None,
-             out_log_fname=None):
+             out_log_fname=None, mcmc_tag=None):
 
         (met_files, url, rev) = self.initialise_stuff()
 
@@ -96,7 +96,7 @@ class RunCable(object):
                 p = mp.Process(target=self.worker,
                                args=(met_files[start:end], url, rev,
                                      param_names, param_values,
-                                     out_fname, out_log_fname, ))
+                                     out_fname, out_log_fname, mcmc_tag, ))
                 processes.append(p)
 
             # Run processes
@@ -104,10 +104,10 @@ class RunCable(object):
                 p.start()
         else:
             self.worker(met_files, url, rev, param_names, param_values,
-                        out_fname, out_log_fname)
+                        out_fname, out_log_fname, mcmc_tag)
 
     def worker(self, met_files, url, rev, param_names, param_values,
-               out_fname, out_log_fname):
+               out_fname, out_log_fname, mcmc_tag):
 
         for fname in met_files:
             site = os.path.basename(fname).split(".")[0]
