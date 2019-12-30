@@ -157,5 +157,5 @@ with pm.Model() as model:
     start = pm.find_MAP()
     #step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
     step = pm.Metropolis()
-    trace = pm.sample(niter, step, start, random_seed=123, progressbar=True)
+    trace = pm.sample(niter, step, start, progressbar=True)
     pm.traceplot(trace)
