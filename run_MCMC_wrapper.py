@@ -77,9 +77,10 @@ def run_and_unpack_cable(params, param_names):
     id = str(uuid.uuid4())
     out_fname = os.path.join(output_dir, "%s.nc" % (id))
     out_log_fname = os.path.join(log_dir, "%s.txt" % (id))
-
+    mcmc_tag = id
+    
     C.main(param_names=param_names, param_values=params, out_fname=out_fname,
-           out_log_fname=out_log_fname)
+           out_log_fname=out_log_fname, mcmc_tag=mcmc_tag)
 
     f = nc.Dataset(out_fname)
     time = nc.num2date(f.variables['time'][:],
@@ -91,7 +92,7 @@ def run_and_unpack_cable(params, param_names):
     #df = df[df.index.year == 2002]
     df = df.resample("D").agg("mean")
     mod = df.Qle.values
-    
+
     #plt.plot(mod)
     #plt.show()
     #sys.exit()
