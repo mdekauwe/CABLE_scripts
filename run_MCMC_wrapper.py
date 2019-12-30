@@ -132,23 +132,38 @@ uncert = 0.1 * np.abs(obs)
 func = run_and_unpack_cable
 
 # Array of initial-guess values of fitting parameters:
-param_names = ["g1", "vcmax"]
-params = np.array([2.0, 50.0])
+#param_names = ["g1", "vcmax"]
+#params = np.array([2.0, 50.0])
+
+param_names = ["vcmax"]
+params = np.array([50.0])
+
 
 # Lower and upper boundaries for the MCMC exploration:
-pmin = np.array([0.0, 10.0])   # kPa^0.5, umol/m2/s
-pmax = np.array([8.0, 120.0])  # kPa^0.5, umol/m2/s
-pstep = np.array([1.0, 1.0])
+#pmin = np.array([0.0, 10.0])   # kPa^0.5, umol/m2/s
+#pmax = np.array([8.0, 120.0])  # kPa^0.5, umol/m2/s
+#pstep = np.array([1.0, 1.0])
+
+pmin = np.array([10.0])   # kPa^0.5, umol/m2/s
+pmax = np.array([120.0])  # kPa^0.5, umol/m2/s
+pstep = np.array([1.0])
 
 # Parameter prior probability distributions:
 # uniform priors
-prior = np.array([0.0, 0.0])
-priorlow = np.array([0.0, 0.0])
-priorup = np.array([0.0, 0.0])
+#prior = np.array([0.0, 0.0])
+#priorlow = np.array([0.0, 0.0])
+#priorup = np.array([0.0, 0.0])
+
+prior = np.array([0.0])
+priorlow = np.array([0.0])
+priorup = np.array([0.0])
 
 # Parameter names:
-pnames = ['g1', 'vcmax']
-texnames = [r'$g_{1}$', r'$V_{cmax}$']
+#pnames = ['g1', 'vcmax']
+#texnames = [r'$g_{1}$', r'$V_{cmax}$']
+
+pnames = ['vcmax']
+texnames = [r'$V_{cmax}$']
 
 # List of additional arguments of func (if necessary):
 indparams = [param_names]
@@ -157,8 +172,8 @@ indparams = [param_names]
 sampler = 'snooker'
 
 # MCMC setup:
-nsamples = 500
-burnin = 50
+nsamples = 5000
+burnin = 500
 nchains = 6 # set to a multiple of ncups
 ncpu = 3
 thinning = 1
@@ -186,7 +201,8 @@ fgamma = 1.0  # Scale factor for DEMC's gamma jump.
 fepsilon = 0.0  # Jump scale factor for DEMC's "e" distribution
 
 # Logging:
-log = 'MCMC_CABLE.log'
+#log = 'MCMC_CABLE.log'
+log = None
 
 # File outputs:
 savefile = 'MCMC_CABLE.npz'
