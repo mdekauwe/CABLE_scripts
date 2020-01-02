@@ -170,7 +170,7 @@ class RunCable(object):
                     os.remove("%s_%s_tmp.nc" % (site, mcmc_tag))
                 else:
                     os.remove("%s_tmp.nc" % (site))
-                os.remove(nml_fname)
+                #os.remove(nml_fname)
 
     def initialise_stuff(self, mcmc_tag):
 

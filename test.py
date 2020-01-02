@@ -212,7 +212,8 @@ with pm.Model() as model:
     # use a DensityDist (use a lamdba function to "call" the Op)
     pm.DensityDist('likelihood', lambda v: logl(v), observed={'v': theta})
 
-    trace = pm.sample(10, chains=1, step=pm.Metropolis())
+    #trace = pm.sample(10, chains=1, step=pm.Metropolis())
+    trace = pm.sample(10, chains=1, step=pm.NUTS())
     #trace = pm.sample(10, chains=1, step=pm.Slice())
     #trace = pm.sample(10, chains=1)
 _ = pm.traceplot(trace)

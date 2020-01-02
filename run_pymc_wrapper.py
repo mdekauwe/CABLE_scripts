@@ -36,11 +36,15 @@ def randomString(stringLength=10):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
-#@theano.compile.ops.as_op(itypes=[tt.dscalar, tt.dscalar], otypes=[tt.dvector])
-@theano.as_op(itypes=[tt.dscalar, tt.dscalar], otypes=[tt.dvector])
-def run_and_unpack_cable(g1, vcmax):
-    params = np.array([g1, vcmax])
-    param_names = ["g1", "vcmax"]
+#@theano.as_op(itypes=[tt.dscalar, tt.dscalar], otypes=[tt.dvector])
+#def run_and_unpack_cable(g1, vcmax):
+    #params = np.array([g1, vcmax])
+    #param_names = ["g1", "vcmax"]
+
+@theano.as_op(itypes=[tt.dscalar], otypes=[tt.dvector])
+def run_and_unpack_cable(vcmax):
+    params = np.array([vcmax])
+    param_names = ["vcmax"]
 
     met_dir = "../../met_data/plumber_met"
     log_dir = "logs"
@@ -135,14 +139,14 @@ obs = obs.astype(np.float64)
 uncert = 0.1 * np.abs(obs) # not using, letting pymc fit this below...
 uncert = uncert.astype(np.float64)
 
-niter = 500
+niter = 100
 with pm.Model() as model:
 
     #
     ## Define priors
     #
-    g1 = pm.Uniform('g1', lower=0.0, upper=8.0)
-    vcmax = pm.Uniform('vcmax', lower=10.0, upper=120.0)
+    #g1 = pm.Uniform('g1', lower=0.0, upper=8.0)
+    vcmax = pm.Uniform('vcmax', lower=10.0, upper=200.0)
     #sigma = pm.Uniform('sigma', lower=0.0, upper=20.0) # fit error?
 
     #
@@ -150,15 +154,16 @@ with pm.Model() as model:
     #
 
     #mod = pm.Deterministic('mod', run_and_unpack_cable(g1, vcmax))
-    mod = run_and_unpack_cable(g1, vcmax)
+    #mod = run_and_unpack_cable(g1, vcmax)
+    mod = run_and_unpack_cable(vcmax)
     y_obs = pm.Normal('Y_obs', mu=mod, sd=uncert, observed=obs)
 
     #
     ## Inference
     #
-    step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
+    #step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
     #step = pm.Slice()
-    #step = pm.Metropolis()
+    step = pm.Metropolis()
 
     #trace = pm.sample(niter, chains=1, step=step, progressbar=True)
     trace = pm.sample(niter, step=step, progressbar=True)
