@@ -165,12 +165,12 @@ class RunCable(object):
             if self.fixed_lai is not None or self.lai_dir is not None:
                 os.remove("%s_tmp.nc" % (site))
 
-            #if self.adjust_params:
-            #    if mcmc_tag is not None:
-            #        os.remove("%s_%s_tmp.nc" % (site, mcmc_tag))
-            #    else:
-            #        os.remove("%s_tmp.nc" % (site))
-            #    os.remove(nml_fname)
+            if self.adjust_params:
+                if mcmc_tag is not None:
+                    os.remove("%s_%s_tmp.nc" % (site, mcmc_tag))
+                else:
+                    os.remove("%s_tmp.nc" % (site))
+                os.remove(nml_fname)
 
     def initialise_stuff(self, mcmc_tag):
 

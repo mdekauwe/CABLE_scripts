@@ -156,9 +156,9 @@ with pm.Model() as model:
     #
     ## Inference
     #
-    #step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
-    step = pm.Slice()
-    step = pm.Metropolis()
+    step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
+    #step = pm.Slice()
+    #step = pm.Metropolis()
 
     #trace = pm.sample(niter, chains=1, step=step, progressbar=True)
     trace = pm.sample(niter, step=step, progressbar=True)
