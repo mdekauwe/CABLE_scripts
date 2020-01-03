@@ -380,7 +380,8 @@ with pm.Model() as model:
     step = pm.NUTS() # Hamiltonian MCMC with No U-Turn Sampler
     #step = pm.Slice()
     #step = pm.Metropolis()
-    trace = pm.sample(ndraws, tune=nburn, discard_tuned_samples=True)
+    trace = pm.sample(ndraws, tune=nburn, discard_tuned_samples=True,
+                      progressbar=True)
 
 _ = pm.traceplot(trace)
 pm.summary(trace)
