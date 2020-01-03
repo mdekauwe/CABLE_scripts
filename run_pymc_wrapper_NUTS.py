@@ -362,7 +362,10 @@ uncert = uncert.astype(np.float64)
 # create our Op
 logl = LogLikeWithGrad(my_likelihood, obs, uncert)
 
-#logl = LogLike(my_loglikelihood, obs, uncert)
+ndraws = 1000  # number of draws from the distribution
+nburn = 100   # number of "burn-in points" (which we'll discard)
+
+
 with pm.Model() as model:
     g1 = pm.Uniform('g1', lower=0.0, upper=8.0)
     vcmax = pm.Uniform('vcmax', lower=10.0, upper=120.0)
