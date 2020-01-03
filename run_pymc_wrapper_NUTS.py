@@ -163,7 +163,7 @@ class LogLikeWithGrad(tt.Op):
     itypes = [tt.dvector] # expects a vector of parameter values when called
     otypes = [tt.dscalar] # outputs a single scalar value (the log likelihood)
 
-    def __init__(self, loglike, data, x, sigma):
+    def __init__(self, loglike, data, sigma):
         """
         Initialise with various things that the function requires. Below
         are the things that are needed in this particular example.
@@ -183,7 +183,6 @@ class LogLikeWithGrad(tt.Op):
         # add inputs as class attributes
         self.likelihood = loglike
         self.data = data
-        self.x = x
         self.sigma = sigma
 
         # initialise the gradient Op (below)
@@ -381,6 +380,6 @@ with pm.Model() as model:
     #step = pm.Slice()
     #step = pm.Metropolis()
     trace = pm.sample(ndraws, tune=nburn, discard_tuned_samples=True)
-    
+
 _ = pm.traceplot(trace)
 pm.summary(trace)
