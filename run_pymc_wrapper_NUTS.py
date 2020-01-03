@@ -174,8 +174,6 @@ class LogLikeWithGrad(tt.Op):
             The log-likelihood (or whatever) function we've defined
         data:
             The "observed" data that our log-likelihood function takes in
-        x:
-            The dependent variable (aka 'x') that our model requires
         sigma:
             The noise standard deviation that out function requires.
         """
@@ -246,7 +244,7 @@ class LogLikeGrad(tt.Op):
 
         outputs[0][0] = grads
 
-def my_likelihood(theta, x, obs, sigma):
+def my_likelihood(theta, obs, sigma):
     """
     A Gaussian log-likelihood function for a model with parameters given
     in theta
