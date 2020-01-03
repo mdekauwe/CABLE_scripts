@@ -191,7 +191,7 @@ class LogLikeWithGrad(tt.Op):
         theta, = inputs  # this will contain my variables
 
         # call the log-likelihood function
-        logl = self.likelihood(theta, self.x, self.data, self.sigma)
+        logl = self.likelihood(theta, self.data, self.sigma)
 
         outputs[0][0] = np.array(logl) # output the log-likelihood
 
