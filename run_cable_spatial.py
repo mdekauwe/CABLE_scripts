@@ -242,7 +242,7 @@ if __name__ == "__main__":
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restarts"
-    aux_dir = "/g/data1/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
+    aux_dir = "/g/data/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
     #cable_src = "../../src/trunk/trunk/"
     cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
     spinup_start_yr = 1995
