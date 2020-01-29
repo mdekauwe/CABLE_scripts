@@ -70,7 +70,7 @@ class RunCable(object):
                  grid_fname=None,
                  #mask_fname="gswp3_landmask_nomissing.nc",
                  mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
-                 cable_exe="cable-mpi", walltime=None, mem="16GB", ncpus="28"):
+                 cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
