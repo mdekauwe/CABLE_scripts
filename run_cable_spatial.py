@@ -79,7 +79,6 @@ class RunCable(object):
         self.aux_dir = aux_dir
         self.restart_dir = restart_dir
         self.spinup_dir = spinup_dir
-        self.veg_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.soil_fname = soil_fname
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
@@ -201,7 +200,6 @@ class RunCable(object):
                         #"gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
                         #"gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
                         #"gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
-
                         "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/AWAP.Rainf.3hr.%s.nc" % (year))),
                         "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/AWAP.Snowf.3hr.%s.nc" % (year))),
                         "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/AWAP.LWdown.3hr.%s.nc" % (year))),
