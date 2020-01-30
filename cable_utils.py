@@ -375,7 +375,6 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     print(" ", end="\n", file=f)
 
     print("module load dot", end="\n", file=f)
-    print("module add intel-cc", end="\n", file=f)
     print("module add intel-mpi/2019.6.166", end="\n", file=f)
     print("module add netcdf/4.7.1", end="\n", file=f)
 
