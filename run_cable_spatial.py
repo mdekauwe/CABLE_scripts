@@ -86,7 +86,8 @@ class RunCable(object):
         self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
         #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
-        self.grid_fname = "SE_aus_veg_types_AWAP_grid.nc"
+        #self.grid_fname = "SE_aus_veg_types_AWAP_grid.nc"
+        self.grid_fname = "SE_aus_veg_types_AWAP_plus_LAI_fper_grid.nc"
         #self.mask_fname = os.path.join(self.aux_dir,
         #                               "offline/%s" % (mask_fname))
         #self.mask_fname = os.path.join("/short/w35/mm3972/cable/src/CABLE-AUX/",
@@ -190,14 +191,23 @@ class RunCable(object):
                         "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
                         "CABLE_USER%YearStart": "0", # needs to be 0 so the ncciy is set
                         "CABLE_USER%YearEnd": "0",   # needs to be 0 so the ncciy is set
-                        "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
-                        "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
-                        "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
-                        "gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))),
-                        "gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))),
-                        "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
-                        "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
-                        "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
+                        #"gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
+
+                        "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/AWAP.Rainf.3hr.%s.nc" % (year))),
+                        "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/AWAP.Snowf.3hr.%s.nc" % (year))),
+                        "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/AWAP.LWdown.3hr.%s.nc" % (year))),
+                        "gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/AWAP.SWdown.3hr.%s.nc" % (year))),
+                        "gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/AWAP.PSurf.3hr.%s.nc" % (year))),
+                        "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/AWAP.Qair.3hr.%s.nc" % (year))),
+                        "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/AWAP.Tair.3hr.%s.nc" % (year))),
+                        "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/AWAP.Wind.3hr.%s.nc" % (year))),
 
 
         }
