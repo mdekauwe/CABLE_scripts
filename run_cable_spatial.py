@@ -69,7 +69,8 @@ class RunCable(object):
                  #grid_fname="CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc",
                  grid_fname=None,
                  #mask_fname="gswp3_landmask_nomissing.nc",
-                 mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
+                 #mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
+                 mask_fname="SE_AUS_AWAP_landmask.nc",
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
 
         self.met_dir = met_dir
