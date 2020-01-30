@@ -93,7 +93,8 @@ class RunCable(object):
         #                               "offline/%s" % (mask_fname))
         #self.mask_fname = os.path.join("/short/w35/mm3972/cable/src/CABLE-AUX/",
         #                               "offline/%s" % (mask_fname))
-        self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
+        #self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
+        self.mask_fname = os.path.join("SE_AUS_AWAP_grid_mask_files/%s" % (mask_fname))
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
         self.qsub_fname = qsub_fname
