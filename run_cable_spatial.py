@@ -66,10 +66,8 @@ class RunCable(object):
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
-                 #grid_fname="CABLE_UNSW_GSWP3_gridinfo_0.5x0.5.nc",
                  grid_fname=None,
                  #mask_fname="gswp3_landmask_nomissing.nc",
-                 #mask_fname="SE_AUS_gswp3_landmask_nomissing.nc",
                  mask_fname="SE_AUS_AWAP_landmask.nc",
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
 
@@ -87,6 +85,7 @@ class RunCable(object):
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
         #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
         #self.grid_fname = "SE_aus_veg_types_AWAP_grid.nc"
+        #self.grid_fname = "gridinfo_AWAP_EBF.nc"
         self.grid_fname = "SE_aus_veg_types_AWAP_plus_LAI_fper_grid.nc"
         #self.mask_fname = os.path.join(self.aux_dir,
         #                               "offline/%s" % (mask_fname))
@@ -208,8 +207,6 @@ class RunCable(object):
                         "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/AWAP.Qair.3hr.%s.nc" % (year))),
                         "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/AWAP.Tair.3hr.%s.nc" % (year))),
                         "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/AWAP.Wind.3hr.%s.nc" % (year))),
-
-
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
@@ -256,8 +253,8 @@ if __name__ == "__main__":
     #cable_src = "../../src/trunk/trunk/"
     cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
     spinup_start_yr = 1995
-    #spinup_end_yr = 2000
     spinup_end_yr = 1995
+    #spinup_end_yr = 2000
     run_start_yr = 2000
     run_end_yr = 2010
     # ------------------------------------------- #
@@ -269,12 +266,13 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
+        #walltime = "4:00:00"
         walltime = "0:30:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
-        walltime = "1:00:00"
+        walltime = "6:30:00"
         qsub_fname = "qsub_wrapper_script_simulation.sh"
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
