@@ -1,4 +1,4 @@
-def_veg_params_zr_clitt_albedo_fix#!/usr/bin/env python
+#!/usr/bin/env python
 
 """
 Run CABLE spatially, i.e. global GSWP3 run.
