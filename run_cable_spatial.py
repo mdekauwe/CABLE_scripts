@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+def_veg_params_zr_clitt_albedo_fix#!/usr/bin/env python
 
 """
 Run CABLE spatially, i.e. global GSWP3 run.
@@ -83,8 +83,8 @@ class RunCable(object):
         self.soil_fname = soil_fname
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
-        self.veg_fname = os.path.join(self.aux_dir, veg_fname)
-        self.soil_fname = os.path.join(self.aux_dir, soil_fname)
+        self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
+        self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
         #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
         self.grid_fname = "SE_aus_veg_types_AWAP_grid.nc"
         #self.mask_fname = os.path.join(self.aux_dir,
