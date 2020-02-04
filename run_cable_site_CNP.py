@@ -42,7 +42,8 @@ To spin the model up to equilibrium there are 5 steps:
 NB. Set mpi = True if doing a number of flux sites (*needs checking...)
 
 ps. my suggestion is that you use this script as an experimental record, so
-embed flags you want on into the "replace_dict" dict...
+embed flags you want either directly into the "replace_dict" dict...or better
+still, pass them via the "sci_config" dict.
 
 
 That's all folks.
