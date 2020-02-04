@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-Run CABLE casa (CNP) for either a single site, a subset, or all the flux sites
-in the met directory.
+Run CABLE casa (CNP) for either a single site, a subset of sites, or all the
+flux sites in the met directory.
 
 Steps involve:
 
@@ -717,7 +717,7 @@ if __name__ == "__main__":
                      co2_ndep_dir=co2_ndep_dir)
         C.main(sci_config)
     """
-    
+
     dont_have_restart = False
     num = 511
     for biogeochem in ["CN"]:
