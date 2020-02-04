@@ -14,7 +14,7 @@ Steps involve:
 The script automatically generates the required met forcing(i.e. with embedded
 CO2, Ndep/Pdep.
 
-To spin the model up to equilibrium there are 4 steps:
+To spin the model up to equilibrium there are 5 steps:
 
 1. An initial spin to generate the first restart file and setup the nml file
 2. A set of runs repeating the meteorological forcing to build up sufficient
@@ -30,6 +30,8 @@ To spin the model up to equilibrium there are 4 steps:
    at steady-state from initial testing. However, it is likely to be good enough
    for most applications. If you wish to ensure the passive pools is stabilised
    simply set "check_passive" in the steady state function call.
+5. CABLE then repeats step 4, but allowing the labile P and mineral N pools to
+   freely vary.
 
  If you've already run the C version, you can speed things up by using the \
  restart file from this as the initial condition for the CN run. You
@@ -188,7 +190,10 @@ class RunCable(object):
             self.setup_nml_file(site)
             self.inital_spin_setup(site, fname_spin, sci_config, num)
 
+            # First phase: spin up with static CO2, Ndep, Pdep. Essentially
+            # growing biomass from dust with a repeated sequence of met data
             if dont_have_restart:
+
                 # Create initial restart file
                 print("\n===============================================\n")
                 print("Generate initial restart file\n")
@@ -197,8 +202,7 @@ class RunCable(object):
                 self.clean_up(num, tag="spin")
                 num += 1
 
-                # First phase of spinup with static CO2, Ndep, Pdep. Essentially
-                # growing biomass from dust with a repeated sequence of met data
+                # Build up some C stocks...
                 for i in range(N_spin):
                     print("\n===============================================\n")
                     print("Phase 1: init C pools: %d/%d\n" % (i, N_spin))
@@ -214,7 +218,7 @@ class RunCable(object):
                 # won't do...
                 num = restart_num + 1
 
-            # Second phase of spinup, bring plant biomass pools into equilibrium
+            # Second phase: bring plant biomass pools into equilibrium
             not_stabilised = True
             while not_stabilised:
 
@@ -230,13 +234,47 @@ class RunCable(object):
                                                     num, plant=True, debug=True)
                 num += 1
 
-            # Third phase, bring soil pools into equilibrium using analytical
+            # Third phase: bring soil pools into equilibrium using analytical
             # solution
             not_stabilised = True
             while not_stabilised:
 
                 print("\n===================================================\n")
                 print("Bring soil C pools into equilibrium: %d\n" % (num))
+                print("===================================================\n\n")
+                self.setup_analytical_spin(st_yr, en_yr, number=num)
+                self.run_me()
+                self.clean_up(num, tag="spin_analytic")
+
+                not_stabilised = check_steady_state(self.experiment_id,
+                                                    self.restart_dir,
+                                                    num, plant=False,
+                                                    debug=True)
+
+                # run another simulation...
+                self.setup_spin(number=num)
+                self.run_me()
+                self.clean_up(num, tag="spin")
+
+                num += 1
+
+            # Fourth phase: bring soil pools into equilibrium using analytical
+            # solution, but without restricting N and P pools
+            for i in range(3):
+
+                # run another simulation...
+                self.setup_spin(number=num, labile=False)
+                self.run_me()
+                self.clean_up(num, tag="spin")
+
+                num += 1
+
+            not_stabilised = True
+            while not_stabilised:
+
+                print("\n===================================================\n")
+                print("Bring soil C pools into equilibrium: \n")
+                print("Urestricted labile P/mineral N: %d\n" % (num))
                 print("===================================================\n\n")
                 self.setup_analytical_spin(st_yr, en_yr, number=num)
                 self.run_me()
@@ -382,6 +420,12 @@ class RunCable(object):
         casa_rst_ofname = "%s_casa_rst_%d.nc" % (self.experiment_id, number)
         casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
 
+        # Restrict build up of labile P and mineral N pools during spinup
+        if self.biogeochem_id != "C":
+            restrict_labile = ".TRUE."
+        else:
+            restrict_labile = ".FALSE."
+
         replace_dict = {
                         "filename%met": "'%s'" % (met_fname),
                         "filename%out": "'%s'" % (out_fname),
@@ -413,7 +457,7 @@ class RunCable(object):
                         "output%restart": ".TRUE.",
                         "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
-                        "cable_user%limit_labile": ".TRUE.",
+                        "cable_user%limit_labile": "%s" % (restrict_labile),
         }
         # Make sure the dict isn't empty
         if bool(sci_config):
@@ -421,7 +465,7 @@ class RunCable(object):
 
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def setup_spin(self, number=None):
+    def setup_spin(self, number=None, labile=True):
         """
         Adjust the CABLE namelist file with the various flags for another spin
         """
@@ -444,6 +488,12 @@ class RunCable(object):
         casa_rst_ofname = "%s_casa_rst_%d.nc" % (self.experiment_id, number)
         casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
 
+        # Restrict build up of labile P and mineral N pools during spinup
+        if labile and self.biogeochem_id != "C":
+            restrict_labile = ".TRUE."
+        else:
+            restrict_labile = ".FALSE."
+
         replace_dict = {
                         "filename%out": "'%s'" % (out_fname),
                         "filename%log": "'%s'" % (out_log_fname),
@@ -459,10 +509,11 @@ class RunCable(object):
                         "spincasa": ".FALSE.",
                         "icycle": "%d" % (self.biogeochem_id),
                         "leaps": ".TRUE.",
+                        "cable_user%limit_labile": "%s" % (restrict_labile),
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def setup_analytical_spin(self, st_yr, en_yr, number=None):
+    def setup_analytical_spin(self, st_yr, en_yr, labile=True, number=None):
         """
         Adjust the CABLE namelist file with the various flags for the
         analytical spin step (to stabilise the soil C pools)
