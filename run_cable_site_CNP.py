@@ -420,12 +420,6 @@ class RunCable(object):
         casa_rst_ofname = "%s_casa_rst_%d.nc" % (self.experiment_id, number)
         casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
 
-        # Restrict build up of labile P and mineral N pools during spinup
-        if self.biogeochem_id != "C":
-            restrict_labile = ".TRUE."
-        else:
-            restrict_labile = ".FALSE."
-
         replace_dict = {
                         "filename%met": "'%s'" % (met_fname),
                         "filename%out": "'%s'" % (out_fname),
@@ -442,7 +436,7 @@ class RunCable(object):
                         "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%vcmax": "'%s'" % (self.vcmax),
-                        "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
+                        "l_vcmaxFeedbk": ".TRUE.",
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
                         "cable_user%CASA_OUT_FREQ": "'annually'",
@@ -457,7 +451,7 @@ class RunCable(object):
                         "output%restart": ".TRUE.",
                         "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
-                        "cable_user%limit_labile": "%s" % (restrict_labile),
+                        "cable_user%limit_labile": ".TRUE.",
         }
         # Make sure the dict isn't empty
         if bool(sci_config):
@@ -489,7 +483,7 @@ class RunCable(object):
         casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
 
         # Restrict build up of labile P and mineral N pools during spinup
-        if labile and self.biogeochem_id != "C":
+        if labile:
             restrict_labile = ".TRUE."
         else:
             restrict_labile = ".FALSE."
