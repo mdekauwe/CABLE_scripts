@@ -2,7 +2,7 @@
 
 """
 Run CABLE casa (CNP) for either a single site, a subset, or all the flux sites
-in the met directory
+in the met directory.
 
 Steps involve:
 
@@ -38,6 +38,10 @@ To spin the model up to equilibrium there are 4 steps:
  number.
 
 NB. Set mpi = True if doing a number of flux sites (*needs checking...)
+
+ps. my suggestion is that you use this script as an experimental record, so
+embed flags you want on into the "replace_dict" dict...
+
 
 That's all folks.
 """
