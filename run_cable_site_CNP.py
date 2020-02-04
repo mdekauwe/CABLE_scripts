@@ -694,7 +694,17 @@ if __name__ == "__main__":
     #biogeochem = "CNP"
     # ------------------------------------------- #
 
-    #for biogeochem in ["C", "CN", "CNP"]:
+    """
+    dont_have_restart = True
+    for biogeochem in ["C", "CN", "CNP"]:
+        C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                     dump_dir=dump_dir, restart_dir=restart_dir,
+                     aux_dir=aux_dir, namelist_dir=namelist_dir,
+                     met_subset=met_subset, cable_src=cable_src, mpi=mpi,
+                     num_cores=num_cores, biogeochem=biogeochem,
+                     co2_ndep_dir=co2_ndep_dir)
+        C.main(sci_config)
+    """
 
     """
     dont_have_restart = True
@@ -707,6 +717,7 @@ if __name__ == "__main__":
                      co2_ndep_dir=co2_ndep_dir)
         C.main(sci_config)
     """
+    
     dont_have_restart = False
     num = 511
     for biogeochem in ["CN"]:
