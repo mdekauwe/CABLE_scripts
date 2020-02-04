@@ -311,7 +311,7 @@ def get_years(met_fname, nyear_spinup):
             st_yr_spin, en_yr_spin)
 
 def check_steady_state(experiment_id, restart_dir, num, plant=True,
-                       debug=False):
+                       check_passive=False, debug=False):
     """
     Check whether the plant (leaves, wood and roots) carbon pools have reached
     equilibrium. To do this we are checking the state of the last year in the
@@ -352,21 +352,34 @@ def check_steady_state(experiment_id, restart_dir, num, plant=True,
                   np.fabs((new_cplant - prev_cplant) / new_cplant))
             print("\n===============================================\n")
     else:
-        if ( np.fabs((new_csoil - prev_csoil) / new_csoil) < tol ):
-        #if ( np.fabs(new_passive - prev_passive) < tol_pass):
-             not_in_equilibrium = False
-        else:
-            not_in_equilibrium = True
+        if check_passive:
+            if ( np.fabs(new_passive - prev_passive) < tol_pass):
+                 not_in_equilibrium = False
+            else:
+                not_in_equilibrium = True
 
-        if debug:
-            print("\n===============================================\n")
-            print("*", num, not_in_equilibrium,
-                  "Passive", new_passive, prev_passive,
-                  np.fabs(new_passive - prev_passive))
-            print("*", num, not_in_equilibrium,
-                  "Csoil", new_csoil, prev_csoil,
-                  np.fabs((new_csoil - prev_csoil) / new_csoil))
-            print("\n===============================================\n")
+            if debug:
+                print("\n===============================================\n")
+                print("*", num, not_in_equilibrium,
+                      "Passive", new_passive, prev_passive,
+                      np.fabs(new_passive - prev_passive))
+                print("\n===============================================\n")
+
+        else:
+            if ( np.fabs((new_csoil - prev_csoil) / new_csoil) < tol ):
+                 not_in_equilibrium = False
+            else:
+                not_in_equilibrium = True
+
+            if debug:
+                print("\n===============================================\n")
+                print("*", num, not_in_equilibrium,
+                      "Passive", new_passive, prev_passive,
+                      np.fabs(new_passive - prev_passive))
+                print("*", num, not_in_equilibrium,
+                      "Csoil", new_csoil, prev_csoil,
+                      np.fabs((new_csoil - prev_csoil) / new_csoil))
+                print("\n===============================================\n")
 
     ds_old.close()
     ds_new.close()

@@ -1,20 +1,49 @@
 #!/usr/bin/env python
 
 """
-Run CABLE CNP for either a single site, a subset, or all the flux sites
+Run CABLE casa (CNP) for either a single site, a subset, or all the flux sites
 in the met directory
 
-- Set mpi = True if doing a number of flux sites
-- Simulation spin up to equilibrium at 1850
-- There is then a transient simulation from 1850 to the start of the FLUXNET
-  file using time varying (annual) CO2, Ndep and Pdep
-- Run the simulation with time varying CO2, Ndep and Pdep.
+Steps involve:
+
+1. Spin up carbon plant & soil pools to equilibrium at pre-industrial (1850).
+2. There is then a transient simulation from 1850 to the start of the FLUXNET
+  file using time varying (annual) CO2, Ndep and Pdep.
+3. Run the simulation with time varying CO2, Ndep and Pdep.
+
+The script automatically generates the required met forcing(i.e. with embedded
+CO2, Ndep/Pdep.
+
+To spin the model up to equilibrium there are 4 steps:
+
+1. An initial spin to generate the first restart file and setup the nml file
+2. A set of runs repeating the meteorological forcing to build up sufficient
+   C stocks. Currently this is set to 30 (N_spin). This is arbitary, this ought
+   to work with fewer or more steps at this stage...feel free to test.
+3. At this point the code checks to see that the plant C pools are stabilised,
+   if not, cable is re-run until the plant pools have stabilised.
+4. CABLE then attempts to use the analytical solution following Xia et al. 2013
+   GCB to solve the steady-state soil and litter pools. While speeding things
+   up, this does not lead to an instant solution and so CABLE is then re-run
+   until the soil pools have stabilised. Currently I have set the check based on
+   the total soil C pools, but this means that the passive pools is not quite
+   at steady-state from initial testing. However, it is likely to be good enough
+   for most applications. If you wish to ensure the passive pools is stabilised
+   simply set "check_passive" in the steady state function call.
+
+ If you've already run the C version, you can speed things up by using the \
+ restart file from this as the initial condition for the CN run. You
+ can of course do likewise for a CNP run, using the CN restart file. You simply
+ need to set "dont_have_restart" to be False and supply the restart file
+ number.
+
+NB. Set mpi = True if doing a number of flux sites (*needs checking...)
 
 That's all folks.
 """
 
 __author__ = "Martin De Kauwe"
-__version__ = "1.0 (29.03.2019)"
+__version__ = "1.0 (05.02.2020)"
 __email__ = "mdekauwe@gmail.com"
 
 import os
@@ -102,7 +131,7 @@ class RunCable(object):
             #self.vcmax = "Walker2014"
             self.vcmax_feedback = ".TRUE."
 
-    def main(self, sci_config):
+    def main(self, sci_config, dont_have_restart=True, restart_num=None):
 
         (met_files, url, rev) = self.initialise_stuff()
 
@@ -123,19 +152,22 @@ class RunCable(object):
                 # setup a list of processes that we want to run
                 p = mp.Process(target=self.worker,
                                args=(met_files[start:end], url, rev,
-                                     sci_config, ))
+                                     sci_config, dont_have_restart,
+                                     restart_num, ))
                 processes.append(p)
 
             # Run processes
             for p in processes:
                 p.start()
         else:
-            self.worker(met_files, url, rev, sci_config, )
+            self.worker(met_files, url, rev, sci_config, dont_have_restart,
+                        restart_num,)
 
-    def worker(self, met_files, url, rev, sci_config):
+    def worker(self, met_files, url, rev, sci_config, dont_have_restart,
+               restart_num):
 
         num = 0
-        not_stabilised = True
+        N_spin = 30
 
         for fname in met_files:
 
@@ -149,56 +181,103 @@ class RunCable(object):
              fname_trans,
              fname_sim) = self.generate_met_files(site, st_yr, en_yr, fname)
 
-            # Initial setup and first spin ...
-            print("\nSpinup stage: %d\n" % (num))
+            self.setup_nml_file(site)
             self.inital_spin_setup(site, fname_spin, sci_config, num)
-            self.run_me()
 
-            #sys.exit()
-            self.clean_up(num, tag="spin")
+            if dont_have_restart:
+                # Create initial restart file
+                print("\n===============================================\n")
+                print("Generate initial restart file\n")
+                print("===============================================\n\n")
+                self.run_me()
+                self.clean_up(num, tag="spin")
+                num += 1
 
-            num += 1
+                # First phase of spinup with static CO2, Ndep, Pdep. Essentially
+                # growing biomass from dust with a repeated sequence of met data
+                for i in range(N_spin):
+                    print("\n===============================================\n")
+                    print("Phase 1: init C pools: %d/%d\n" % (i, N_spin))
+                    print("===============================================\n\n")
+                    self.setup_spin(number=num)
+                    self.run_me()
+                    self.clean_up(num, tag="spin")
 
+                    num += 1
+            else:
+                self.setup_inital_restart_file(restart_num, site)
+                # logic is based on that final increment above that the user
+                # won't do...
+                num = restart_num + 1
+
+            # Second phase of spinup, bring plant biomass pools into equilibrium
+            not_stabilised = True
             while not_stabilised:
 
-                print("\nSpinup stage: %d\n" % (num))
-                self.setup_re_spin(number=num)
+                print("\n===============================================\n")
+                print("Bring plant C pools into equilibrium: %d\n" % (num))
+                print("===============================================\n\n")
+                self.setup_spin(number=num)
                 self.run_me()
                 self.clean_up(num, tag="spin")
 
-                print("\nAnalytical stage: %d\n" % (num))
+                not_stabilised = check_steady_state(self.experiment_id,
+                                                    self.restart_dir,
+                                                    num, plant=True, debug=True)
+                num += 1
+
+            # Third phase, bring soil pools into equilibrium using analytical
+            # solution
+            not_stabilised = True
+            while not_stabilised:
+
+                print("\n===================================================\n")
+                print("Bring soil C pools into equilibrium: %d\n" % (num))
+                print("===================================================\n\n")
                 self.setup_analytical_spin(st_yr, en_yr, number=num)
                 self.run_me()
                 self.clean_up(num, tag="spin_analytic")
 
-                print("\nChecking stabilisation: %d\n" % (num))
                 not_stabilised = check_steady_state(self.experiment_id,
-                                                    self.restart_dir, num,
+                                                    self.restart_dir,
+                                                    num, plant=False,
                                                     debug=True)
+
+                # run another simulation...
+                self.setup_spin(number=num)
+                self.run_me()
+                self.clean_up(num, tag="spin")
 
                 num += 1
 
-            # one final spin
-            print("\nFinal spin\n")
-            self.setup_re_spin(number=num)
-            self.run_me()
-
-            # Run transiet simulation from 1850
-            print("\nHistorical\n")
+            # Run transient simulation from 1850
+            print("\n===================================================\n")
+            print("Historical\n")
+            print("===================================================\n\n")
             (out_fname) = self.setup_simulation(fname_trans, historical=True,
-                                                number=num)
+                                                number=num-1)
             self.run_me()
             self.clean_up(number=None, tag="historical")
 
-            print("\nSimulation\n")
+            print("\n===================================================\n")
+            print("Simulation\n")
+            print("===================================================\n\n")
             (out_fname) = self.setup_simulation(fname_sim, historical=False,
-                                                number=num)
+                                                number=num-1)
             self.run_me()
             self.clean_up(number=None, tag="simulation")
 
             add_attributes_to_output_file(self.nml_fname, out_fname, url, rev)
             ofname = os.path.join(self.namelist_dir, self.nml_fname)
             shutil.move(self.nml_fname, ofname)
+
+    def setup_nml_file(self, site):
+        # get a clean namelist file
+
+        base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
+        nml_fname = "cable_%s.nml" % (site)
+        shutil.copy(base_nml_fn, nml_fname)
+        self.nml_fname = nml_fname
 
     def generate_met_files(self, site, st_yr, en_yr, met_fname):
 
@@ -226,6 +305,25 @@ class RunCable(object):
             G.create_simulation_file(fname_sim)
 
         return (fname_spin, fname_trans, fname_sim)
+
+    def setup_inital_restart_file(self, number, site):
+
+        if self.biogeochem_cyc == "CN":
+            old_experiment_id = "%s_%s" % (site, "C")
+        elif self.biogeochem_cyc == "CNP":
+            old_experiment_id = "%s_%s" % (site, "CN")
+
+        cable_rst_ofname = "%s_cable_rst_%d.nc" % (old_experiment_id, number)
+        cable_rst_ofname = os.path.join(self.restart_dir, cable_rst_ofname)
+        new_cable_rst = "%s_cable_rst_%d.nc" % (self.experiment_id, number)
+        new_cable_rst = os.path.join(self.restart_dir, new_cable_rst)
+        shutil.copy(cable_rst_ofname, new_cable_rst)
+
+        casa_rst_ofname = "%s_casa_rst_%d.nc" % (old_experiment_id, number)
+        casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
+        new_casa_rst = "%s_casa_rst_%d.nc" % (self.experiment_id, number)
+        new_casa_rst = os.path.join(self.restart_dir, new_casa_rst)
+        shutil.copy(casa_rst_ofname, new_casa_rst)
 
     def initialise_stuff(self):
 
@@ -264,14 +362,10 @@ class RunCable(object):
 
     def inital_spin_setup(self, site, met_fname, sci_config, number=None):
         """
-        Initial setup for CASA spinup from zero
+        Initial setup for CASA spinup from zero to generate restart file
         """
 
-        base_nml_fn = os.path.join(self.grid_dir, "%s" % (self.nml_fname))
-        nml_fname = "cable_%s.nml" % (site)
-        shutil.copy(base_nml_fn, nml_fname)
-        self.nml_fname = nml_fname
-
+        # set directory paths...
         out_fname = "%s_out_cable_spin_%d.nc" % (self.experiment_id, number)
         out_fname = os.path.join(self.output_dir, out_fname)
 
@@ -303,18 +397,19 @@ class RunCable(object):
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
-                        "cable_user%CASA_OUT_FREQ": "'monthly'",
+                        "cable_user%CASA_OUT_FREQ": "'annually'",
                         "output%casa": ".TRUE.",
                         "leaps": ".TRUE.",
                         "cable_user%CASA_fromZero": ".TRUE.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
-                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
+                        "cable_user%CASA_DUMP_WRITE": ".TRUE.",
                         "cable_user%CASA_NREP": "0",
+                        "spinup": ".FALSE.",
                         "spincasa": ".FALSE.",
                         "output%restart": ".TRUE.",
                         "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
-                        #"cable_user%limit_labile": ".FALSE.",
+                        "cable_user%limit_labile": ".TRUE.",
         }
         # Make sure the dict isn't empty
         if bool(sci_config):
@@ -322,7 +417,7 @@ class RunCable(object):
 
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def setup_re_spin(self, number=None):
+    def setup_spin(self, number=None):
         """
         Adjust the CABLE namelist file with the various flags for another spin
         """
@@ -360,14 +455,13 @@ class RunCable(object):
                         "spincasa": ".FALSE.",
                         "icycle": "%d" % (self.biogeochem_id),
                         "leaps": ".TRUE.",
-                        #"cable_user%limit_labile": ".FALSE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
     def setup_analytical_spin(self, st_yr, en_yr, number=None):
         """
         Adjust the CABLE namelist file with the various flags for the
-        analytical spin step
+        analytical spin step (to stabilise the soil C pools)
         """
 
         out_fname = "%s_out_cable_aspin_%d.nc" % (self.experiment_id, number)
@@ -402,12 +496,11 @@ class RunCable(object):
                         "cable_user%CASA_SPIN_STARTYEAR": "%d" % (st_yr),
                         "cable_user%CASA_SPIN_ENDYEAR": "%d" % (en_yr),
                         "output%restart": ".TRUE.",
-                        "leaps": ".FALSE.",
-                        #"cable_user%limit_labile": ".TRUE.",
+                        "leaps": ".TRUE.",
 
         }
         adjust_nml_file(self.nml_fname, replace_dict)
-        print(self.nml_fname)
+
 
     def setup_simulation(self, met_fname, historical=True, number=None):
         """
@@ -449,11 +542,10 @@ class RunCable(object):
                             "cable_user%CASA_DUMP_READ": ".FALSE.",
                             "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                             "spincasa": ".FALSE.",
-                            "spinup": ".FALSE.",
                             "output%restart": ".TRUE.",
                             "output%averaging": "'daily'",
                             "leaps": ".TRUE.",
-                            #"cable_user%limit_labile": ".FALSE.",
+                            "cable_user%limit_labile": ".FALSE.",
             }
         else:
             replace_dict = {
@@ -468,11 +560,10 @@ class RunCable(object):
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "spincasa": ".FALSE.",
-                        "spinup": ".FALSE.",
                         "output%restart": ".FALSE.",
                         "output%averaging": "'daily'",
                         "leaps": ".TRUE.",
-                        #"cable_user%limit_labile": ".FALSE.",
+                        "cable_user%limit_labile": ".FALSE.",
 
         }
         adjust_nml_file(self.nml_fname, replace_dict)
@@ -553,8 +644,11 @@ if __name__ == "__main__":
     #biogeochem = "CNP"
     # ------------------------------------------- #
 
-    for biogeochem in ["C", "CN", "CNP"]:
-    #for biogeochem in ["C"]:
+    #for biogeochem in ["C", "CN", "CNP"]:
+
+    """
+    dont_have_restart = True
+    for biogeochem in ["C"]:
         C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                      dump_dir=dump_dir, restart_dir=restart_dir,
                      aux_dir=aux_dir, namelist_dir=namelist_dir,
@@ -562,3 +656,14 @@ if __name__ == "__main__":
                      num_cores=num_cores, biogeochem=biogeochem,
                      co2_ndep_dir=co2_ndep_dir)
         C.main(sci_config)
+    """
+    dont_have_restart = False
+    num = 511
+    for biogeochem in ["CN"]:
+        C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                     dump_dir=dump_dir, restart_dir=restart_dir,
+                     aux_dir=aux_dir, namelist_dir=namelist_dir,
+                     met_subset=met_subset, cable_src=cable_src, mpi=mpi,
+                     num_cores=num_cores, biogeochem=biogeochem,
+                     co2_ndep_dir=co2_ndep_dir)
+        C.main(sci_config, dont_have_restart, num)
