@@ -144,7 +144,7 @@ class RunCable(object):
             os.remove(local_exe)
         shutil.copy(self.cable_exe, local_exe)
 
-    def setup_nml_file(self):
+    def setup_nml_file(self, number):
 
         # set directory paths...
         out_fname = "%s_out_cable_spin_%d.nc" % (self.experiment_id, number)
@@ -339,7 +339,7 @@ if __name__ == "__main__":
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
-        C.setup_nml_file()
+        C.setup_nml_file(num=0)
         C.run_qsub_script(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
