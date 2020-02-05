@@ -3,6 +3,37 @@
 """
 Run CABLE spatially with CNP turned on
 
+Steps involve:
+
+1. Spin up carbon plant & soil pools to equilibrium at pre-industrial (1850).
+2. Run the simulation with time varying CO2, Ndep and Pdep from 1850-20XX
+
+To spin the model up to equilibrium there are 5 steps:
+
+1. An initial spin to generate the first restart file and setup the nml file
+2. A set of runs repeating the meteorological forcing to build up sufficient
+   C stocks. Currently this is set to 30 (N_spin). This is arbitary, this ought
+   to work with fewer or more steps at this stage...feel free to test.
+3. At this point the code checks to see that the plant C pools are stabilised,
+   if not, cable is re-run until the plant pools have stabilised.
+4. CABLE then attempts to use the analytical solution following Xia et al. 2013
+   GCB to solve the steady-state soil and litter pools. While speeding things
+   up, this does not lead to an instant solution and so CABLE is then re-run
+   until the soil pools have stabilised. Currently I have set the check based on
+   the total soil C pools, but this means that the passive pools is not quite
+   at steady-state from initial testing. However, it is likely to be good enough
+   for most applications. If you wish to ensure the passive pools is stabilised
+   simply set "check_passive" in the steady state function call.
+[For both steps 3 and 4, we are taking the average of three latitude bands to
+ check we've reached quasi-equilibrium]
+5. CABLE then repeats step 4, but allowing the labile P and mineral N pools to
+   freely vary.
+
+If you've already run the C version, you can speed things up by using the
+restart file from this as the initial condition for the CN run. You can of course
+do likewise for a CNP run, using the CN restart file. You simply need to set
+"dont_have_restart" to be False and supply the restart file number.
+
 Ensure you run it with "-s" if you want to do a spin-up run, i.e.
 
 ./run_cable_spatial.py -s
