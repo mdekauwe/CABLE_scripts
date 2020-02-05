@@ -171,7 +171,7 @@ class RunCable(object):
                         "filename%restart_out": "'%s'" % (cable_rst_ofname),
                         "casafile%cnpipool": "' '",
                         "casafile%cnpepool": "'%s'" % (casa_rst_ofname),
-                        "fixedCO2": "%.2f" % (self.co2_conc),
+                        "fixedCO2": "%.2f" % (self.co2_fixed),
                         "casafile%phen": "'%s'" % (self.phen_fname),
                         "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
