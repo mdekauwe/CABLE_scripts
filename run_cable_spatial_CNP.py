@@ -70,6 +70,7 @@ class RunCable(object):
                  mask_fname="gswp3_landmask_nomissing.nc",
                  biogeochem="C", co2_conc=400.0, co2_fixed=284.7,
                  ndep_fixed=0.79, pdep_fixed=0.144,
+                 experiment_name=experiment_name,
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
 
         self.met_dir = met_dir
@@ -107,6 +108,8 @@ class RunCable(object):
             self.biogeochem_id = 2
         elif self.biogeochem_cyc == "CNP":
             self.biogeochem_id = 3
+
+        self.experiment_id = "%s_%s" % (experiment_name, self.biogeochem_cyc)
 
         if nml_fname is None:
             nml_fname = "cable.nml"
@@ -301,6 +304,7 @@ if __name__ == "__main__":
     run_start_yr = 2000
     run_end_yr = 2010
     biogeochem = "C"
+    experiment_name = "GSWP3_CNP"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
