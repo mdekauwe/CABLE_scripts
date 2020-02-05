@@ -123,16 +123,10 @@ class RunCable(object):
 
         if self.biogeochem_cyc == "C":
             self.biogeochem_id = 1
-            self.vcmax = "standard"
-            #self.vcmax = "Walker2014"
         elif self.biogeochem_cyc == "CN":
             self.biogeochem_id = 2
-            self.vcmax = "standard"
-            #self.vcmax = "Walker2014"
         elif self.biogeochem_cyc == "CNP":
             self.biogeochem_id = 3
-            self.vcmax = "standard"
-            #self.vcmax = "Walker2014"
 
     def main(self, sci_config, dont_have_restart=True, restart_num=None):
 
@@ -432,7 +426,7 @@ class RunCable(object):
                         "casafile%phen": "'%s'" % (self.phen_fname),
                         "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
-                        "cable_user%vcmax": "'%s'" % (self.vcmax),
+                        "cable_user%vcmax": "'standard'",
                         "l_vcmaxFeedbk": ".TRUE.",
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
