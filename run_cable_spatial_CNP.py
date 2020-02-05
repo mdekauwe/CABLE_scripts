@@ -70,7 +70,7 @@ class RunCable(object):
                  mask_fname="gswp3_landmask_nomissing.nc",
                  biogeochem="C", co2_conc=400.0, co2_fixed=284.7,
                  ndep_fixed=0.79, pdep_fixed=0.144,
-                 exp_name=exp_name,
+                 experiment_name=experiment_name,
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
 
         self.met_dir = met_dir
@@ -101,7 +101,6 @@ class RunCable(object):
         self.ndep_fixed = ndep_fixed  # kg N ha-1 yr-1
         self.pdep_fixed = pdep_fixed  # kg N ha-1 yr-1
         self.biogeochem_cyc = biogeochem
-        self.exp_name = exp_name
 
         if self.biogeochem_cyc == "C":
             self.biogeochem_id = 1
@@ -110,7 +109,7 @@ class RunCable(object):
         elif self.biogeochem_cyc == "CNP":
             self.biogeochem_id = 3
 
-        self.experiment_id = "%s_%s" % (self.exp_name, self.biogeochem_cyc)
+        self.experiment_id = "%s_%s" % (experiment_name, self.biogeochem_cyc)
 
         if nml_fname is None:
             nml_fname = "cable.nml"
@@ -305,7 +304,7 @@ if __name__ == "__main__":
     run_start_yr = 2000
     run_end_yr = 2010
     biogeochem = "C"
-    exp_name = "GSWP3_CNP"
+    experiment_name = "GSWP3_CNP"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
@@ -330,7 +329,7 @@ if __name__ == "__main__":
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, qsub_fname=qsub_fname,
                  nml_fname=nml_fname, walltime=walltime,
-                 biogeochem=biogeochem, exp_name=exp_name)
+                 biogeochem=biogeochem, experiment_name=experiment_name)
 
     # Sort the restart files out before we run simulations "-t"
     if sort_restarts:
