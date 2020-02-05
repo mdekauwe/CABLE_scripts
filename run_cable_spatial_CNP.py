@@ -29,8 +29,8 @@ from cable_utils import generate_spatial_qsub_script
 def cmd_line_parser():
 
     p = optparse.OptionParser()
-    p.add_option("--s1", action="store_true", default=False,
-                   help="Spinup model: S1")
+    p.add_option("-s", action="store_true", default=False,
+                   help="Spinup model")
     p.add_option("--s2", action="store_true", default=False,
                    help="Spinup model: S2")
     p.add_option("--s3", action="store_true", default=False,
@@ -49,7 +49,7 @@ def cmd_line_parser():
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, int(options.y),
-            float(options.c), options.n, options.s1, options.s2, options.s3,
+            float(options.c), options.n, options.s, options.s2, options.s3,
             options.a, options.t)
 
 
@@ -302,7 +302,7 @@ if __name__ == "__main__":
 
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
-     nml_fname, spin1, spin2, spin3,
+     nml_fname, spin_up, spin2, spin3,
      adjust_nml, sort_restarts) = cmd_line_parser()
 
 
