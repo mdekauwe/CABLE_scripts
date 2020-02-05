@@ -33,11 +33,10 @@ To spin the model up to equilibrium there are 5 steps:
 5. CABLE then repeats step 4, but allowing the labile P and mineral N pools to
    freely vary.
 
- If you've already run the C version, you can speed things up by using the \
- restart file from this as the initial condition for the CN run. You
- can of course do likewise for a CNP run, using the CN restart file. You simply
- need to set "dont_have_restart" to be False and supply the restart file
- number.
+If you've already run the C version, you can speed things up by using the
+restart file from this as the initial condition for the CN run. You can of course
+do likewise for a CNP run, using the CN restart file. You simply need to set
+"dont_have_restart" to be False and supply the restart file number.
 
 NB. Set mpi = True if doing a number of flux sites (*needs checking...)
 
@@ -126,17 +125,14 @@ class RunCable(object):
             self.biogeochem_id = 1
             self.vcmax = "standard"
             #self.vcmax = "Walker2014"
-            self.vcmax_feedback = ".TRUE."
         elif self.biogeochem_cyc == "CN":
             self.biogeochem_id = 2
             self.vcmax = "standard"
             #self.vcmax = "Walker2014"
-            self.vcmax_feedback = ".TRUE."
         elif self.biogeochem_cyc == "CNP":
             self.biogeochem_id = 3
             self.vcmax = "standard"
             #self.vcmax = "Walker2014"
-            self.vcmax_feedback = ".TRUE."
 
     def main(self, sci_config, dont_have_restart=True, restart_num=None):
 
@@ -706,7 +702,7 @@ if __name__ == "__main__":
         C.main(sci_config)
     """
 
-    """
+    #"""
     dont_have_restart = True
     for biogeochem in ["C"]:
         C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
@@ -716,8 +712,9 @@ if __name__ == "__main__":
                      num_cores=num_cores, biogeochem=biogeochem,
                      co2_ndep_dir=co2_ndep_dir)
         C.main(sci_config)
-    """
+    #"""
 
+    """
     dont_have_restart = False
     num = 511
     for biogeochem in ["CN"]:
@@ -728,3 +725,4 @@ if __name__ == "__main__":
                      num_cores=num_cores, biogeochem=biogeochem,
                      co2_ndep_dir=co2_ndep_dir)
         C.main(sci_config, dont_have_restart, num)
+    """
