@@ -306,7 +306,7 @@ if __name__ == "__main__":
      adjust_nml, sort_restarts) = cmd_line_parser()
 
 
-    if spin1:
+    if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
         #walltime = "4:00:00"
