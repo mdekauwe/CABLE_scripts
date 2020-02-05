@@ -3,48 +3,9 @@
 """
 Run CABLE spatially with CNP turned on
 
-Steps involve:
+To write...
 
-1. Spin up carbon plant & soil pools to equilibrium at pre-industrial (1850).
-2. Run the simulation with time varying CO2, Ndep and Pdep from 1850-20XX
 
-To spin the model up to equilibrium there are 5 steps:
-
-1. An initial spin to generate the first restart file and setup the nml file
-2. A set of runs repeating the meteorological forcing to build up sufficient
-   C stocks. Currently this is set to 30 (N_spin). This is arbitary, this ought
-   to work with fewer or more steps at this stage...feel free to test.
-3. At this point the code checks to see that the plant C pools are stabilised,
-   if not, cable is re-run until the plant pools have stabilised.
-4. CABLE then attempts to use the analytical solution following Xia et al. 2013
-   GCB to solve the steady-state soil and litter pools. While speeding things
-   up, this does not lead to an instant solution and so CABLE is then re-run
-   until the soil pools have stabilised. Currently I have set the check based on
-   the total soil C pools, but this means that the passive pools is not quite
-   at steady-state from initial testing. However, it is likely to be good enough
-   for most applications. If you wish to ensure the passive pools is stabilised
-   simply set "check_passive" in the steady state function call.
-[For both steps 3 and 4, we are taking the average of three latitude bands to
- check we've reached quasi-equilibrium]
-5. CABLE then repeats step 4, but allowing the labile P and mineral N pools to
-   freely vary.
-
-If you've already run the C version, you can speed things up by using the
-restart file from this as the initial condition for the CN run. You can of course
-do likewise for a CNP run, using the CN restart file. You simply need to set
-"dont_have_restart" to be False and supply the restart file number.
-
-Ensure you run it with "-s" if you want to do a spin-up run, i.e.
-
-./run_cable_spatial.py -s
-
-Once this is complete just run without the "-s" flag
-
-The script does a few things internally:
-- creates a qsub script.
-- after the spin-up step it renames the final restart file to be the first
-  simulation year restart file so that we can run a longer simulation
-- submits the qsub script
 
 That's all folks.
 """
@@ -68,8 +29,12 @@ from cable_utils import generate_spatial_qsub_script
 def cmd_line_parser():
 
     p = optparse.OptionParser()
-    p.add_option("-s", action="store_true", default=False,
-                   help="Spinup model")
+    p.add_option("--s1", action="store_true", default=False,
+                   help="Spinup model: S1")
+    p.add_option("--s2", action="store_true", default=False,
+                   help="Spinup model: S2")
+    p.add_option("--s3", action="store_true", default=False,
+                   help="Spinup model: S3")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
     p.add_option("-t", action="store_true", default=False,
@@ -84,7 +49,8 @@ def cmd_line_parser():
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, int(options.y),
-            float(options.c), options.n, options.s, options.a, options.t)
+            float(options.c), options.n, options.s1, options.s2, options.s3,
+            options.a, options.t)
 
 
 class RunCable(object):
@@ -98,8 +64,9 @@ class RunCable(object):
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
                  grid_fname=None,
-                 #mask_fname="gswp3_landmask_nomissing.nc",
-                 mask_fname="SE_AUS_AWAP_landmask.nc",
+                 mask_fname="gswp3_landmask_nomissing.nc",
+                 biogeochem="C", co2_conc=400.0, co2_fixed=284.7,
+                 ndep_fixed=0.79, pdep_fixed=0.144
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
 
         self.met_dir = met_dir
@@ -114,9 +81,6 @@ class RunCable(object):
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
         self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
-        #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
-        #self.grid_fname = "SE_aus_veg_types_AWAP_grid.nc"
-        #self.grid_fname = "gridinfo_AWAP_EBF.nc"
         self.grid_fname = "SE_aus_veg_types_AWAP_plus_LAI_fper_grid.nc"
         #self.mask_fname = os.path.join(self.aux_dir,
         #                               "offline/%s" % (mask_fname))
@@ -124,12 +88,27 @@ class RunCable(object):
         #                               "offline/%s" % (mask_fname))
         #self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
         self.mask_fname = os.path.join("SE_AUS_AWAP_grid_mask_files/%s" % (mask_fname))
+        self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
+        #self.cnpbiome_fname = os.path.join(self.biogeochem_dir, cnpbiome_fname)
+        self.cnpbiome_fname = os.path.join("CNP_param_file", cnpbiome_fname)
+
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
         self.qsub_fname = qsub_fname
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
         self.spin_up = spin_up
+        self.co2_fixed = co2_fixed    # umol mol-1
+        self.ndep_fixed = ndep_fixed  # kg N ha-1 yr-1
+        self.pdep_fixed = pdep_fixed  # kg N ha-1 yr-1
+        self.biogeochem_cyc = biogeochem
+
+        if self.biogeochem_cyc == "C":
+            self.biogeochem_id = 1
+        elif self.biogeochem_cyc == "CN":
+            self.biogeochem_id = 2
+        elif self.biogeochem_cyc == "CNP":
+            self.biogeochem_id = 3
 
         if nml_fname is None:
             nml_fname = "cable.nml"
@@ -166,14 +145,52 @@ class RunCable(object):
 
     def setup_nml_file(self):
 
+        # set directory paths...
+        out_fname = "%s_out_cable_spin_%d.nc" % (self.experiment_id, number)
+        out_fname = os.path.join(self.output_dir, out_fname)
+
+        out_log_fname = "%s_log_spin_%d.txt" % (self.experiment_id, number)
+        out_log_fname = os.path.join(self.log_dir, out_log_fname)
+
+        cable_rst_ofname = "%s_cable_rst_%d.nc" % (self.experiment_id, number)
+        cable_rst_ofname = os.path.join(self.restart_dir, cable_rst_ofname)
+
+        casa_rst_ofname = "%s_casa_rst_%d.nc" % (self.experiment_id, number)
+        casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
+
         replace_dict = {
                         "filename%met": "''",  # not needed for GSWP3 run
                         "filename%type": "'%s'" % (self.grid_fname),
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
-                        "output%averaging": "'monthly'",
+                        "filename%out": "'%s'" % (out_fname),
+                        "filename%log": "'%s'" % (out_log_fname),
+                        "filename%restart_in": "' '",
+                        "filename%restart_out": "'%s'" % (cable_rst_ofname),
+                        "casafile%cnpipool": "' '",
+                        "casafile%cnpepool": "'%s'" % (casa_rst_ofname),
+                        "fixedCO2": "%.2f" % (self.co2_conc),
+                        "casafile%phen": "'%s'" % (self.phen_fname),
+                        "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
+                        "cable_user%RunIden": "'%s'" % (self.experiment_id),
+                        "cable_user%vcmax": "'standard'",
+                        "l_vcmaxFeedbk": ".TRUE.",
+                        "l_laiFeedbk": ".TRUE.", # prognoistic LAI
+                        "icycle": "%d" % (self.biogeochem_id),
+                        "cable_user%CASA_OUT_FREQ": "'annually'",
+                        "output%casa": ".TRUE.",
+                        "leaps": ".TRUE.",
+                        "cable_user%CASA_fromZero": ".TRUE.",
+                        "cable_user%CASA_DUMP_READ": ".FALSE.",
+                        "cable_user%CASA_DUMP_WRITE": ".TRUE.",
+                        "cable_user%CASA_NREP": "0",
                         "spinup": ".FALSE.",
+                        "spincasa": ".FALSE.",
+                        "output%restart": ".TRUE.",
+                        "cable_user%FWSOIL_SWITCH": "'standard'",
+                        "cable_user%GS_SWITCH": "'medlyn'",
+                        "cable_user%limit_labile": ".TRUE.",
                         "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
                         "cable_user%GW_MODEL": ".FALSE.",
@@ -193,12 +210,15 @@ class RunCable(object):
                                          self.mem, self.ncpus,
                                          spin_up=self.spin_up)
 
+
         # Run qsub script
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
                     (start_yr, end_yr, self.co2_fname, self.qsub_fname)
+
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
             raise("Job failed to submit\n")
+
 
     def create_new_nml_file(self, log_fname, out_fname, restart_in_fname,
                             restart_out_fname, year, co2_conc):
@@ -222,22 +242,15 @@ class RunCable(object):
                         "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
                         "CABLE_USER%YearStart": "0", # needs to be 0 so the ncciy is set
                         "CABLE_USER%YearEnd": "0",   # needs to be 0 so the ncciy is set
-                        #"gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
-                        "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/AWAP.Rainf.3hr.%s.nc" % (year))),
-                        "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/AWAP.Snowf.3hr.%s.nc" % (year))),
-                        "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/AWAP.LWdown.3hr.%s.nc" % (year))),
-                        "gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/AWAP.SWdown.3hr.%s.nc" % (year))),
-                        "gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/AWAP.PSurf.3hr.%s.nc" % (year))),
-                        "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/AWAP.Qair.3hr.%s.nc" % (year))),
-                        "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/AWAP.Tair.3hr.%s.nc" % (year))),
-                        "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/AWAP.Wind.3hr.%s.nc" % (year))),
+                        "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
+                        "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
+                        "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
+                        "gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))),
+                        "gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))),
+                        "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
+                        "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
+                        "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
+
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
@@ -276,30 +289,34 @@ class RunCable(object):
 if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
-    met_dir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
+    met_dir = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restarts"
-    aux_dir = "/g/data/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
+    #aux_dir = "/g/data/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
+    aux_dir = "../../src/CABLE-AUX"
     #cable_src = "../../src/trunk/trunk/"
-    cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
-    spinup_start_yr = 1995
-    spinup_end_yr = 1995
+    cable_src = "../../src/trunk/trunk/"
+    spinup_start_yr = 1900
+    spinup_end_yr = 1930
     #spinup_end_yr = 2000
     run_start_yr = 2000
     run_end_yr = 2010
+    biogeochem = "C"
     # ------------------------------------------- #
 
     (log_fname, out_fname, restart_in_fname,
      restart_out_fname, year, co2_conc,
-     nml_fname, spin_up, adjust_nml, sort_restarts) = cmd_line_parser()
+     nml_fname, spin1, spin2, spin3,
+     adjust_nml, sort_restarts) = cmd_line_parser()
 
-    if spin_up:
+
+    if spin1:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
         #walltime = "4:00:00"
-        walltime = "0:30:00"
-        qsub_fname = "qsub_wrapper_script_spinup.sh"
+        walltime = "2:00:00"
+        qsub_fname = "qsub_wrapper_script_spinup_s1.sh"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
@@ -309,7 +326,8 @@ if __name__ == "__main__":
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
                  cable_src=cable_src, qsub_fname=qsub_fname,
-                 nml_fname=nml_fname, walltime=walltime)
+                 nml_fname=nml_fname, walltime=walltime,
+                 biogeochem=biogeochem)
 
     # Sort the restart files out before we run simulations "-t"
     if sort_restarts:
