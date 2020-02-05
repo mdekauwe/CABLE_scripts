@@ -209,7 +209,7 @@ class RunCable(object):
         if not os.path.isfile(self.qsub_fname):
             generate_spatial_qsub_script(self.qsub_fname, self.walltime,
                                          self.mem, self.ncpus,
-                                         spin_up=self.spin_up)
+                                         spin_up=self.spin_up, CNP=True)
 
 
         # Run qsub script
