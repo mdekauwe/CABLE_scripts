@@ -63,10 +63,10 @@ class RunCable(object):
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
-                 grid_fname=None,
+                 grid_fname="gridinfo_mmy_MD_elev_orig_std_avg-sand_mask.nc",
                  mask_fname="gswp3_landmask_nomissing.nc",
                  biogeochem="C", co2_conc=400.0, co2_fixed=284.7,
-                 ndep_fixed=0.79, pdep_fixed=0.144
+                 ndep_fixed=0.79, pdep_fixed=0.144,
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
 
         self.met_dir = met_dir
@@ -81,13 +81,8 @@ class RunCable(object):
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
         self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
-        self.grid_fname = "SE_aus_veg_types_AWAP_plus_LAI_fper_grid.nc"
-        #self.mask_fname = os.path.join(self.aux_dir,
-        #                               "offline/%s" % (mask_fname))
-        #self.mask_fname = os.path.join("/short/w35/mm3972/cable/src/CABLE-AUX/",
-        #                               "offline/%s" % (mask_fname))
-        #self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
-        self.mask_fname = os.path.join("SE_AUS_AWAP_grid_mask_files/%s" % (mask_fname))
+        self.grid_fname = grid_fname
+        self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
         self.phen_fname = os.path.join(self.biogeochem_dir, phen_fname)
         #self.cnpbiome_fname = os.path.join(self.biogeochem_dir, cnpbiome_fname)
         self.cnpbiome_fname = os.path.join("CNP_param_file", cnpbiome_fname)
