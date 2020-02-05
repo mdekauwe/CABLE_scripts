@@ -339,7 +339,7 @@ if __name__ == "__main__":
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
-        C.setup_nml_file(num=0)
+        C.setup_nml_file(number=0)
         C.run_qsub_script(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
