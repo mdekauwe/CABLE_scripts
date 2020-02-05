@@ -504,14 +504,10 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
 
     print("    echo $co2_conc $year $start_yr $prev_yr $end_yr $restart_in $restart_out $nml_fname $outfile", end="\n", file=f)
 
-    if spin_up:
-        print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
-        print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
-        print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
-    else:
-        print("    python ./run_cable_spatial.py -y $year -l $logfile -o $outfile \\", end="\n", file=f)
-        print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
-        print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
+
+    print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
+    print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
+    print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
     print("    mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
