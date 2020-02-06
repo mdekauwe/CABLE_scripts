@@ -176,7 +176,7 @@ class RunCable(object):
                         "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%vcmax": "'standard'",
-                        "l_vcmaxFeedbk": ".TRUE.",
+                        "l_vcmaxFeedbk": ".FALSE.",
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
                         "cable_user%CASA_OUT_FREQ": "'annually'",
