@@ -71,7 +71,7 @@ class RunCable(object):
                  biogeochem="C", co2_conc=400.0, co2_fixed=284.7,
                  ndep_fixed=0.79, pdep_fixed=0.144,
                  experiment_name="GSWP3_CNP",
-                 cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="96"):
+                 cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="48"):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
