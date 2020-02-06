@@ -66,9 +66,9 @@ class RunCable(object):
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
-                 grid_fname=None,
-                 #mask_fname="gswp3_landmask_nomissing.nc",
-                 mask_fname="SE_AUS_AWAP_landmask.nc",
+                 grid_fname="gridinfo_mmy_MD_elev_orig_std_avg-sand_mask.nc",
+                 mask_fname="gswp3_landmask_nomissing.nc",
+                 #mask_fname="SE_AUS_AWAP_landmask.nc",
                  met_data="GSWP3",
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="48"):
 
@@ -85,15 +85,10 @@ class RunCable(object):
         self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
         #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
-        #self.grid_fname = "SE_aus_veg_types_AWAP_grid.nc"
-        #self.grid_fname = "gridinfo_AWAP_EBF.nc"
-        self.grid_fname = "SE_aus_veg_types_AWAP_plus_LAI_fper_grid.nc"
+        self.grid_fname = os.path.join("grid_file/%s" % (mask_fname))
         #self.mask_fname = os.path.join(self.aux_dir,
         #                               "offline/%s" % (mask_fname))
-        #self.mask_fname = os.path.join("/short/w35/mm3972/cable/src/CABLE-AUX/",
-        #                               "offline/%s" % (mask_fname))
-        #self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
-        self.mask_fname = os.path.join("SE_AUS_AWAP_grid_mask_files/%s" % (mask_fname))
+        self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
         self.qsub_fname = qsub_fname
@@ -258,15 +253,20 @@ class RunCable(object):
 if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
-    met_dir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
-    #met_data = "GSWP3"
+    #met_data = "AWAP"
+    met_data = "GSWP3"
+    if met_data == "GSWP3":
+        met_dir = "/g/data/wd9/MetForcing/Global/GSWP3_2017/"
+    elif met_data == "AWAP":
+        met_dir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
+
     met_data = "AWAP"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restarts"
     aux_dir = "/g/data/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
-    #cable_src = "../../src/trunk/trunk/"
-    cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
+    cable_src = "../../src/trunk/trunk/"
+    #cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
     spinup_start_yr = 1995
     spinup_end_yr = 1995
     #spinup_end_yr = 2000
