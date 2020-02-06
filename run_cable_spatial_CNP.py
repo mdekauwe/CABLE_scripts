@@ -301,7 +301,7 @@ if __name__ == "__main__":
     aux_dir = "../../src/CABLE-AUX"
     #cable_src = "../../src/trunk/trunk/"
     cable_src = "../../src/trunk/trunk/"
-    spinup_start_yr = 1900
+    spinup_start_yr = 1901 # GSWP3 starts in 1901
     spinup_end_yr = 1930
     #spinup_end_yr = 2000
     run_start_yr = 2000
