@@ -69,6 +69,7 @@ class RunCable(object):
                  grid_fname=None,
                  #mask_fname="gswp3_landmask_nomissing.nc",
                  mask_fname="SE_AUS_AWAP_landmask.nc",
+                 met_data="GSWP3",
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="48"):
 
         self.met_dir = met_dir
@@ -99,6 +100,7 @@ class RunCable(object):
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
         self.spin_up = spin_up
+        self.met_data = met_data
 
         if nml_fname is None:
             nml_fname = "cable.nml"
@@ -182,6 +184,25 @@ class RunCable(object):
             restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
         restart_out_fname = os.path.join(self.restart_dir, restart_out_fname)
 
+        if self.met_data == "GSWP3":
+            rainf_fn = os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))
+            snowf_fn = os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))
+            lwdown_fn = os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))
+            swdown_fn = os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))
+            psurf_fn = os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))
+            qair_fn = os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))
+            wind_fn = os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))
+            tair_fn = (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year)))
+        elif self.met_data == "AWAP":
+            rainf_fn = os.path.join(self.met_dir, "Rainf/AWAP.Rainf.3hr.%s.nc" % (year))
+            snowf_fn = os.path.join(self.met_dir, "Snowf/AWAP.Snowf.3hr.%s.nc" % (year))
+            lwdown_fn = os.path.join(self.met_dir, "LWdown/AWAP.LWdown.3hr.%s.nc" % (year))
+            swdown_fn = os.path.join(self.met_dir, "SWdown/AWAP.SWdown.3hr.%s.nc" % (year))
+            psurf_fn = os.path.join(self.met_dir, "PSurf/AWAP.PSurf.3hr.%s.nc" % (year))
+            qair_fn = os.path.join(self.met_dir, "Qair/AWAP.Qair.3hr.%s.nc" % (year))
+            wind_fn = os.path.join(self.met_dir, "Wind/AWAP.Wind.3hr.%s.nc" % (year))
+            tair_fn = (os.path.join(self.met_dir, "Tair/AWAP.Tair.3hr.%s.nc" % (year)))
+
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "filename%out": "'%s'" % (out_fname),
@@ -191,22 +212,14 @@ class RunCable(object):
                         "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
                         "CABLE_USER%YearStart": "0", # needs to be 0 so the ncciy is set
                         "CABLE_USER%YearEnd": "0",   # needs to be 0 so the ncciy is set
-                        #"gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/GSWP3.BC.Rainf.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/GSWP3.BC.Snowf.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/GSWP3.BC.LWdown.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/GSWP3.BC.SWdown.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/GSWP3.BC.PSurf.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
-                        #"gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
-                        "gswpfile%rainf": "'%s'" % (os.path.join(self.met_dir, "Rainf/AWAP.Rainf.3hr.%s.nc" % (year))),
-                        "gswpfile%snowf": "'%s'" % (os.path.join(self.met_dir, "Snowf/AWAP.Snowf.3hr.%s.nc" % (year))),
-                        "gswpfile%LWdown": "'%s'" % (os.path.join(self.met_dir, "LWdown/AWAP.LWdown.3hr.%s.nc" % (year))),
-                        "gswpfile%SWdown": "'%s'" % (os.path.join(self.met_dir, "SWdown/AWAP.SWdown.3hr.%s.nc" % (year))),
-                        "gswpfile%PSurf": "'%s'" % (os.path.join(self.met_dir, "PSurf/AWAP.PSurf.3hr.%s.nc" % (year))),
-                        "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/AWAP.Qair.3hr.%s.nc" % (year))),
-                        "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/AWAP.Tair.3hr.%s.nc" % (year))),
-                        "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/AWAP.Wind.3hr.%s.nc" % (year))),
+                        "gswpfile%rainf": "'%s'" % (rainf_fn),
+                        "gswpfile%snowf": "'%s'" % (snowf_fn),
+                        "gswpfile%LWdown": "'%s'" % (lwdown_fn),
+                        "gswpfile%SWdown": "'%s'" % (swdown_fn),
+                        "gswpfile%PSurf": "'%s'" % (psurf_fn),
+                        "gswpfile%Qair": "'%s'" % (qair_fn),
+                        "gswpfile%Tair": "'%s'" % (tair_fn),
+                        "gswpfile%wind": "'%s'" % (wind_fn),
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
@@ -246,6 +259,8 @@ if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
     met_dir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
+    #met_data = "GSWP3"
+    met_data = "AWAP"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restarts"
@@ -277,7 +292,7 @@ if __name__ == "__main__":
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
-                 cable_src=cable_src, qsub_fname=qsub_fname,
+                 cable_src=cable_src, qsub_fname=qsub_fname, met_data=met_data,
                  nml_fname=nml_fname, walltime=walltime)
 
     # Sort the restart files out before we run simulations "-t"

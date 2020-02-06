@@ -454,7 +454,7 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     print("#PBS -j oe", end="\n", file=f)
     print("#PBS -l wd", end="\n", file=f)
     #print("#PBS -l other=gdata1", end="\n", file=f)
-    print("#PBS -l storage=gdata/w35", end="\n", file=f)
+    print("#PBS -l storage=gdata/w35+/g/data/wd9/MetForcing/Global/GSWP3_2017/", end="\n", file=f)
     print("#PBS -M mdekauwe@gmail.com", end="\n", file=f)
     print(" ", end="\n", file=f)
 
