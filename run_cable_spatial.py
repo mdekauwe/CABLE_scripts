@@ -256,19 +256,19 @@ if __name__ == "__main__":
     #met_data = "AWAP"
     met_data = "GSWP3"
     if met_data == "GSWP3":
-        met_dir = "/g/data/wd9/MetForcing/Global/GSWP3_2017/"
+        #met_dir = "/g/data/wd9/MetForcing/Global/GSWP3_2017/"
+        met_dir = "/g/data/w35/mgk576/research/GSWP_test/"
     elif met_data == "AWAP":
         met_dir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
 
-    met_data = "AWAP"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restarts"
     aux_dir = "/g/data/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
     cable_src = "../../src/trunk/trunk/"
     #cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
-    spinup_start_yr = 1995
-    spinup_end_yr = 1995
+    spinup_start_yr = 1901
+    spinup_end_yr = 1901
     #spinup_end_yr = 2000
     run_start_yr = 2000
     run_end_yr = 2010
