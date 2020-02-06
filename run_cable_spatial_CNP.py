@@ -321,7 +321,7 @@ if __name__ == "__main__":
         end_yr = spinup_end_yr
         #walltime = "4:00:00"
         walltime = "2:00:00"
-        qsub_fname = "qsub_wrapper_script_spinup_s1.sh"
+        qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
