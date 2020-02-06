@@ -85,7 +85,7 @@ class RunCable(object):
         self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
         #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
-        self.grid_fname = os.path.join("grid_file/%s" % (mask_fname))
+        self.grid_fname = os.path.join("grid_file", mask_fname)
         #self.mask_fname = os.path.join(self.aux_dir,
         #                               "offline/%s" % (mask_fname))
         self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
