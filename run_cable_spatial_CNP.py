@@ -293,7 +293,7 @@ class RunCable(object):
 if __name__ == "__main__":
 
     #------------- Change stuff ------------- #
-    met_dir = "/g/data1/wd9/MetForcing/Global/GSWP3_2017/"
+    met_dir = "/g/data/wd9/MetForcing/Global/GSWP3_2017/"
     log_dir = "logs"
     output_dir = "outputs"
     restart_dir = "restarts"
