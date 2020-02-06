@@ -184,7 +184,7 @@ class RunCable(object):
                         "icycle": "%d" % (self.biogeochem_id),
                         "cable_user%CASA_OUT_FREQ": "'annually'",
                         "output%casa": ".TRUE.",
-                        "leaps": ".TRUE.",
+                        "leaps": ".FALSE.",
                         "cable_user%CASA_fromZero": ".TRUE.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
                         "cable_user%CASA_DUMP_WRITE": ".TRUE.",
