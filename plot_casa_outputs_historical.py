@@ -115,28 +115,28 @@ def plot_nitrogen_fluxes(cycle, ds):
     ax8 = fig.add_subplot(3,3,8)
     ax9 = fig.add_subplot(3,3,9)
 
-    ax1.set_title("N deposition (g N/m^2/year)")
+    ax1.set_title("$N_{\mathrm{dep}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax1.plot(ds.time, ds.Nmindep[:,0])
 
-    ax2.set_title("N fixation (g N/m^2/year)")
+    ax2.set_title("$N_{\mathrm{fix}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax2.plot(ds.time, ds.Nminfix[:,0], label="Nfix")
 
-    ax3.set_title("N loss (g N/m^2/year)")
+    ax3.set_title("$N_{\mathrm{loss}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax3.plot(ds.time, ds.Nminloss[:,0])
 
-    ax4.set_title("N leach")
+    ax4.set_title("$N_{\mathrm{leach}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax4.plot(ds.time, ds.Nminleach[:,0])
 
-    ax5.set_title("N uptake")
+    ax5.set_title("$N_{\mathrm{uptake}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax5.plot(ds.time, ds.Nupland[:,0])
 
-    ax6.set_title("N gross mineralisation")
+    ax6.set_title("$N_{\mathrm{grossmin}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax6.plot(ds.time, ds.Nsmin[:,0])
 
-    ax7.set_title("N net mineralisation")
+    ax7.set_title("$N_{\mathrm{netmin}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax7.plot(ds.time, ds.Nsnet[:,0])
 
-    ax8.set_title("N immobilisation")
+    ax8.set_title("$N_{\mathrm{immobilisation}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax8.plot(ds.time, ds.Nsimm[:,0])
 
     ax9.set_title("Plant N:C")
