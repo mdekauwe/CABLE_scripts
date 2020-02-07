@@ -43,8 +43,6 @@ def plot_spinup_state(cycle, cf, cw, cr, ca, cs, cp, co2, ndep, pdep):
     ax8 = fig.add_subplot(3,3,8)
     ax9 = fig.add_subplot(3,3,9)
 
-    co2, ndep, pdep
-
     ax1.set_title("$C_{\mathrm{f}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax1.plot(cf)
 
@@ -66,10 +64,10 @@ def plot_spinup_state(cycle, cf, cw, cr, ca, cs, cp, co2, ndep, pdep):
     ax7.set_title("CO$_2$ ($\mathrm{\mu}$mol mol$^{-1}$)")
     ax7.plot(co2)
 
-    ax8.set_title("$N_{\mathrm{dep}}$ (gN m$^{-2}$ d$^{-1}$)")
+    ax8.set_title("$N_{\mathrm{dep}}$ (gN m$^{-2}$ y$^{-1}$)")
     ax8.plot(ndep)
 
-    ax9.set_title("$P_{\mathrm{dep}}$ (gP m$^{-2}$ d$^{-1}$)")
+    ax9.set_title("$P_{\mathrm{dep}}$ (gP m$^{-2}$ y$^{-1}$)")
     ax9.plot(pdep)
 
     plot_fname = "%s_spinup_carbon_pools.pdf" % (cycle)
@@ -116,8 +114,8 @@ if __name__ == "__main__":
     pdep = []
 
 
-    for cycle in ["C"]:
-    #for cycle in ["C", "CN"]:
+    #for cycle in ["CN"]:
+    for cycle in ["C", "CN"]:
     #for cycle in ["C", "CN", "CNP"]:
 
         files = glob.glob("outputs/%s_%s_out_casa_spin_*.nc" % (site, cycle))
@@ -139,7 +137,7 @@ if __name__ == "__main__":
             cp.append(csoil[2])
 
             co2.append(co2x)
-            ndep.append(ndepx)
-            pdep.append(pdepx)
+            ndep.append(ndepx * 365.)
+            pdep.append(pdepx * 365.)
 
         plot_spinup_state(cycle, cf, cw, cr, ca, cs, cp, co2, ndep, pdep)
