@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Plot some CABLE outputs for the simulation
+Plot some CASA/CABLE outputs for the simulation
 
 That's all folks.
 """
