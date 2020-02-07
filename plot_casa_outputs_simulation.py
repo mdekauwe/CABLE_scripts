@@ -139,7 +139,7 @@ def plot_nitrogen_fluxes(cycle, ds):
     ax8.set_title("$N_{\mathrm{immobilisation}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax8.plot(ds.time, ds.Nsimm[:,0])
 
-    ax9.set_title("Plant N:C")
+    ax9.set_title("Plant N:C (-)")
     ax9.plot(ds.time, ds.nplant[:,0]/ds.cplant[:,0], label="Leaf")
     ax9.plot(ds.time, ds.nplant[:,1]/ds.cplant[:,1], label="Wood")
     ax9.plot(ds.time, ds.nplant[:,2]/ds.cplant[:,2], label="Root")
@@ -178,28 +178,28 @@ def plot_phosphorus_fluxes(cycle, ds):
     ax7 = fig.add_subplot(3,3,7)
     ax8 = fig.add_subplot(3,3,8)
 
-    ax1.set_title("P deposition (g N/m^2/year)")
+    ax1.set_title("$P_{\mathrm{dep}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax1.plot(ds.time, ds.Pdep[:,0])
 
-    ax2.set_title("P loss")
+    ax2.set_title("$P_{\mathrm{loss}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax2.plot(ds.time, ds.Ploss[:,0])
 
-    ax3.set_title("P leach")
+    ax3.set_title("$P_{\mathrm{leach}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax3.plot(ds.time, ds.Pleach[:,0])
 
-    ax4.set_title("P uptake")
+    ax4.set_title("$P_{\mathrm{uptake}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax4.plot(ds.time, ds.Pupland[:,0])
 
-    ax5.set_title("P gross mineralisation")
+    ax5.set_title("$P_{\mathrm{grossmin}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax5.plot(ds.time, ds.Psmin[:,0])
 
-    ax6.set_title("P net mineralisation")
+    ax6.set_title("$P_{\mathrm{netmin}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax6.plot(ds.time, ds.Psnet[:,0])
 
-    ax7.set_title("P immobilisation")
+    ax7.set_title("$P_{\mathrm{immobilisation}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax7.plot(ds.time, ds.Psimm[:,0])
 
-    ax8.set_title("Plant P:N")
+    ax8.set_title("Plant P:N (-)")
     ax8.plot(ds.time, ds.pplant[:,0]/ds.nplant[:,0], label="Leaf")
     ax8.plot(ds.time, ds.pplant[:,1]/ds.nplant[:,1], label="Wood")
     ax8.plot(ds.time, ds.pplant[:,2]/ds.nplant[:,2], label="Root")
@@ -236,37 +236,37 @@ def plot_cnp_states(cycle, ds):
     ax6 = fig.add_subplot(2,3,6)
 
 
-    ax1.set_title("Carbon")
+    ax1.set_title("$C_{\mathrm{plant}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax1.plot(ds.time, ds.cplant[:,0], label="Cf")
     ax1.plot(ds.time, ds.cplant[:,1], label="Cr")
     ax1.plot(ds.time, ds.cplant[:,2], label="Cw")
     ax1.legend(numpoints=1, loc="best")
 
-    ax2.set_title("N plant")
+    ax2.set_title("$N_{\mathrm{plant}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax2.plot(ds.time, ds.nplant[:,0], label="Cf")
     ax2.plot(ds.time, ds.nplant[:,1], label="Cr")
     ax2.plot(ds.time, ds.nplant[:,2], label="Cw")
     ax2.legend(numpoints=1, loc="best")
 
-    ax3.set_title("P plant")
+    ax3.set_title("$P_{\mathrm{plant}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax3.plot(ds.time, ds.pplant[:,0], label="Nf")
     ax3.plot(ds.time, ds.pplant[:,1], label="Nr")
     ax3.plot(ds.time, ds.pplant[:,2], label="Nw")
     ax3.legend(numpoints=1, loc="best")
 
-    ax4.set_title("C soil")
+    ax4.set_title("$C_{\mathrm{soil}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax4.plot(ds.time, ds.csoil[:,0], label="Cf")
     ax4.plot(ds.time, ds.csoil[:,1], label="Cr")
     ax4.plot(ds.time, ds.csoil[:,2], label="Cw")
     ax4.legend(numpoints=1, loc="best")
 
-    ax5.set_title("N soil")
+    ax5.set_title("$N_{\mathrm{soil}}$ (g N m$^{-2}$ d$^{-1}$)")
     ax5.plot(ds.time, ds.nsoil[:,0], label="Nf")
     ax5.plot(ds.time, ds.nsoil[:,1], label="Nr")
     ax5.plot(ds.time, ds.nsoil[:,2], label="Nw")
     ax5.legend(numpoints=1, loc="best")
 
-    ax6.set_title("P soil")
+    ax6.set_title("$P_{\mathrm{soil}}$ (g P m$^{-2}$ d$^{-1}$)")
     ax6.plot(ds.time, ds.psoil[:,0], label="Pf")
     ax6.plot(ds.time, ds.psoil[:,1], label="Pr")
     ax6.plot(ds.time, ds.psoil[:,2], label="Pw")
@@ -303,8 +303,10 @@ def open_cable_and_add_time(fname, start_date):
 if __name__ == "__main__":
 
 
+
+    #for cycle in ["C"]:
+    for cycle in ["C", "CN"]:
     #for cycle in ["C", "CN", "CNP"]:
-    for cycle in ["C"]:
 
         fname = "*_%s_out_casa_simulation.nc" % (cycle)
         fname = glob.glob(os.path.join("outputs", fname))[0]
