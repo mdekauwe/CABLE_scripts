@@ -54,7 +54,7 @@ def plot_carbon_fluxes(cycle, ds, ds_cable):
     ax3.set_title("LAI (m$^{2}$ m$^{-2}$)")
     ax3.plot(ds.time, ds.glai[:,0])
 
-    ax4.set_title("Vcmax ($\mathrm{\mu}$mol m$^{-2}$ s$^{-1}$)")
+    ax4.set_title("$V_{\mathrm{cmax}}$ ($\mathrm{\mu}$mol m$^{-2}$ s$^{-1}$)")
     ax4.plot(ds.time, ds.vcmax[:,0]*1E6)
 
     ax5.set_title("Allocation (-)")
@@ -63,19 +63,19 @@ def plot_carbon_fluxes(cycle, ds, ds_cable):
     ax5.plot(ds.time, ds.fracCalloc[:,2], label="Ar")
     ax5.legend(numpoints=1, loc="best")
 
-    ax6.set_title("C labile (g C m$^{-2}$ d$^{-1}$)")
+    ax6.set_title("$C_{\mathrm{labile}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax6.plot(ds.time, ds.clabile[:,0])
 
     ax7.set_title("CO$_2$ ($\mathrm{\mu}$mol mol$^{-1}$)")
     ax7.plot(ds_cable.time, ds_cable.CO2air[:,0,0])
 
-    ax8.set_title("Cplant (g C m$^{-2}$ d$^{-1}$)")
+    ax8.set_title("$C_{\mathrm{plant}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax8.plot(ds.time, ds.cplant[:,0], label="Cf")
     ax8.plot(ds.time, ds.cplant[:,1], label="Cw")
     ax8.plot(ds.time, ds.cplant[:,2], label="Cr")
     ax8.legend(numpoints=1, loc="best")
 
-    ax9.set_title("Csoil (g C m$^{-2}$ d$^{-1}$)")
+    ax9.set_title("$C_{\mathrm{soil}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax9.plot(ds.time, ds.csoil[:,0], label="Active")
     ax9.plot(ds.time, ds.csoil[:,1], label="Slow")
     ax9.plot(ds.time, ds.csoil[:,2], label="Passive")
@@ -302,8 +302,8 @@ def open_cable_and_add_time(fname, start_date):
 if __name__ == "__main__":
 
     #for cycle in ["C", "CN", "CNP"]:
-    for cycle in ["C"]:
-    #for cycle in ["C", "CN"]:
+    #for cycle in ["C"]:
+    for cycle in ["C", "CN"]:
     #for cycle in ["C", "CN", "CNP"]:
         fname = "*_%s_out_casa_historical.nc" % (cycle)
         fname = glob.glob(os.path.join("outputs", fname))[0]

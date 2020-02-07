@@ -45,31 +45,31 @@ def plot_spinup_state(cycle, cf, cw, cr, ca, cs, cp, co2, ndep, pdep):
 
     co2, ndep, pdep
 
-    ax1.set_title("C foliage")
+    ax1.set_title("$C_{\mathrm{f}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax1.plot(cf)
 
-    ax2.set_title("C wood")
+    ax2.set_title("$C_{\mathrm{w}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax2.plot(cw)
 
-    ax3.set_title("C root")
+    ax3.set_title("$C_{\mathrm{r}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax3.plot(cr)
 
-    ax4.set_title("C soil (active)")
+    ax4.set_title("$C_{\mathrm{active}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax4.plot(ca)
 
-    ax5.set_title("C soil (slow)")
+    ax5.set_title("$C_{\mathrm{slow}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax5.plot(cs)
 
-    ax6.set_title("C soil (passive)")
+    ax6.set_title("$C_{\mathrm{passive}}$ (g C m$^{-2}$ d$^{-1}$)")
     ax6.plot(cp)
 
-    ax7.set_title("CO2")
+    ax7.set_title("CO$_2$ ($\mathrm{\mu}$mol mol$^{-1}$)")
     ax7.plot(co2)
 
-    ax8.set_title("N deposition")
+    ax8.set_title("$N_{\mathrm{dep}}$ (gN m$^{-2}$ d$^{-1}$)")
     ax8.plot(ndep)
 
-    ax9.set_title("P deposition")
+    ax9.set_title("$P_{\mathrm{dep}}$ (gP m$^{-2}$ d$^{-1}$)")
     ax9.plot(pdep)
 
     plot_fname = "%s_spinup_carbon_pools.pdf" % (cycle)
@@ -115,9 +115,10 @@ if __name__ == "__main__":
     ndep = []
     pdep = []
 
+
+    for cycle in ["C"]:
+    #for cycle in ["C", "CN"]:
     #for cycle in ["C", "CN", "CNP"]:
-    #for cycle in ["C"]:
-    for cycle in ["C", "CN"]:
 
         files = glob.glob("outputs/%s_%s_out_casa_spin_*.nc" % (site, cycle))
         nums = sorted([int(f.split(".")[0].split("_")[-1]) for f in files])
