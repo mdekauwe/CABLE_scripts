@@ -301,10 +301,10 @@ def open_cable_and_add_time(fname, start_date):
 
 if __name__ == "__main__":
 
-    #for cycle in ["C", "CN", "CNP"]:
     #for cycle in ["C"]:
     for cycle in ["C", "CN"]:
     #for cycle in ["C", "CN", "CNP"]:
+    
         fname = "*_%s_out_casa_historical.nc" % (cycle)
         fname = glob.glob(os.path.join("outputs", fname))[0]
         ds_casa = open_casa_and_add_time(fname, start_date="01/01/1850")
