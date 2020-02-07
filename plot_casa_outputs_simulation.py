@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 """
-Plot some CASA/CABLE outputs for the simulation
+CASA simulation diagnostics...
 
 That's all folks.
 """
 __author__ = "Martin De Kauwe"
-__version__ = "1.0 (21.07.2018)"
+__version__ = "1.0 (07.02.2020)"
 __email__ = "mdekauwe@gmail.com"
 
 import matplotlib.pyplot as plt
