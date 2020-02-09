@@ -177,5 +177,12 @@ with pm.Model() as model:
     #trace = pm.sample(niter, chains=1, step=step, progressbar=True)
     trace = pm.sample(niter, chains=1, step=step, progressbar=True)
 
-_ = pm.traceplot(trace)
-pm.summary(trace)
+plt.figure(figsize=(7, 7))
+pm.traceplot(trace[100:])
+#plt.tight_layout()
+plt.show()
+
+print(pm.summary(trace))
+
+#_ = pm.traceplot(trace)
+#pm.summary(trace)

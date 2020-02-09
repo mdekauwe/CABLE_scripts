@@ -399,27 +399,18 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
 
     print("#PBS -m ae", end="\n", file=f)
     print("#PBS -P w35", end="\n", file=f)
-    #print("#PBS -q normalbw", end="\n", file=f)
     print("#PBS -q normal", end="\n", file=f)
     print("#PBS -l walltime=%s" % (walltime), end="\n", file=f)
     print("#PBS -l mem=%s" % (mem), end="\n", file=f)
     print("#PBS -l ncpus=%s" % (ncpus), end="\n", file=f)
     print("#PBS -j oe", end="\n", file=f)
     print("#PBS -l wd", end="\n", file=f)
-    #print("#PBS -l other=gdata1", end="\n", file=f)
-    print("#PBS -l storage=gdata/w35", end="\n", file=f)
+    print("#PBS -l storage=gdata/w35+gdata/wd9", end="\n", file=f)
     print("#PBS -M mdekauwe@gmail.com", end="\n", file=f)
     print(" ", end="\n", file=f)
-
     print("module load dot", end="\n", file=f)
     print("module add intel-mpi/2019.6.166", end="\n", file=f)
     print("module add netcdf/4.7.1", end="\n", file=f)
-
-    #print("module add intel-cc", end="\n", file=f)
-    #print("module add intel-fc", end="\n", file=f)
-    #print("module load netcdf/4.3.3.1", end="\n", file=f)
-    #print("module load intel-mpi", end="\n", file=f)
-    #print("module load subversion/1.9.0", end="\n", file=f)
     print("source activate sci", end="\n", file=f)
     print(" ", end="\n", file=f)
 
