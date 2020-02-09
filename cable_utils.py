@@ -386,53 +386,6 @@ def check_steady_state(experiment_id, restart_dir, num, plant=True,
 
     return not_in_equilibrium
 
-def check_steady_state_soil(experiment_id, restart_dir, num, debug=False):
-    """
-    Check whether the soil passive carbon pool has reached
-    equilibrium. To do this we are checking the state of the last year in the
-    previous spin cycle to the state in the final year of the current spin
-    cycle.
-    """
-    tol = 0.01     # steady-state carbon influx delta (%), Xia et al. 2013
-    tol_pass = 0.5 # steady-state passive delta (g C m-2 yr-1), Xia et al. 2013
-    if num == 1:
-        prev_csoil = 99999.9
-        prev_passive = 99999.9
-    else:
-        casa_rst_ofname = "%s_casa_rst_%d.nc" % (experiment_id, num-1)
-        fname = os.path.join(restart_dir, casa_rst_ofname)
-        ds_old = xr.open_dataset(fname)
-        prev_csoil = np.sum(ds_old.csoil.values)
-        prev_passive = ds_old.csoil.values[2][0]
-
-    casa_rst_ofname = "%s_casa_rst_%d.nc" % (experiment_id, num)
-    fname = os.path.join(restart_dir, casa_rst_ofname)
-    ds_new = xr.open_dataset(fname)
-
-    new_csoil = np.sum(ds_new.csoil.values)
-    new_passive = ds_new.csoil.values[2][0]
-
-    if ( np.fabs((new_csoil - prev_csoil) / new_csoil) < tol ):
-    #if ( np.fabs(new_passive - prev_passive) < tol_pass):
-         not_in_equilibrium = False
-    else:
-        not_in_equilibrium = True
-
-    if debug:
-        print("\n===============================================\n")
-        print("*", num, not_in_equilibrium,
-              "Passive", new_passive, prev_passive,
-              np.fabs(new_passive - prev_passive))
-        print("*", num, not_in_equilibrium,
-              "Csoil", new_csoil, prev_csoil,
-              np.fabs((new_csoil - prev_csoil) / new_csoil))
-        print("\n===============================================\n")
-
-    ds_old.close()
-    ds_new.close()
-
-    return not_in_equilibrium
-
 def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
                                  spin_up=False, CNP=False):
 
