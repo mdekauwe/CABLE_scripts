@@ -66,9 +66,8 @@ class RunCable(object):
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
-                 grid_fname="gridinfo_mmy_MD_elev_orig_std_avg-sand_mask.nc",
-                 mask_fname="gswp3_landmask_nomissing.nc",
-                 #mask_fname="SE_AUS_AWAP_landmask.nc",
+                 grid_fname="SE_AU_AWAP_NVIS_iveg_csiro_soil_gimms_lai_grid.nc",
+                 mask_fname="SE_AUS_AWAP_csiro_soil_landmask.nc",
                  met_data="GSWP3",
                  cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="48"):
 
@@ -78,17 +77,14 @@ class RunCable(object):
         self.aux_dir = aux_dir
         self.restart_dir = restart_dir
         self.spinup_dir = spinup_dir
-        self.grid_dir = os.path.join(self.aux_dir, "offline")
+        #self.grid_dir = os.path.join(self.aux_dir, "offline")
         self.soil_fname = soil_fname
         self.biogeophys_dir = os.path.join(self.aux_dir, "core/biogeophys")
         self.biogeochem_dir = os.path.join(self.aux_dir, "core/biogeochem/")
         self.veg_fname = os.path.join(self.biogeophys_dir, veg_fname)
         self.soil_fname = os.path.join(self.biogeophys_dir, soil_fname)
-        #self.grid_fname = os.path.join(self.grid_dir, grid_fname)
-        self.grid_fname = os.path.join("grid_file", grid_fname)
-        #self.mask_fname = os.path.join(self.aux_dir,
-        #                               "offline/%s" % (mask_fname))
-        self.mask_fname = os.path.join("land_sea_mask/%s" % (mask_fname))
+        self.grid_fname = os.path.join("SE_AUS_AWAP_grid_mask_files/grid", (grid_fname))
+        self.mask_fname = os.path.join("SE_AUS_AWAP_grid_mask_files/mask", (mask_fname))
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
         self.qsub_fname = qsub_fname
@@ -257,7 +253,6 @@ if __name__ == "__main__":
     met_data = "GSWP3"
     if met_data == "GSWP3":
         met_dir = "/g/data/wd9/MetForcing/Global/GSWP3_2017/"
-        #met_dir = "/g/data/w35/mgk576/research/GSWP_test/"
     elif met_data == "AWAP":
         met_dir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
 
@@ -265,11 +260,11 @@ if __name__ == "__main__":
     output_dir = "outputs"
     restart_dir = "restarts"
     aux_dir = "/g/data/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
-    cable_src = "../../src/trunk/trunk/"
-    #cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
-    spinup_start_yr = 1901
-    spinup_end_yr = 1901
-    #spinup_end_yr = 2000
+    #cable_src = "../../src/trunk/trunk/"
+    cable_src = "../../src/trunk_DESICA_PFTs/trunk_DESICA_PFTs/"
+    spinup_start_yr = 1995
+    #spinup_end_yr = 1995
+    spinup_end_yr = 2000
     run_start_yr = 2000
     run_end_yr = 2010
     # ------------------------------------------- #
@@ -281,13 +276,12 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        #walltime = "4:00:00"
-        walltime = "0:30:00"
+        walltime = "4:00:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
-        walltime = "6:30:00"
+        walltime = "7:30:00"
         qsub_fname = "qsub_wrapper_script_simulation.sh"
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,

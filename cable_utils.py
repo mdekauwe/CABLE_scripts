@@ -398,7 +398,8 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     print(" ", end="\n", file=f)
 
     print("#PBS -m ae", end="\n", file=f)
-    print("#PBS -P w35", end="\n", file=f)
+    #print("#PBS -P w35", end="\n", file=f)
+    print("#PBS -P dp72", end="\n", file=f)
     print("#PBS -q normal", end="\n", file=f)
     print("#PBS -l walltime=%s" % (walltime), end="\n", file=f)
     print("#PBS -l mem=%s" % (mem), end="\n", file=f)
