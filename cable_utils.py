@@ -381,7 +381,8 @@ def check_steady_state(experiment_id, restart_dir, num, plant=True,
                       np.fabs((new_csoil - prev_csoil) / new_csoil))
                 print("\n===============================================\n")
 
-    ds_old.close()
+    if num != 1:
+        ds_old.close()
     ds_new.close()
 
     return not_in_equilibrium
