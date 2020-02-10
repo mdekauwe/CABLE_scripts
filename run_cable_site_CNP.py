@@ -14,15 +14,14 @@ Steps involve:
 The script automatically generates the required met forcing(i.e. with embedded
 CO2, Ndep/Pdep.
 
-To spin the model up to equilibrium there are 5 steps:
+To spin the model up to equilibrium there are 4 steps:
 
-1. An initial spin to generate the first restart file and setup the nml file
-2. A set of runs repeating the meteorological forcing to build up sufficient
-   C stocks. Currently this is set to 30 (N_spin). This is arbitary, this ought
-   to work with fewer or more steps at this stage...feel free to test.
-3. At this point the code checks to see that the plant C pools are stabilised,
+1. An initial spin to generate the first restart file and setup the nml file.
+   This step involves initialising from the PFT-level plant & soil C pools
+   given in the "cnpbiome_fname" file.
+2. At this point the code checks to see that the plant C pools are stabilised,
    if not, cable is re-run until the plant pools have stabilised.
-4. CABLE then attempts to use the analytical solution following Xia et al. 2013
+3. CABLE then attempts to use the analytical solution following Xia et al. 2013
    GCB to solve the steady-state soil and litter pools. While speeding things
    up, this does not lead to an instant solution and so CABLE is then re-run
    until the soil pools have stabilised. Currently I have set the check based on
@@ -30,7 +29,7 @@ To spin the model up to equilibrium there are 5 steps:
    at steady-state from initial testing. However, it is likely to be good enough
    for most applications. If you wish to ensure the passive pools is stabilised
    simply set "check_passive" in the steady state function call.
-5. CABLE then repeats step 4, but allowing the labile P and mineral N pools to
+4. CABLE then repeats step 4, but allowing the labile P and mineral N pools to
    freely vary.
 
 If you've already run the C version, you can speed things up by using the
@@ -167,7 +166,6 @@ class RunCable(object):
                restart_num):
 
         num = 0
-        N_spin = 30
 
         for fname in met_files:
 
@@ -184,8 +182,9 @@ class RunCable(object):
             self.setup_nml_file(site)
             self.inital_spin_setup(site, fname_spin, sci_config, num)
 
-            # First phase: spin up with static CO2, Ndep, Pdep. Essentially
-            # growing biomass from dust with a repeated sequence of met data
+            # First phase: spin up with static CO2, Ndep, Pdep. Here we run the
+            # model once to read in the initial plant and soil C pools from the
+            # PFT level file and setup the restart file.
             if dont_have_restart:
 
                 # Create initial restart file
@@ -195,17 +194,6 @@ class RunCable(object):
                 self.run_me()
                 self.clean_up(num, tag="spin")
                 num += 1
-
-                # Build up some C stocks...
-                for i in range(N_spin):
-                    print("\n===============================================\n")
-                    print("Phase 1: init C pools: %d/%d\n" % (i, N_spin))
-                    print("===============================================\n\n")
-                    self.setup_spin(number=num)
-                    self.run_me()
-                    self.clean_up(num, tag="spin")
-
-                    num += 1
             else:
                 self.setup_inital_restart_file(restart_num, site)
                 # logic is based on that final increment above that the user
