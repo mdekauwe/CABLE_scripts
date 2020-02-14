@@ -310,7 +310,8 @@ def get_years(met_fname, nyear_spinup):
     return (st_yr, en_yr, st_yr_transient, en_yr_transient,
             st_yr_spin, en_yr_spin)
 
-def check_steady_state(experiment_id, restart_dir, num, plant=True,
+def check_steady_state(experiment_id, restart_dir, output_dir, num,
+                       check_npp=False, check_plant=False, check_soil=False,
                        check_passive=False, debug=False):
     """
     Check whether the plant (leaves, wood and roots) carbon pools have reached
@@ -318,29 +319,58 @@ def check_steady_state(experiment_id, restart_dir, num, plant=True,
     previous spin cycle to the state in the final year of the current spin
     cycle.
     """
-    tol = 0.01     # steady-state carbon influx delta (%), Xia et al. 2013
-    tol_pass = 0.5 # steady-state passive delta (g C m-2 yr-1), Xia et al. 2013
+    tol_npp = 0.005 # delta < 10^-4 g C m-2, Xia et al. 2013
+    tol_plant = 0.01 # delta steady-state carbon (%), Xia et al. 2013
+    tol_soil = 0.01
+    tol_pass = 0.5   # delta passive pool (g C m-2 yr-1), Xia et al. 2013
+
     if num == 1:
+        prev_npp = 99999.9
         prev_cplant = 99999.9
         prev_csoil = 99999.9
         prev_passive = 99999.9
+        prev_cl = 99999.9
+        prev_cw = 99999.9
+        prev_cr = 99999.9
     else:
         casa_rst_ofname = "%s_casa_rst_%d.nc" % (experiment_id, num-1)
         fname = os.path.join(restart_dir, casa_rst_ofname)
-        ds_old = xr.open_dataset(fname)
-        prev_cplant = np.sum(ds_old.cplant.values)
-        prev_csoil = np.sum(ds_old.csoil.values)
-        prev_passive = ds_old.csoil.values[2][0]
+        ds_casa = xr.open_dataset(fname)
+        prev_cplant = np.sum(ds_casa.cplant.values)
+        prev_cl = ds_casa.cplant.values[0][0]
+        prev_cw = ds_casa.cplant.values[1][0]
+        prev_cr = ds_casa.cplant.values[2][0]
+        prev_csoil = np.sum(ds_casa.csoil.values)
+        prev_passive = ds_casa.csoil.values[2][0]
+        ds_casa.close()
+
+        if check_npp:
+            cable_ofname = "%s_out_cable_spin_%d.nc" % (experiment_id, num-1)
+            fname = os.path.join(output_dir, cable_ofname)
+            ds_cable = xr.open_dataset(fname, decode_times=False)
+            prev_npp = np.mean(ds_cable.NPP.values)
+            ds_cable.close()
 
     casa_rst_ofname = "%s_casa_rst_%d.nc" % (experiment_id, num)
     fname = os.path.join(restart_dir, casa_rst_ofname)
-    ds_new = xr.open_dataset(fname)
-    new_cplant = np.sum(ds_new.cplant.values)
-    new_csoil = np.sum(ds_new.csoil.values)
-    new_passive = ds_new.csoil.values[2][0]
+    ds_casa = xr.open_dataset(fname)
+    new_cplant = np.sum(ds_casa.cplant.values)
+    new_cl = ds_casa.cplant.values[0][0]
+    new_cw = ds_casa.cplant.values[1][0]
+    new_cr = ds_casa.cplant.values[2][0]
+    new_csoil = np.sum(ds_casa.csoil.values)
+    new_passive = ds_casa.csoil.values[2][0]
+    ds_casa.close()
 
-    if plant:
-        if ( np.fabs((new_cplant - prev_cplant) / new_cplant) < tol):
+    if check_npp:
+        cable_ofname = "%s_out_cable_spin_%d.nc" % (experiment_id, num)
+        fname = os.path.join(output_dir, cable_ofname)
+        ds_cable = xr.open_dataset(fname, decode_times=False)
+        new_npp = np.mean(ds_cable.NPP.values)
+        ds_cable.close()
+
+    if check_npp:
+        if ( np.fabs(new_npp - prev_npp) < tol_npp ):
              not_in_equilibrium = False
         else:
             not_in_equilibrium = True
@@ -348,12 +378,44 @@ def check_steady_state(experiment_id, restart_dir, num, plant=True,
         if debug:
             print("\n===============================================\n")
             print("*", num, not_in_equilibrium,
-                  "Cplant", new_cplant, prev_cplant,
-                  np.fabs((new_cplant - prev_cplant) / new_cplant))
+                  "NPP", new_npp, prev_npp,
+                  np.fabs(new_npp - prev_npp), tol_npp )
             print("\n===============================================\n")
     else:
+
+        if check_plant:
+            delta_cl = np.fabs(new_cl - prev_cl) / new_cl
+            delta_cw = np.fabs(new_cw - prev_cw) / new_cw
+            delta_cr = np.fabs(new_cr - prev_cr) / new_cr
+            if ( delta_cl + delta_cw + delta_cr  < tol_plant ):
+            #if ( np.fabs((new_cplant - prev_cplant) / new_cplant) < tol_plant ):
+                 not_in_equilibrium = False
+            else:
+                not_in_equilibrium = True
+
+            if debug:
+                print("\n===============================================\n")
+                print("*", num, not_in_equilibrium,
+                      "Cplant", new_cplant, prev_cplant,
+                      delta_cl + delta_cw + delta_cr, tol_plant  )
+                print("\n===============================================\n")
+        elif check_soil:
+            if ( np.fabs((new_csoil - prev_csoil) / new_csoil) < tol_soil ):
+                 not_in_equilibrium = False
+            else:
+                not_in_equilibrium = True
+
+            if debug:
+                print("\n===============================================\n")
+                print("*", num, not_in_equilibrium,
+                      "Csoil", new_csoil, prev_csoil,
+                      np.fabs((new_csoil - prev_csoil) / new_csoil), tol_soil,
+                      "Passive", new_passive, prev_passive )
+                print("\n===============================================\n")
+
+        """
         if check_passive:
-            if ( np.fabs(new_passive - prev_passive) < tol_pass):
+            if ( np.fabs(new_passive - prev_passive) < tol_pass ):
                  not_in_equilibrium = False
             else:
                 not_in_equilibrium = True
@@ -380,11 +442,7 @@ def check_steady_state(experiment_id, restart_dir, num, plant=True,
                       "Csoil", new_csoil, prev_csoil,
                       np.fabs((new_csoil - prev_csoil) / new_csoil))
                 print("\n===============================================\n")
-
-    if num != 1:
-        ds_old.close()
-    ds_new.close()
-
+        """
     return not_in_equilibrium
 
 def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,

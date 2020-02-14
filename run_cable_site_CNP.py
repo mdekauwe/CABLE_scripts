@@ -200,7 +200,29 @@ class RunCable(object):
                 # won't do...
                 num = restart_num + 1
 
-            # Second phase: bring plant biomass pools into equilibrium
+
+
+
+            # Second phase: find steady-state NPP
+            not_stabilised = True
+            while not_stabilised:
+
+                print("\n===============================================\n")
+                print("Find steady-state NPP: %d\n" % (num))
+                print("===============================================\n\n")
+                self.setup_spin(number=num)
+                self.run_me()
+                self.clean_up(num, tag="spin")
+
+                not_stabilised = check_steady_state(self.experiment_id,
+                                                    self.restart_dir,
+                                                    self.output_dir,
+                                                    num, check_npp=True,
+                                                    debug=True)
+                num += 1
+
+
+            # Third phase: bring plant biomass pools into equilibrium
             not_stabilised = True
             while not_stabilised:
 
@@ -213,10 +235,13 @@ class RunCable(object):
 
                 not_stabilised = check_steady_state(self.experiment_id,
                                                     self.restart_dir,
-                                                    num, plant=True, debug=True)
+                                                    self.output_dir,
+                                                    num, check_plant=True,
+                                                    debug=True)
                 num += 1
 
-            # Third phase: bring soil pools into equilibrium using analytical
+
+            # Fourht phase: bring soil pools into equilibrium using analytical
             # solution
             not_stabilised = True
             while not_stabilised:
@@ -230,15 +255,17 @@ class RunCable(object):
 
                 not_stabilised = check_steady_state(self.experiment_id,
                                                     self.restart_dir,
-                                                    num, plant=False,
+                                                    self.output_dir,
+                                                    num, check_soil=True,
                                                     debug=True)
 
-                # run another simulation...
-                self.setup_spin(number=num)
-                self.run_me()
-                self.clean_up(num, tag="spin")
+                # Not found a steady-state solution run further simulations...
+                for i in range(10):
+                    self.setup_spin(number=num)
+                    self.run_me()
+                    self.clean_up(num, tag="spin")
 
-                num += 1
+                    num += 1
 
             # Fourth phase: bring soil pools into equilibrium using analytical
             # solution, but without restricting N and P pools
@@ -264,13 +291,17 @@ class RunCable(object):
 
                 not_stabilised = check_steady_state(self.experiment_id,
                                                     self.restart_dir,
-                                                    num, plant=False,
+                                                    self.output_dir,
+                                                    num, check_soil=True,
                                                     debug=True)
 
-                # run another simulation...
-                self.setup_spin(number=num)
-                self.run_me()
-                self.clean_up(num, tag="spin")
+                # Not found a steady-state solution run further simulations...
+                for i in range(5):
+                    self.setup_spin(number=num)
+                    self.run_me()
+                    self.clean_up(num, tag="spin")
+
+                    num += 1
 
                 num += 1
 
@@ -666,7 +697,8 @@ if __name__ == "__main__":
     restart_dir = "restarts"
     namelist_dir = "namelists"
     aux_dir = "../../src/CABLE-AUX/"
-    cable_src = "../../src/trunk/trunk"
+    #cable_src = "../../src/trunk/trunk"
+    cable_src = "../../src/trunk_analytical/trunk_analytical/"
     mpi = False
     num_cores = 1 # set to a number, if None it will use all cores...!
     # if empty...run all the files in the met_dir
