@@ -212,15 +212,28 @@ if __name__ == "__main__":
                 (data_type, row, col, start_yr, end_yr)
     main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname)
     """
+
+    """
     #fdir = "/Users/mdekauwe/Desktop/interpolated"
     fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
     vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
     start_yr = 1995
     end_yr = 2000
-    #row = 292
-    #col = 590
     row = 186
     col = 664
+
+    data_type = "AWAP"
+    ofname = "single_pixel_spinup_%s_%d_%d_%d_%d.nc" % \
+                (data_type, row, col, start_yr, end_yr)
+    main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname)
+    """
+
+    fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
+    vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
+    start_yr = 2012
+    end_yr = 2019
+    row = 409 #410
+    col = 793
 
     data_type = "AWAP"
     ofname = "single_pixel_spinup_%s_%d_%d_%d_%d.nc" % \
