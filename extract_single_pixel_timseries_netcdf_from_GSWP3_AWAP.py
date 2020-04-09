@@ -230,7 +230,7 @@ if __name__ == "__main__":
 
     fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
     vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
-    start_yr = 2012
+    start_yr = 2016
     end_yr = 2019
     row = 409 #410
     col = 793
