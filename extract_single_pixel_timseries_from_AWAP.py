@@ -64,4 +64,4 @@ if __name__ == "__main__":
     col = 793
 
     data_type = "AWAP"
-    main(fdir, vars, start_yr, end_yr, row, col, data_type)
+    main(fdir, var, start_yr, end_yr, row, col, data_type)
