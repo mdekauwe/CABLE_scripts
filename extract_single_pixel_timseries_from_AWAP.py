@@ -29,7 +29,10 @@ def main(fdir, var, start_yr, end_yr, row, col, data_type):
             fname = "%s/%s.BC.%s.3hrMap.%d.nc" % (var, data_type, var, yr)
         else:
             fname = "%s/%s.%s.3hr.%d.nc" % (var, data_type, var, yr)
+
+        print(fname)
         fpath = os.path.join(fdir, fname)
+        print(fpath)
         ds = xr.open_dataset(fpath)
         vals = ds[var][:,row,col].values
         lat = ds["lat"][row].values
