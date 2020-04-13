@@ -186,6 +186,34 @@ def main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname):
 
 if __name__ == "__main__":
 
+    fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
+    vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
+    start_yr = 2016
+    end_yr = 2019
+    row = 409 #410
+    col = 793
+
+    data_type = "AWAP"
+    ofname = "single_pixel_spinup_%s_%d_%d_%d_%d.nc" % \
+                (data_type, row, col, start_yr, end_yr)
+    main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     """
     # find pixel
     fname = "all_yrs_plc_AWAP.nc"
@@ -227,15 +255,3 @@ if __name__ == "__main__":
                 (data_type, row, col, start_yr, end_yr)
     main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname)
     """
-
-    fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
-    vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
-    start_yr = 2016
-    end_yr = 2019
-    row = 409 #410
-    col = 793
-
-    data_type = "AWAP"
-    ofname = "single_pixel_spinup_%s_%d_%d_%d_%d.nc" % \
-                (data_type, row, col, start_yr, end_yr)
-    main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname)
