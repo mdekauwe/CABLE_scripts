@@ -35,6 +35,8 @@ def main(fdir, var, start_yr, end_yr, row, col, data_type, ofname):
         lat = ds["lat"][row].values
         lon = ds["lon"][col].values
 
+        print(vals.shape)
+        print(lat.shape)
         out = np.append(out, vals)
 
         ds.close()
@@ -44,7 +46,7 @@ def main(fdir, var, start_yr, end_yr, row, col, data_type, ofname):
 if __name__ == "__main__":
 
     # Expecting PFT to be supplied on cmd line, e.g.
-    # $ python extract_single_pixel_timseries_from_AWAP.py "rf"
+    # $ python extract_single_pixel_timseries_from_AWAP.py "Qair" "2016"
     if len(sys.argv) < 2:
         raise TypeError("Expecting pft name to be supplied on cmd line!")
     var = sys.argv[1]
@@ -59,6 +61,4 @@ if __name__ == "__main__":
     col = 793
 
     data_type = "AWAP"
-    ofname = "single_pixel_spinup_%s_%d_%d_%d_%d.nc" % \
-                (data_type, row, col, start_yr, end_yr)
     main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname)
