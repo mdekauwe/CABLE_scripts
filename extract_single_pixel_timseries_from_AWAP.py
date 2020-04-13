@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 
-def main(fdir, var, start_yr, end_yr, row, col, data_type, ofname):
+def main(fdir, var, start_yr, end_yr, row, col, data_type):
 
     out = np.zeros(0)
 
@@ -61,4 +61,4 @@ if __name__ == "__main__":
     col = 793
 
     data_type = "AWAP"
-    main(fdir, vars, start_yr, end_yr, row, col, data_type, ofname)
+    main(fdir, vars, start_yr, end_yr, row, col, data_type)
