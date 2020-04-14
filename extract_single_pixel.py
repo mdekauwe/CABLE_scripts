@@ -23,6 +23,7 @@ import subprocess
 import sys
 import os
 
+data_type = "AWAP"
 fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
 vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
 start_yr = 2016
@@ -36,7 +37,10 @@ var = str(sys.argv[1])
 
 for yr in range(start_yr, end_yr +1):
 
-    fname = "%s/%s/%s.%s.3hr.%d.nc" % (fdir, var, data_type, var, yr)
+    if data_type == "GSWP3":
+        fname = "%s/%s/%s.BC.%s.3hrMap.%d.nc" % (fdir, var, data_type, var, yr)
+    else:
+        fname = "%s/%s/%s.%s.3hr.%d.nc" % (fdir, var, data_type, var, yr)
     ofname = "%s_yr.nc" % (var, yr)
     qs_cmd = "ncks -dlat,%d,%d -dlon,%d,%d %s %s" % \
                 (row, row, col, col, fname, ofname)
