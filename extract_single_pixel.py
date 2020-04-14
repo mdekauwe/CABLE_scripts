@@ -41,7 +41,7 @@ for yr in range(start_yr, end_yr +1):
         fname = "%s/%s/%s.BC.%s.3hrMap.%d.nc" % (fdir, var, data_type, var, yr)
     else:
         fname = "%s/%s/%s.%s.3hr.%d.nc" % (fdir, var, data_type, var, yr)
-    ofname = "%s_yr.nc" % (var, yr)
+    ofname = "%s_%d.nc" % (var, yr)
     qs_cmd = "ncks -dlat,%d,%d -dlon,%d,%d %s %s" % \
                 (row, row, col, col, fname, ofname)
     error = subprocess.call(qs_cmd, shell=True)
