@@ -17,8 +17,9 @@ import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 import datetime
+import glob as glob
 
-def main(vars, start_yr, end_yr,  data_type):
+def main(vars, start_yr, end_yr,  data_type, row, col):
 
     LWdown_out = np.zeros(0)
     PSurf_out = np.zeros(0)
@@ -34,7 +35,7 @@ def main(vars, start_yr, end_yr,  data_type):
 
         for i, var in enumerate(vars):
 
-            fname = "%s_%d.nc" % (var, yr)
+            fname = "%s_%d_%d_%d.nc" % (var, yr, row, col)
             ds = xr.open_dataset(fname)
 
             vals = ds[var][:,0,0].values
@@ -192,4 +193,8 @@ if __name__ == "__main__":
     end_yr = 2019
     data_type = "AWAP"
 
-    main(vars, start_yr, end_yr,  data_type)
+    tmp_fn = glob.glob("SWdown_%d_*_*.nc" % (start_yr))[0]
+    row = int(tmp_fn.split("_")[2])
+    col = int(tmp_fn.split("_")[3].split(".")[0])
+
+    main(vars, start_yr, end_yr,  data_type, row, col)
