@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Belinda's pixels.
 
 import numpy as np
@@ -11,18 +13,14 @@ def get_row_col(lat0, lon0):
     aus_latvals = np.zeros((nrows, ncols))
     aus_lonvals = np.zeros((nrows, ncols))
 
-    # Upper right corner.
-    urcrnrlat = -44.025 + (float(nrows) * 0.05)
-    urcrnrlon = 111.975 + (float(ncols) * 0.05)
-
     # lower left corner
-    llcrnrlon = 111.975
-    llcrnrlat = -44.025
+    llcrnrlon = 112.
+    llcrnrlat = -44.
 
     for i in range(nrows):
         for j in range(ncols):
 
-            lat = urcrnrlat - (float(i) * 0.05)
+            lat = llcrnrlat + (float(i) * 0.05)
             lon = llcrnrlon + (float(j) * 0.05)
             aus_latvals[i,j] = lat
             aus_lonvals[i,j] = lon
