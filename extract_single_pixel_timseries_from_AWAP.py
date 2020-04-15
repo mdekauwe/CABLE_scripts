@@ -23,22 +23,17 @@ def main(fdir, var, start_yr, end_yr, row, col, data_type):
     out = np.zeros(0)
 
     for yr in range(start_yr, end_yr +1):
-        print(yr)
-
+    
         if data_type == "GSWP3":
             fname = "%s/%s.BC.%s.3hrMap.%d.nc" % (var, data_type, var, yr)
         else:
             fname = "%s/%s.%s.3hr.%d.nc" % (var, data_type, var, yr)
 
         fpath = os.path.join(fdir, fname)
-        print(fpath)
         ds = xr.open_dataset(fpath)
         vals = ds[var][:,row,col].values
         lat = ds["lat"][row].values
         lon = ds["lon"][col].values
-
-        print(vals.shape)
-        print(lat.shape)
         out = np.append(out, vals)
 
         ds.close()
@@ -59,8 +54,8 @@ if __name__ == "__main__":
     fdir = "/g/data1a/w35/mgk576/research/AWAP_interpolation/interpolated"
     #vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
 
-    row = 409 #410
-    col = 793
+    row = 272
+    col = 792
 
     data_type = "AWAP"
     main(fdir, var, start_yr, end_yr, row, col, data_type)
