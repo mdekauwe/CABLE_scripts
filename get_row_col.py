@@ -43,8 +43,8 @@ def get_row_col(lat0, lon0):
 #for lat,lon in zip(lats, lons):
 #    get_row_col(lat, lon)
 
-lats = [-31.0927,-31.0927,-30.0]
-lons = [150.9320,142.5, 141.4]
+lats = [-30.4176, -30.4, -31.0927,-31.0927,-30.0]
+lons = [151.6234, 150.6, 150.9320,142.5, 141.4]
 
 for lat,lon in zip(lats, lons):
     get_row_col(lat, lon)
