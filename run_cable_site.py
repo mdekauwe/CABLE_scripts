@@ -106,6 +106,7 @@ class RunCable(object):
             self.worker(met_files, url, rev, param_names, param_values,
                         out_fname, out_log_fname, mcmc_tag)
 
+
     def worker(self, met_files, url, rev, param_names, param_values,
                out_fname, out_log_fname, mcmc_tag):
 
@@ -265,4 +266,4 @@ if __name__ == "__main__":
                  namelist_dir=namelist_dir, met_subset=met_subset,
                  cable_src=cable_src, mpi=mpi, num_cores=num_cores,
                  adjust_params=adjust_params)
-    C.main(param_names, param_values)
+    C.main()
