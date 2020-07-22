@@ -300,7 +300,7 @@ if __name__ == "__main__":
     #aux_dir = "/g/data/w35/mgk576/research/CABLE_runs/src/CABLE-AUX"
     aux_dir = "../../src/CABLE-AUX"
     #cable_src = "../../src/trunk/trunk/"
-    cable_src = "../../src/trunk/trunk/"
+    cable_src = "../../src/trunk_cnp_spatial/trunk_cnp_spatial/"
     spinup_start_yr = 1901 # GSWP3 starts in 1901
     spinup_end_yr = 1930
     #spinup_end_yr = 2000
