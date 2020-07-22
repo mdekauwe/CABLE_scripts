@@ -194,7 +194,7 @@ class RunCable(object):
                         "output%restart": ".TRUE.",
                         "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
-                        "cable_user%limit_labile": ".TRUE.",
+                        #"cable_user%limit_labile": ".TRUE.",
                         "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
                         "cable_user%GW_MODEL": ".FALSE.",
