@@ -494,14 +494,32 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     if spin_up:
         print("    if [ $start_yr == $year ]", end="\n", file=f)
         print("    then", end="\n", file=f)
-        print("        restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
+        if CNP:
+            print("        restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
+            print("        casa_restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
+        else:
+            print("        restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
         print("    else", end="\n", file=f)
-        print("        restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+
+        if CNP:
+            print("        restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+            print("        casa_restart_in=\"casa_restart_$prev_yr.nc\"", end="\n", file=f)
+        else:
+            print("        restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
         print("    fi", end="\n", file=f)
         print(" ", end="\n", file=f)
     else:
-        print("    restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
-    print("    restart_out=\"restart_$year.nc\"", end="\n", file=f)
+        if CNP:
+            print("    restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+            print("    casa_restart_in=\"casa_restart_$prev_yr.nc\"", end="\n", file=f)
+        else:
+            print("    restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+
+    if CNP:
+        print("    restart_out=\"restart_$year.nc\"", end="\n", file=f)
+        print("    casa_restart_out=\"casa_restart_$year.nc\"", end="\n", file=f)
+    else:
+        print("    restart_out=\"restart_$year.nc\"", end="\n", file=f)
     print("    outfile=\"cable_out_$year.nc\"", end="\n", file=f)
     print("    logfile=\"cable_log_$year.txt\"", end="\n", file=f)
     print(" ", end="\n", file=f)
@@ -515,6 +533,7 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     else:
         print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
         print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
+        print("                                  --ci $casa_restart_in --cr $casa_restart_out \\", end="\n", file=f)
         print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
     print("    mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
