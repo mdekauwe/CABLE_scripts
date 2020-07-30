@@ -29,8 +29,10 @@ from cable_utils import generate_spatial_qsub_script
 def cmd_line_parser():
 
     p = optparse.OptionParser()
-    p.add_option("-s", action="store_true", default=False,
-                   help="Spinup model")
+    p.add_option("--s1", action="store_true", default=False,
+                   help="Spinup model: first round")
+    p.add_option("--s2", action="store_true", default=False,
+                   help="Spinup model: second round")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
     p.add_option("-t", action="store_true", default=False,
@@ -48,15 +50,14 @@ def cmd_line_parser():
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, options.ci,
-            options.cr, int(options.y),float(options.c), options.n, options.s,
-            options.s2, options.s3, options.a, options.t, int(options.rn))
+            options.cr, int(options.y),float(options.c), options.n, options.s1,
+            options.s2, options.a, options.t, int(options.rn))
 
 
 class RunCable(object):
 
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, cable_src=None, nml_fname=None,
-                 spin_up=False, qsub_fname=None,
                  spinup_dir="spinup_files",
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
@@ -92,10 +93,8 @@ class RunCable(object):
 
         self.namelist_dir = namelist_dir
         self.co2_fname = co2_fname
-        self.qsub_fname = qsub_fname
         self.cable_src = cable_src
         self.cable_exe = os.path.join(cable_src, "offline/%s" % (cable_exe))
-        self.spin_up = spin_up
         self.co2_fixed = co2_fixed    # umol mol-1
         self.ndep_fixed = ndep_fixed  # kg N ha-1 yr-1
         self.pdep_fixed = pdep_fixed  # kg N ha-1 yr-1
@@ -207,19 +206,19 @@ class RunCable(object):
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def run_qsub_script(self, start_yr, end_yr):
+    def run_qsub_script(self, qsub_fname, start_yr, end_yr, spin_up):
 
         # Create a qsub script for simulations if missing, there is one of spinup
         # and one for simulations, so two qsub_fnames
-        if not os.path.isfile(self.qsub_fname):
-            generate_spatial_qsub_script(self.qsub_fname, self.walltime,
+        if not os.path.isfile(qsub_fname):
+            generate_spatial_qsub_script(qsub_fname, self.walltime,
                                          self.mem, self.ncpus,
-                                         spin_up=self.spin_up, CNP=True)
+                                         spin_up=spin_up, CNP=True)
 
 
         # Run qsub script
         qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s %s' % \
-                    (start_yr, end_yr, self.co2_fname, self.qsub_fname)
+                    (start_yr, end_yr, self.co2_fname, qsub_fname)
 
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
@@ -317,7 +316,6 @@ if __name__ == "__main__":
     cable_src = "../../src/trunk_cnp_spatial/trunk_cnp_spatial/"
     spinup_start_yr = 1901 # GSWP3 starts in 1901
     spinup_end_yr = 1930
-    #spinup_end_yr = 2000
     run_start_yr = 1924
     run_end_yr = 1950
     biogeochem = "C"
@@ -327,37 +325,40 @@ if __name__ == "__main__":
     (log_fname, out_fname, cable_rst_ifname,
      cable_rst_ofname, casa_rst_ifname,
      casa_rst_ofname, year, co2_conc,
-     nml_fname, spin_up, spin2, spin3,
+     nml_fname, spin_up_step_one, spin_up_step_two,
      adjust_nml, sort_restarts,
      rst_num) = cmd_line_parser()
 
-    if spin_up:
+    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
+                 restart_dir=restart_dir, aux_dir=aux_dir,
+                 cable_src=cable_src, qsub_fname,
+                 nml_fname=nml_fname, walltime=walltime,
+                 biogeochem=biogeochem, experiment_name=experiment_name)
+
+    # First spin up round....
+    if spin_up_step_one:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
         walltime = "6:00:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
+    # Second spin up round, here we're reusing the restart files...
+    elif spin_up_step_two:
+        start_yr = spinup_start_yr
+        end_yr = spinup_end_yr
+        walltime = "6:00:00"
+        qsub_fname = "qsub_wrapper_script_simulation.sh"
+        C.sort_restart_files(spinup_start_yr, spinup_end_yr, rst_num)
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
-        walltime = "4:00:00"
+        walltime = "6:00:00"
         qsub_fname = "qsub_wrapper_script_simulation.sh"
-
-    C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
-                 restart_dir=restart_dir, aux_dir=aux_dir, spin_up=spin_up,
-                 cable_src=cable_src, qsub_fname=qsub_fname,
-                 nml_fname=nml_fname, walltime=walltime,
-                 biogeochem=biogeochem, experiment_name=experiment_name)
-
-    # Sort the restart files out before we run simulations "-t" + "--rn 1"
-    if sort_restarts:
-        C.sort_restart_files(spinup_start_yr, spinup_end_yr, rst_num)
-        sys.exit('Restart files fixed up, run spinup again')
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file(start_yr)
-        C.run_qsub_script(start_yr, end_yr)
+        C.run_qsub_script(qsub_fname, start_yr, end_yr, spin_up=True)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
