@@ -40,17 +40,20 @@ def cmd_line_parser():
     p.add_option("-t", action="store_true", default=False,
                    help="Sort restart files")
     p.add_option("-y", default="1900", help="year")
+    p.add_option("--rn", default="", help="rst_num")
     p.add_option("-l", default="", help="log filename")
     p.add_option("-o", default="", help="out filename")
     p.add_option("-i", default="", help="restart in filename")
     p.add_option("-r", default="", help="restart out filename")
+    p.add_option("--ci", default="", help="casa restart in filename")
+    p.add_option("--cr", default="", help="casa restart out filename")
     p.add_option("-c", default="400.0", help="CO2 concentration")
     p.add_option("-n", default=None, help="nml_fname")
     options, args = p.parse_args()
 
-    return (options.l, options.o, options.i,  options.r, int(options.y),
-            float(options.c), options.n, options.s, options.s2, options.s3,
-            options.a, options.t)
+    return (options.l, options.o, options.i,  options.r, options.ci,
+            options.cr, int(options.y),float(options.c), options.n, options.s,
+            options.s2, options.s3, options.a, options.t, int(options.rn))
 
 
 class RunCable(object):
@@ -58,12 +61,12 @@ class RunCable(object):
     def __init__(self, met_dir=None, log_dir=None, output_dir=None,
                  restart_dir=None, aux_dir=None, cable_src=None, nml_fname=None,
                  spin_up=False, qsub_fname=None,
-                 spinup_dir="spinup_restart",
+                 spinup_dir="spinup_files",
                  namelist_dir="namelists",
                  soil_fname="def_soil_params.txt",
                  veg_fname="def_veg_params_zr_clitt_albedo_fix.txt",
                  co2_fname="Annual_CO2_concentration_until_2010.txt",
-                 grid_fname="gridinfo_mmy_MD_elev_orig_std_avg-sand_mask.nc",
+                 grid_fname="gridinfo_mmy_MD_elev_orig_std_casa_avg-sand_mask.nc",
                  phen_fname="modis_phenology_csiro.txt",
                  #cnpbiome_fname="pftlookup_csiro_v16_17tiles_Ticket2.csv",
                  cnpbiome_fname="pftlookup_csiro_v16_17tiles-cheng-m02.csv",
@@ -147,20 +150,22 @@ class RunCable(object):
             os.remove(local_exe)
         shutil.copy(self.cable_exe, local_exe)
 
-    def setup_nml_file(self, number):
+    def setup_nml_file(self, start_yr):
 
         # set directory paths...
-        out_fname = "%s_out_cable_spin_%d.nc" % (self.experiment_id, number)
+        out_fname = "%s_out_cable_spin.nc" % (self.experiment_id)
         out_fname = os.path.join(self.output_dir, out_fname)
 
-        out_log_fname = "%s_log_spin_%d.txt" % (self.experiment_id, number)
+        out_log_fname = "%s_log_spin.txt" % (self.experiment_id)
         out_log_fname = os.path.join(self.log_dir, out_log_fname)
 
-        cable_rst_ofname = "%s_cable_rst_%d.nc" % (self.experiment_id, number)
-        cable_rst_ofname = os.path.join(self.restart_dir, cable_rst_ofname)
+        cable_rst_ifname = ""
+        cable_rst_ofname = os.path.join(self.restart_dir,
+                                        "cable_restart_%d.nc" % (start_yr))
 
-        casa_rst_ofname = "%s_casa_rst_%d.nc" % (self.experiment_id, number)
-        casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
+        casa_rst_ifname = ""
+        casa_rst_ofname = os.path.join(self.restart_dir,
+                                       "casa_restart_%d.nc" % (start_yr))
 
         replace_dict = {
                         "filename%met": "''",  # not needed for GSWP3 run
@@ -170,9 +175,9 @@ class RunCable(object):
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
                         "filename%out": "'%s'" % (out_fname),
                         "filename%log": "'%s'" % (out_log_fname),
-                        "filename%restart_in": "' '",
+                        "filename%restart_in": "'%s'" % (cable_rst_ifname),
                         "filename%restart_out": "'%s'" % (cable_rst_ofname),
-                        "casafile%cnpipool": "' '",
+                        "casafile%cnpipool": "'%s'" % (casa_rst_ifname),
                         "casafile%cnpepool": "'%s'" % (casa_rst_ofname),
                         "fixedCO2": "%.2f" % (self.co2_fixed),
                         "casafile%phen": "'%s'" % (self.phen_fname),
@@ -182,12 +187,13 @@ class RunCable(object):
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
+                        "output%averaging": "'annually'",
                         "cable_user%CASA_OUT_FREQ": "'annually'",
                         "output%casa": ".TRUE.",
                         "leaps": ".FALSE.",
                         "cable_user%CASA_fromZero": ".TRUE.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
-                        "cable_user%CASA_DUMP_WRITE": ".TRUE.",
+                        "cable_user%CASA_DUMP_WRITE": ".FALSE.",
                         "cable_user%CASA_NREP": "0",
                         "spinup": ".FALSE.",
                         "spincasa": ".FALSE.",
@@ -201,7 +207,7 @@ class RunCable(object):
                         "cable_user%or_evap": ".FALSE.",
                         "cable_user%GSWP3": ".TRUE.",
                         "cable_user%MetType": "'gswp3'",
-                        "verbose": ".FALSE.",
+                        "verbose": ".TRUE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
@@ -223,25 +229,32 @@ class RunCable(object):
         if error is 1:
             raise("Job failed to submit\n")
 
-
-    def create_new_nml_file(self, log_fname, out_fname, restart_in_fname,
-                            restart_out_fname, year, co2_conc):
+    def create_new_nml_file(self, log_fname, out_fname, cable_rst_ifname,
+                            cable_rst_ofname, casa_rst_ifname, casa_rst_ofname,
+                            year, co2_conc):
 
         out_log_fname = os.path.join(self.log_dir, log_fname)
         out_fname = os.path.join(self.output_dir, out_fname)
 
         # i.e. no restart file for first spinup year
-        if restart_in_fname == "missing":
-            restart_in_fname = ""
+        if cable_restart_ifname == "missing":
+            cable_rst_ifname = ""
+            casa_rst_ifname = ""
         else:
-            restart_in_fname = os.path.join(self.restart_dir, restart_in_fname)
-        restart_out_fname = os.path.join(self.restart_dir, restart_out_fname)
+            cable_rst_ifname = os.path.join(self.restart_dir, cable_rst_ifname)
+            casa_rst_ifname = os.path.join(self.restart_dir, casa_rst_ifname)
+
+        cable_rst_ofname = os.path.join(self.restart_dir, cable_rst_ofname)
+        casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
 
         replace_dict = {
                         "filename%log": "'%s'" % (out_log_fname),
                         "filename%out": "'%s'" % (out_fname),
-                        "filename%restart_in": "'%s'" % (restart_in_fname),
-                        "filename%restart_out": "'%s'" % (restart_out_fname),
+                        "filename%restart_in": "'%s'" % (cable_rst_ifname),
+                        "filename%restart_out": "'%s'" % (cable_rst_ofname),
+                        "casafile%cnpipool": "'%s'" % (casa_rst_ifname),
+                        "casafile%cnpepool": "'%s'" % (casa_rst_ofname),
+
                         "fixedCO2": "%f" % (co2_conc),
                         "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
                         "CABLE_USER%YearStart": "0", # needs to be 0 so the ncciy is set
@@ -262,31 +275,36 @@ class RunCable(object):
         shutil.copyfile(self.nml_fname, os.path.join(self.namelist_dir,
                                                      "cable_%d.nml" % (year)))
 
-    def sort_restart_files(self, start_yr, end_yr):
+    def sort_restart_files(self, start_yr, end_yr, number):
 
         if not os.path.exists(self.spinup_dir):
             os.makedirs(self.spinup_dir)
 
-            # Copy the last spinup restart file to the backup dir and rename
-            # it as if it was the first year
-            fn_in = "restart_%d.nc" % (end_yr)
-            fn_out = "restart_%d.nc" % (start_yr)
+        # Copy the last spinup restart file to the backup dir and rename
+        # it as if it was the first year
+        fn_in = "cable_restart_%d.nc" % (end_yr)
+        fn_out = "cable_restart_%d_%d.nc" % (start_yr, number)
+        restart_in_fname = os.path.join(self.restart_dir, fn_in)
+        restart_out_fname = os.path.join(self.spinup_dir, fn_out)
+        shutil.copyfile(restart_in_fname, restart_out_fname)
 
-            restart_in_fname = os.path.join(self.restart_dir, fn_in)
-            restart_out_fname = os.path.join(self.spinup_dir, fn_out)
+        # Copy the output file to check for stability
+        fn_in = "cable_out_%d.nc" % (end_yr)
+        fn_out = "cable_out_s_%d.nc" % (number)
+        old_fname = os.path.join(self.output_dir, fn_in)
+        new_fname = os.path.join(self.spinup_dir, fn_out)
+        shutil.copyfile(old_fname, new_fname)
 
-            shutil.copyfile(restart_in_fname, restart_out_fname)
+        # remove the restart dir and remake it with the equilibrium file
+        shutil.rmtree(self.restart_dir, ignore_errors=True)
+        if not os.path.exists(self.restart_dir):
+            os.makedirs(self.restart_dir)
 
-            # remove the restart dir and remake it with the equilibrium file
-            shutil.rmtree(self.restart_dir, ignore_errors=True)
-
-            if not os.path.exists(self.restart_dir):
-                os.makedirs(self.restart_dir)
-
-            fn_in = "restart_%d.nc" % (start_yr)
-            restart_in_fname = os.path.join(self.spinup_dir, fn_in)
-            restart_out_fname = os.path.join(self.restart_dir, fn_in)
-            shutil.copyfile(restart_in_fname, restart_out_fname)
+        fn_in = "cable_restart_%d_%d.nc" % (start_yr, number)
+        fn_out = "cable_restart_%d.nc" % (start_yr)
+        restart_in_fname = os.path.join(self.spinup_dir, fn_in)
+        restart_out_fname = os.path.join(self.restart_dir, fn_out)
+        shutil.copyfile(restart_in_fname, restart_out_fname)
 
 
 
@@ -304,28 +322,28 @@ if __name__ == "__main__":
     spinup_start_yr = 1901 # GSWP3 starts in 1901
     spinup_end_yr = 1930
     #spinup_end_yr = 2000
-    run_start_yr = 2000
-    run_end_yr = 2010
+    run_start_yr = 1924
+    run_end_yr = 1950
     biogeochem = "C"
     experiment_name = "GSWP3_CNP"
     # ------------------------------------------- #
 
-    (log_fname, out_fname, restart_in_fname,
-     restart_out_fname, year, co2_conc,
+    (log_fname, out_fname, cable_rst_ifname,
+     cable_rst_ofname, casa_rst_ifname,
+     casa_rst_ofname, year, co2_conc,
      nml_fname, spin_up, spin2, spin3,
-     adjust_nml, sort_restarts) = cmd_line_parser()
-
+     adjust_nml, sort_restarts
+     rst_num) = cmd_line_parser()
 
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        #walltime = "4:00:00"
-        walltime = "2:00:00"
+        walltime = "6:00:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
         end_yr = run_end_yr
-        walltime = "6:30:00"
+        walltime = "4:00:00"
         qsub_fname = "qsub_wrapper_script_simulation.sh"
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
@@ -334,18 +352,19 @@ if __name__ == "__main__":
                  nml_fname=nml_fname, walltime=walltime,
                  biogeochem=biogeochem, experiment_name=experiment_name)
 
-    # Sort the restart files out before we run simulations "-t"
+    # Sort the restart files out before we run simulations "-t" + "--rn 1"
     if sort_restarts:
-        C.sort_restart_files(spinup_start_yr, spinup_end_yr)
-        sys.exit('Restart files fixed up, run simulation')
+        C.sort_restart_files(spinup_start_yr, spinup_end_yr, rst_num)
+        sys.exit('Restart files fixed up, run spinup again')
 
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
-        C.setup_nml_file(number=0)
+        C.setup_nml_file(start_yr)
         C.run_qsub_script(start_yr, end_yr)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
-        C.create_new_nml_file(log_fname, out_fname, restart_in_fname,
-                              restart_out_fname, year, co2_conc)
+        C.create_new_nml_file(log_fname, out_fname, cable_rst_ifname,
+                              cable_rst_ofname, casa_rst_ifname,
+                              casa_rst_ofname, year, co2_conc)
