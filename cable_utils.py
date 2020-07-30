@@ -502,24 +502,24 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
         print("    else", end="\n", file=f)
 
         if CNP:
-            print("        restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+            print("        restart_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
             print("        casa_restart_in=\"casa_restart_$prev_yr.nc\"", end="\n", file=f)
         else:
-            print("        restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+            print("        restart_in=\"cable_$prev_yr.nc\"", end="\n", file=f)
         print("    fi", end="\n", file=f)
         print(" ", end="\n", file=f)
     else:
         if CNP:
-            print("    restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+            print("    restart_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
             print("    casa_restart_in=\"casa_restart_$prev_yr.nc\"", end="\n", file=f)
         else:
-            print("    restart_in=\"restart_$prev_yr.nc\"", end="\n", file=f)
+            print("    restart_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
 
     if CNP:
-        print("    restart_out=\"restart_$year.nc\"", end="\n", file=f)
+        print("    restart_out=\"cable_restart_$year.nc\"", end="\n", file=f)
         print("    casa_restart_out=\"casa_restart_$year.nc\"", end="\n", file=f)
     else:
-        print("    restart_out=\"restart_$year.nc\"", end="\n", file=f)
+        print("    restart_out=\"cable_restart_$year.nc\"", end="\n", file=f)
     print("    outfile=\"cable_out_$year.nc\"", end="\n", file=f)
     print("    logfile=\"cable_log_$year.txt\"", end="\n", file=f)
     print(" ", end="\n", file=f)
