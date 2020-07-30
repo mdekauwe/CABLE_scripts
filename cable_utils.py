@@ -529,11 +529,11 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     if CNP:
         print("    python ./run_cable_spatial_CNP.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
         print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
+        print("                                  --ci $casa_restart_in --cr $casa_restart_out \\", end="\n", file=f)
         print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
     else:
         print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
         print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
-        print("                                  --ci $casa_restart_in --cr $casa_restart_out \\", end="\n", file=f)
         print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
     print("    mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
