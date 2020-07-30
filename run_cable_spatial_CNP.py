@@ -331,8 +331,7 @@ if __name__ == "__main__":
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir,
-                 cable_src=cable_src, qsub_fname,
-                 nml_fname=nml_fname, walltime=walltime,
+                 cable_src=cable_src, nml_fname=nml_fname, walltime=walltime,
                  biogeochem=biogeochem, experiment_name=experiment_name)
 
     # First spin up round....
