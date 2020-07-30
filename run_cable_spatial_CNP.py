@@ -332,7 +332,7 @@ if __name__ == "__main__":
      cable_rst_ofname, casa_rst_ifname,
      casa_rst_ofname, year, co2_conc,
      nml_fname, spin_up, spin2, spin3,
-     adjust_nml, sort_restarts
+     adjust_nml, sort_restarts,
      rst_num) = cmd_line_parser()
 
     if spin_up:
