@@ -181,8 +181,8 @@ class RunCable(object):
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
-                        "output%averaging": "'annually'",
-                        "cable_user%CASA_OUT_FREQ": "'annually'",
+                        "output%averaging": "'monthly'",
+                        "cable_user%CASA_OUT_FREQ": "'monthly'",
                         "output%casa": ".TRUE.",
                         "leaps": ".FALSE.",
                         "cable_user%CASA_fromZero": ".TRUE.",
