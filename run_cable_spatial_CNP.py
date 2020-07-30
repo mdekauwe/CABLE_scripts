@@ -31,16 +31,12 @@ def cmd_line_parser():
     p = optparse.OptionParser()
     p.add_option("-s", action="store_true", default=False,
                    help="Spinup model")
-    p.add_option("--s2", action="store_true", default=False,
-                   help="Spinup model: S2")
-    p.add_option("--s3", action="store_true", default=False,
-                   help="Spinup model: S3")
     p.add_option("-a", action="store_true", default=False,
                    help="Adjust namelist file")
     p.add_option("-t", action="store_true", default=False,
                    help="Sort restart files")
     p.add_option("-y", default="1900", help="year")
-    p.add_option("--rn", default="", help="rst_num")
+    p.add_option("--rn", default="1", help="rst_num")
     p.add_option("-l", default="", help="log filename")
     p.add_option("-o", default="", help="out filename")
     p.add_option("-i", default="", help="restart in filename")
