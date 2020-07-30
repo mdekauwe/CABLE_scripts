@@ -71,7 +71,7 @@ class RunCable(object):
                  biogeochem="C", co2_conc=400.0, co2_fixed=284.7,
                  ndep_fixed=0.79, pdep_fixed=0.144,
                  experiment_name="GSWP3_CNP",
-                 cable_exe="cable-mpi", walltime=None, mem="64GB", ncpus="48"):
+                 cable_exe="cable-mpi", mem="64GB", ncpus="48"):
 
         self.met_dir = met_dir
         self.log_dir = log_dir
@@ -121,7 +121,6 @@ class RunCable(object):
             self.nml_fname = nml_fname
 
         # qsub stuff
-        self.walltime = walltime
         self.mem = mem
         self.ncpus = ncpus
 
@@ -206,12 +205,12 @@ class RunCable(object):
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
-    def run_qsub_script(self, qsub_fname, start_yr, end_yr, spin_up):
+    def run_qsub_script(self, qsub_fname, start_yr, end_yr, walltime, spin_up):
 
         # Create a qsub script for simulations if missing, there is one of spinup
         # and one for simulations, so two qsub_fnames
         if not os.path.isfile(qsub_fname):
-            generate_spatial_qsub_script(qsub_fname, self.walltime,
+            generate_spatial_qsub_script(qsub_fname, walltime,
                                          self.mem, self.ncpus,
                                          spin_up=spin_up, CNP=True)
 
@@ -331,7 +330,7 @@ if __name__ == "__main__":
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir,
-                 cable_src=cable_src, nml_fname=nml_fname, walltime=walltime,
+                 cable_src=cable_src, nml_fname=nml_fname,
                  biogeochem=biogeochem, experiment_name=experiment_name)
 
     # First spin up round....
@@ -357,7 +356,7 @@ if __name__ == "__main__":
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file(start_yr)
-        C.run_qsub_script(qsub_fname, start_yr, end_yr, spin_up=True)
+        C.run_qsub_script(qsub_fname, start_yr, end_yr, walltime, spin_up=True)
 
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
