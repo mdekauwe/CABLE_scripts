@@ -231,7 +231,7 @@ class RunCable(object):
         out_fname = os.path.join(self.output_dir, out_fname)
 
         # i.e. no restart file for first spinup year
-        if cable_restart_ifname == "missing":
+        if cable_rst_ifname == "missing":
             cable_rst_ifname = ""
             casa_rst_ifname = ""
         else:
