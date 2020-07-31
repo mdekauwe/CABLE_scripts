@@ -190,7 +190,7 @@ class RunCable(object):
                         "cable_user%or_evap": ".FALSE.",
                         "cable_user%GSWP3": ".TRUE.",
                         "cable_user%MetType": "'gswp3'",
-                        "verbose": ".TRUE.",
+                        "verbose": ".FALSE.",
         }
         adjust_nml_file(self.nml_fname, replace_dict)
 
