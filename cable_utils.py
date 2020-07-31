@@ -587,12 +587,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
 
     print("        co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)", end="\n", file=f)
 
-    print("        if [ $cable_rst_in != 'missing' ]", end="\n", file=f)
-    print("        then", end="\n", file=f)
-    print("            cable_rst_in=\"cable_restart_$[$year-1].nc\"", end="\n", file=f)
-    print("            casa_rst_in=\"casa_restart_$[$year-1].nc\"", end="\n", file=f)
-    print("        fi", end="\n", file=f)
-    print(" ", end="\n", file=f)
+
 
     print("        cable_rst_out=\"cable_restart_$year.nc\"", end="\n", file=f)
     print("        casa_rst_out=\"casa_restart_$year.nc\"", end="\n", file=f)
@@ -609,18 +604,21 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print(" ", end="\n", file=f)
     print("        mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
-    print("        year=$[$year+1]", end="\n", file=f)
+
+    print("        cable_rst_in=\"cable_restart_$year.nc\"", end="\n", file=f)
+    print("        casa_rst_in=\"casa_restart_$year.nc\"", end="\n", file=f)
 
     print("        year=$[$year+1]", end="\n", file=f)
+
 
 
     print(" ", end="\n", file=f)
     print("    done", end="\n", file=f)
     print(" ", end="\n", file=f)
 
-    print("    # rejig restart files for next iteration", end="\n", file=f)
-    print("    cable_rst_out=\"cable_restart_$[$start_yr-1].nc\"", end="\n", file=f)
-    print("    casa_rst_out=\"casa_restart_$[$start_yr-1].nc\"", end="\n", file=f)
+    print("    # reset restart files for next iteration", end="\n", file=f)
+    print("    cable_rst_in=\"cable_restart_$start_yr.nc\"", end="\n", file=f)
+    print("    casa_rst_in=\"casa_restart_$start_yr.nc\"", end="\n", file=f)
 
     print(" ", end="\n", file=f)
     print("    count=$[$count+1]", end="\n", file=f)
@@ -629,6 +627,5 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("done", end="\n", file=f)
 
     print("\n# HERE IS WHERE WE NEED STABILITY CHECK AND NEW QSUB SUBMISSION", end="\n", file=f)
-
 
     f.close()
