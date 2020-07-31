@@ -100,10 +100,10 @@ class RunCable(object):
             self.vcmax_feedback = ".FALSE."
         elif self.biogeochem_cyc == "CN":
             self.biogeochem_id = 2
-            self.vcmax_feedback = ".TRUE."
+            self.vcmax_feedback = ".TRUE." # using prognostic Vcmax
         elif self.biogeochem_cyc == "CNP":
             self.biogeochem_id = 3
-            self.vcmax_feedback = ".TRUE."
+            self.vcmax_feedback = ".TRUE." # using prognostic Vcmax
 
         self.experiment_id = "%s_%s" % (experiment_name, self.biogeochem_cyc)
 
@@ -139,15 +139,7 @@ class RunCable(object):
             os.remove(local_exe)
         shutil.copy(self.cable_exe, local_exe)
 
-    def setup_nml_file(self, start_yr):
-
-        cable_rst_ifname = ""
-        cable_rst_ofname = os.path.join(self.restart_dir,
-                                        "cable_restart_%d.nc" % (start_yr))
-
-        casa_rst_ifname = ""
-        casa_rst_ofname = os.path.join(self.restart_dir,
-                                       "casa_restart_%d.nc" % (start_yr))
+    def setup_nml_file(self):
 
         replace_dict = {
                         "filename%met": "''",  # not needed for GSWP3 run
@@ -155,10 +147,10 @@ class RunCable(object):
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
-                        "filename%restart_in": "'%s'" % (cable_rst_ifname),
-                        "filename%restart_out": "'%s'" % (cable_rst_ofname),
-                        "casafile%cnpipool": "'%s'" % (casa_rst_ifname),
-                        "casafile%cnpepool": "'%s'" % (casa_rst_ofname),
+                        "filename%restart_in": "''",  # set in next step
+                        "filename%restart_out": "''", # set in next step
+                        "casafile%cnpipool": "''",    # set in next step
+                        "casafile%cnpepool": "''",    # set in next step
                         "fixedCO2": "%.2f" % (self.co2_fixed),
                         "casafile%phen": "'%s'" % (self.phen_fname),
                         "casafile%cnpbiome": "'%s'" % (self.cnpbiome_fname),
@@ -170,8 +162,9 @@ class RunCable(object):
                         "output%averaging": "'monthly'",
                         "cable_user%CASA_OUT_FREQ": "'monthly'",
 
-                        "output%carbon": ".TRUE.",
+                        "output%casa": ".TRUE.",
                         # Turn off for spinup
+                        "output%carbon": ".FALSE.",
                         "output%met": ".FALSE.",
                         "output%flux": ".FALSE.",
                         "output%soil": ".FALSE.",
@@ -180,7 +173,6 @@ class RunCable(object):
                         "output%veg": ".FALSE.",
                         "output%params": ".FALSE.",
                         "output%balances": ".FALSE.",
-                        "output%casa": ".FALSE.",
 
                         "leaps": ".FALSE.",
                         "cable_user%CASA_fromZero": ".TRUE.",
@@ -193,8 +185,6 @@ class RunCable(object):
                         "cable_user%FWSOIL_SWITCH": "'standard'",
                         "cable_user%GS_SWITCH": "'medlyn'",
                         #"cable_user%limit_labile": ".TRUE.",
-                        "cable_user%FWSOIL_SWITCH": "'standard'",
-                        "cable_user%GS_SWITCH": "'medlyn'",
                         "cable_user%GW_MODEL": ".FALSE.",
                         "cable_user%or_evap": ".FALSE.",
                         "cable_user%GSWP3": ".TRUE.",
@@ -231,6 +221,7 @@ class RunCable(object):
 
         # i.e. no restart file for first spinup year
         if cable_rst_ifname == "missing":
+            print("here - yeah")
             cable_rst_ifname = ""
             casa_rst_ifname = ""
         else:
@@ -282,7 +273,7 @@ if __name__ == "__main__":
     #cable_src = "../../src/trunk/trunk/"
     cable_src = "../../src/trunk_cnp_spatial/trunk_cnp_spatial/"
     spinup_start_yr = 1901 # GSWP3 starts in 1901
-    spinup_end_yr = 1930
+    spinup_end_yr = 1901#1930
     run_start_yr = 1924
     run_end_yr = 1950
     biogeochem = "C"
@@ -296,6 +287,7 @@ if __name__ == "__main__":
      casa_rst_ofname, year, co2_conc,
      nml_fname, spin_up, adjust_nml) = cmd_line_parser()
 
+
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir,
                  cable_src=cable_src, nml_fname=nml_fname,
@@ -304,7 +296,8 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        walltime = "6:00:00"
+        #walltime = "6:00:00"
+        walltime = "0:30:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
@@ -315,7 +308,7 @@ if __name__ == "__main__":
     # Setup initial namelist file and submit qsub job
     if adjust_nml == False:
         C.initialise_stuff()
-        C.setup_nml_file(start_yr)
+        C.setup_nml_file()
         C.run_qsub_script(qsub_fname, cable_rst_in, casa_rst_in, start_yr,
                           end_yr, walltime)
     # qsub script is adjusting namelist file, i.e. for a different year
