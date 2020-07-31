@@ -274,7 +274,7 @@ if __name__ == "__main__":
     #cable_src = "../../src/trunk/trunk/"
     cable_src = "../../src/trunk_cnp_spatial/trunk_cnp_spatial/"
     spinup_start_yr = 1901 # GSWP3 starts in 1901
-    spinup_end_yr = 1901#1930
+    spinup_end_yr = 1930
     run_start_yr = 1924
     run_end_yr = 1950
     biogeochem = "C"
@@ -297,8 +297,8 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        #walltime = "6:00:00"
-        walltime = "0:30:00"
+        walltime = "8:00:00"
+        #walltime = "0:30:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
