@@ -141,13 +141,6 @@ class RunCable(object):
 
     def setup_nml_file(self, start_yr):
 
-        # set directory paths...
-        out_fname = "%s_out_cable_spin.nc" % (self.experiment_id)
-        out_fname = os.path.join(self.output_dir, out_fname)
-
-        out_log_fname = "%s_log_spin.txt" % (self.experiment_id)
-        out_log_fname = os.path.join(self.log_dir, out_log_fname)
-
         cable_rst_ifname = ""
         cable_rst_ofname = os.path.join(self.restart_dir,
                                         "cable_restart_%d.nc" % (start_yr))
@@ -162,8 +155,6 @@ class RunCable(object):
                         "filename%veg": "'%s'" % (self.veg_fname),
                         "filename%soil": "'%s'" % (self.soil_fname),
                         "gswpfile%mask": "'%s'" % (self.mask_fname),
-                        "filename%out": "'%s'" % (out_fname),
-                        "filename%log": "'%s'" % (out_log_fname),
                         "filename%restart_in": "'%s'" % (cable_rst_ifname),
                         "filename%restart_out": "'%s'" % (cable_rst_ofname),
                         "casafile%cnpipool": "'%s'" % (casa_rst_ifname),
@@ -213,7 +204,7 @@ class RunCable(object):
         adjust_nml_file(self.nml_fname, replace_dict)
 
     def run_qsub_script(self, qsub_fname, cable_rst_in, casa_rst_in,
-                        start_yr, end_yr, walltime, spin_up):
+                        start_yr, end_yr, walltime):
 
         # Create a qsub script for simulations if missing, there is one of spinup
         # and one for simulations, so two qsub_fnames
@@ -326,7 +317,7 @@ if __name__ == "__main__":
         C.initialise_stuff()
         C.setup_nml_file(start_yr)
         C.run_qsub_script(qsub_fname, cable_rst_in, casa_rst_in, start_yr,
-                          end_yr, walltime, spin_up=True)
+                          end_yr, walltime)
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
         C.create_new_nml_file(log_fname, out_fname, cable_rst_ifname,
