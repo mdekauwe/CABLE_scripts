@@ -296,7 +296,7 @@ if __name__ == "__main__":
     run_end_yr = 1950
     biogeochem = "C"
     experiment_name = "GSWP3_CNP"
-    cable_rst_in ="missing" # we don't have a restart file
+    cable_rst_in = "missing" # we don't have a restart file
     casa_rst_in = "missing" # we don't have a restart file
     # ------------------------------------------- #
 
