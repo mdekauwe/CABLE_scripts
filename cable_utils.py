@@ -595,6 +595,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("        logfile=\"cable_log_$year_$count.txt\"", end="\n", file=f)
     print(" ", end="\n", file=f)
 
+    print("        echo $co2_conc $year $start_yr $end_yr $nml_fname $outfile", end="\n", file=f)
 
     print("        python ./run_cable_spatial_CNP.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
     print("                                          -i $cable_rst_in -r $cable_rst_out \\", end="\n", file=f)
