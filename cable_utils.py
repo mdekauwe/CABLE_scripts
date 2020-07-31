@@ -591,8 +591,8 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
 
     print("        cable_rst_out=\"cable_restart_$year.nc\"", end="\n", file=f)
     print("        casa_rst_out=\"casa_restart_$year.nc\"", end="\n", file=f)
-    print("        outfile=\"cable_out_$year_$count.nc\"", end="\n", file=f)
-    print("        logfile=\"cable_log_$year_$count.txt\"", end="\n", file=f)
+    print("        outfile=\"cable_out_${year}_${count}.nc\"", end="\n", file=f)
+    print("        logfile=\"cable_log_${year}_${count}.txt\"", end="\n", file=f)
     print(" ", end="\n", file=f)
 
     print("        echo $co2_conc $year $start_yr $end_yr $nml_fname $outfile", end="\n", file=f)
