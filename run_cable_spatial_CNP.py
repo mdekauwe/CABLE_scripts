@@ -46,7 +46,7 @@ def cmd_line_parser():
 
     return (options.l, options.o, options.i,  options.r, options.ci,
             options.cr, int(options.y),float(options.c), options.n, options.s,
-            options.a, options.t, int(options.rn))
+            options.a)
 
 
 class RunCable(object):
@@ -277,7 +277,7 @@ class RunCable(object):
         shutil.copyfile(self.nml_fname, os.path.join(self.namelist_dir,
                                                      "cable_%d.nml" % (year)))
 
-    
+
 
 if __name__ == "__main__":
 
