@@ -446,7 +446,7 @@ def check_steady_state(experiment_id, restart_dir, output_dir, num,
     return not_in_equilibrium
 
 def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
-                                 spin_up=False, CNP=False):
+                                 spin_up=False):
 
     ofname = qsub_fname
     if os.path.exists(ofname):
@@ -494,31 +494,15 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     if spin_up:
         print("    if [ $start_yr == $year ]", end="\n", file=f)
         print("    then", end="\n", file=f)
-        if CNP:
-            print("        restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
-            print("        casa_restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
-        else:
-            print("        restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
+
+        print("        restart_in='missing'", end="\n", file=f) # i.e. no restart file for the first year
         print("    else", end="\n", file=f)
 
-        if CNP:
-            print("        restart_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
-            print("        casa_restart_in=\"casa_restart_$prev_yr.nc\"", end="\n", file=f)
-        else:
-            print("        restart_in=\"cable_$prev_yr.nc\"", end="\n", file=f)
+        print("        restart_in=\"cable_$prev_yr.nc\"", end="\n", file=f)
         print("    fi", end="\n", file=f)
         print(" ", end="\n", file=f)
     else:
-        if CNP:
-            print("    restart_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
-            print("    casa_restart_in=\"casa_restart_$prev_yr.nc\"", end="\n", file=f)
-        else:
-            print("    restart_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
-
-    if CNP:
-        print("    restart_out=\"cable_restart_$year.nc\"", end="\n", file=f)
-        print("    casa_restart_out=\"casa_restart_$year.nc\"", end="\n", file=f)
-    else:
+        print("    restart_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
         print("    restart_out=\"cable_restart_$year.nc\"", end="\n", file=f)
     print("    outfile=\"cable_out_$year.nc\"", end="\n", file=f)
     print("    logfile=\"cable_log_$year.txt\"", end="\n", file=f)
@@ -526,15 +510,9 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
 
     print("    echo $co2_conc $year $start_yr $prev_yr $end_yr $restart_in $restart_out $nml_fname $outfile", end="\n", file=f)
 
-    if CNP:
-        print("    python ./run_cable_spatial_CNP.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
-        print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
-        print("                                  --ci $casa_restart_in --cr $casa_restart_out \\", end="\n", file=f)
-        print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
-    else:
-        print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
-        print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
-        print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
+    print("    python ./run_cable_spatial.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
+    print("                                  -i $restart_in -r $restart_out \\", end="\n", file=f)
+    print("                                  -c $co2_conc -n $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
     print("    mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
@@ -552,5 +530,110 @@ def generate_spatial_qsub_script(qsub_fname, walltime, mem, ncpus,
     print(" ", end="\n", file=f)
     print("done", end="\n", file=f)
     print(" ", end="\n", file=f)
+
+    f.close()
+
+def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
+
+    ofname = qsub_fname
+    if os.path.exists(ofname):
+        os.remove(ofname)
+    f = open(ofname, "w")
+
+
+    print("#!/bin/bash", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
+    print("#PBS -m ae", end="\n", file=f)
+    #print("#PBS -P w35", end="\n", file=f)
+    print("#PBS -P dp72", end="\n", file=f)
+    print("#PBS -q normal", end="\n", file=f)
+    print("#PBS -l walltime=%s" % (walltime), end="\n", file=f)
+    print("#PBS -l mem=%s" % (mem), end="\n", file=f)
+    print("#PBS -l ncpus=%s" % (ncpus), end="\n", file=f)
+    print("#PBS -j oe", end="\n", file=f)
+    print("#PBS -l wd", end="\n", file=f)
+    print("#PBS -l storage=gdata/w35+gdata/wd9", end="\n", file=f)
+    print("#PBS -M mdekauwe@gmail.com", end="\n", file=f)
+    print(" ", end="\n", file=f)
+    print("module load dot", end="\n", file=f)
+    print("module add intel-mpi/2019.6.166", end="\n", file=f)
+    print("module add netcdf/4.7.1", end="\n", file=f)
+    print("source activate sci", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
+    print("cpus=%s" % (ncpus), end="\n", file=f)
+    print("exe=\"./cable-mpi\"", end="\n", file=f)
+    print("nml_fname=\"cable.nml\"", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
+    print("start_yr=$start_yr", end="\n", file=f)
+    print("prev_yr=\"$(($start_yr-1))\"", end="\n", file=f)
+    print("end_yr=$end_yr", end="\n", file=f)
+    print("co2_fname=$co2_fname", end="\n", file=f)
+    print("cable_rst_in=$cable_rst", end="\n", file=f)
+    print("casa_rst_in=$casa_rst", end="\n", file=f)
+
+    print(" ", end="\n", file=f)
+
+    print("count=0", end="\n", file=f)
+    print("N=2", end="\n", file=f)
+    print("for i in $(seq 1 $N)", end="\n", file=f)
+    print("do", end="\n", file=f)
+
+
+    print("    year=$start_yr", end="\n", file=f)
+    print("    while [ $year -le $end_yr ]", end="\n", file=f)
+    print("    do", end="\n", file=f)
+
+    print("        co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)", end="\n", file=f)
+
+    print("        if [ $cable_rst_in != 'missing' ]", end="\n", file=f)
+    print("        then", end="\n", file=f)
+    print("            cable_rst_in=\"cable_restart_$prev_yr.nc\"", end="\n", file=f)
+    print("            casa_rst_in=\"casa_restart_$prev_yr.nc\"", end="\n", file=f)
+    print("        fi", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
+    print("        cable_rst_out=\"cable_restart_$year.nc\"", end="\n", file=f)
+    print("        casa_rst_out=\"casa_restart_$year.nc\"", end="\n", file=f)
+    print("        outfile=\"cable_out_$year_$count.nc\"", end="\n", file=f)
+    print("        logfile=\"cable_log_$year_$count.txt\"", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
+
+    print("        python ./run_cable_spatial_CNP.py -a -y $year -l $logfile -o $outfile \\", end="\n", file=f)
+    print("                                          -i $cable_rst_in -r $cable_rst_out \\", end="\n", file=f)
+    print("                                          --ci $casa_rst_in --cr $casa_rst_out \\", end="\n", file=f)
+    print("                                          -c $co2_conc -n $nml_fname", end="\n", file=f)
+
+    print(" ", end="\n", file=f)
+    print("        mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
+    print(" ", end="\n", file=f)
+    print("        year=$[$year+1]", end="\n", file=f)
+
+    print("        if [ $start_yr == $year ]", end="\n", file=f)
+    print("        then", end="\n", file=f)
+    print("            prev_yr=$start_yr", end="\n", file=f)
+    print("        else", end="\n", file=f)
+    print("            prev_yr=$[$prev_yr+1]", end="\n", file=f)
+    print("        fi", end="\n", file=f)
+
+    print(" ", end="\n", file=f)
+    print("    done", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
+    print("    # rejig restart files for next iteration", end="\n", file=f)
+    print("    cable_rst_out=\"cable_restart_$start_yr.nc\"", end="\n", file=f)
+    print("    casa_rst_out=\"casa_restart_$start_yr.nc\"", end="\n", file=f)
+
+    print(" ", end="\n", file=f)
+    print("    count=$((count+1))", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
+    print("done", end="\n", file=f)
+
+    print("\n# HERE IS WHERE WE NEED STABILITY CHECK AND NEW QSUB SUBMISSION", end="\n", file=f)
+
 
     f.close()
