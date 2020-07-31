@@ -163,8 +163,9 @@ class RunCable(object):
                         "cable_user%CASA_OUT_FREQ": "'monthly'",
 
                         "output%casa": ".TRUE.",
+                        "output%carbon": ".TRUE.",
+
                         # Turn off for spinup
-                        "output%carbon": ".FALSE.",
                         "output%met": ".FALSE.",
                         "output%flux": ".FALSE.",
                         "output%soil": ".FALSE.",
