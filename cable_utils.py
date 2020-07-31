@@ -570,8 +570,8 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("start_yr=$start_yr", end="\n", file=f)
     print("end_yr=$end_yr", end="\n", file=f)
     print("co2_fname=$co2_fname", end="\n", file=f)
-    print("cable_rst_in=$cable_rst", end="\n", file=f)
-    print("casa_rst_in=$casa_rst", end="\n", file=f)
+    print("cable_rst_in=$cable_rst_in", end="\n", file=f)
+    print("casa_rst_in=$casa_rst_in", end="\n", file=f)
 
     print(" ", end="\n", file=f)
 
