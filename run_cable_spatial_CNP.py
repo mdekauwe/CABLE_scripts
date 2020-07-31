@@ -183,7 +183,19 @@ class RunCable(object):
                         "icycle": "%d" % (self.biogeochem_id),
                         "output%averaging": "'monthly'",
                         "cable_user%CASA_OUT_FREQ": "'monthly'",
-                        "output%casa": ".TRUE.",
+
+                        "output%carbon": ".TRUE.",
+                        # Turn off for spinup
+                        "output%met": ".FALSE.",
+                        "output%flux": ".FALSE.",
+                        "output%soil": ".FALSE.",
+                        "output%snow": ".FALSE.",
+                        "output%radiation": ".FALSE.",
+                        "output%veg": ".FALSE.",
+                        "output%params": ".FALSE.",
+                        "output%balances": ".FALSE.",
+                        "output%casa": ".FALSE.",
+
                         "leaps": ".FALSE.",
                         "cable_user%CASA_fromZero": ".TRUE.",
                         "cable_user%CASA_DUMP_READ": ".FALSE.",
@@ -332,6 +344,12 @@ if __name__ == "__main__":
                  restart_dir=restart_dir, aux_dir=aux_dir,
                  cable_src=cable_src, nml_fname=nml_fname,
                  biogeochem=biogeochem, experiment_name=experiment_name)
+
+
+    # Sort the restart files out before we run simulations "-t"
+    if sort_restarts:
+        C.sort_restart_files(spinup_start_yr, spinup_end_yr, rst_num)
+        sys.exit('Restart files fixed up, run simulation')
 
     # First spin up round....
     if spin_up_step_one:
