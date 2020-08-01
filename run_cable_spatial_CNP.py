@@ -41,12 +41,13 @@ def cmd_line_parser():
     p.add_option("--ci", default="missing", help="casa restart in filename")
     p.add_option("--cr", default="missing", help="casa restart out filename")
     p.add_option("-c", default="400.0", help="CO2 concentration")
+    p.add_option("-ct", default="0", help="count")
     p.add_option("-n", default=None, help="nml_fname")
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, options.ci,
             options.cr, int(options.y),float(options.c), options.n, options.s,
-            options.a)
+            options.a, int(options.ct))
 
 
 class RunCable(object):
@@ -196,7 +197,7 @@ class RunCable(object):
         adjust_nml_file(self.nml_fname, replace_dict)
 
     def run_qsub_script(self, qsub_fname, cable_rst_in, casa_rst_in,
-                        start_yr, end_yr, walltime):
+                        start_yr, end_yr, walltime, restart_count):
 
         # Create a qsub script for simulations if missing, there is one of spinup
         # and one for simulations, so two qsub_fnames
@@ -206,9 +207,9 @@ class RunCable(object):
 
 
         # Run qsub script
-        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s,cable_rst_in=%s,casa_rst_in=%s %s' % \
+        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s,cable_rst_in=%s,casa_rst_in=%s,restart_count=%d %s' % \
                     (start_yr, end_yr, self.co2_fname, cable_rst_in,
-                     casa_rst_in, qsub_fname)
+                     casa_rst_in, restart_count, qsub_fname)
 
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:
@@ -285,7 +286,8 @@ if __name__ == "__main__":
     (log_fname, out_fname, cable_rst_ifname,
      cable_rst_ofname, casa_rst_ifname,
      casa_rst_ofname, year, co2_conc,
-     nml_fname, spin_up, adjust_nml) = cmd_line_parser()
+     nml_fname, spin_up, adjust_nml,
+     restart_count) = cmd_line_parser()
 
 
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
@@ -297,7 +299,7 @@ if __name__ == "__main__":
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
         #walltime = "10:00:00"
-        walltime = "4:00:00"
+        walltime = "3:00:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
@@ -310,7 +312,7 @@ if __name__ == "__main__":
         C.initialise_stuff()
         C.setup_nml_file()
         C.run_qsub_script(qsub_fname, cable_rst_ifname, casa_rst_ifname,
-                          start_yr, end_yr, walltime)
+                          start_yr, end_yr, walltime, restart_count)
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
         C.create_new_nml_file(log_fname, out_fname, cable_rst_ifname,
