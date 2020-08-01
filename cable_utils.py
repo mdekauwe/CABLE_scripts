@@ -572,13 +572,18 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("co2_fname=$co2_fname", end="\n", file=f)
     print("cable_rst_in=$cable_rst_in", end="\n", file=f)
     print("casa_rst_in=$casa_rst_in", end="\n", file=f)
+    print("restart_count=$restart_count", end="\n", file=f)
 
     print(" ", end="\n", file=f)
 
-    print("count=0", end="\n", file=f)
-    print("prev_count=0", end="\n", file=f)
-    print("prev_prev_count=0", end="\n", file=f)
-    print("N=2", end="\n", file=f)
+    print("if [ $restart_count == 0 ]", end="\n", file=f)
+    print("then", end="\n", file=f)
+    print("    N=2", end="\n", file=f)
+    print("else", end="\n", file=f)
+    print("    N=1", end="\n", file=f)
+    print("fi", end="\n", file=f)
+    print(" ", end="\n", file=f)
+
     print("for i in $(seq 1 $N)", end="\n", file=f)
     print("do", end="\n", file=f)
 
@@ -593,8 +598,8 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
 
     print("        cable_rst_out=\"cable_restart_$year.nc\"", end="\n", file=f)
     print("        casa_rst_out=\"casa_restart_$year.nc\"", end="\n", file=f)
-    print("        outfile=\"cable_out_${year}_${count}.nc\"", end="\n", file=f)
-    print("        logfile=\"cable_log_${year}_${count}.txt\"", end="\n", file=f)
+    print("        outfile=\"cable_out_${year}_${restart_count}.nc\"", end="\n", file=f)
+    print("        logfile=\"cable_log_${year}_${restart_count}.txt\"", end="\n", file=f)
     print(" ", end="\n", file=f)
 
     print("        echo $co2_conc $year $start_yr $end_yr $nml_fname $outfile $cable_rst_in $cable_rst_out $casa_rst_in $casa_rst_out", end="\n", file=f)
@@ -624,8 +629,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("    casa_rst_in=\"casa_restart_$start_yr.nc\"", end="\n", file=f)
 
     print(" ", end="\n", file=f)
-    print("    count=$[$count+1]", end="\n", file=f)
-    print("    prev_count=$[$count-1]", end="\n", file=f)
+    print("    restart_count=$[$restart_count+1]", end="\n", file=f)
     print(" ", end="\n", file=f)
 
     print("done", end="\n", file=f)
@@ -633,11 +637,15 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
 
     print(" ", end="\n", file=f)
 
-    print("prev_prev_count=$[$prev_count-1]", end="\n", file=f)
-    print("in_equilibrium=$(python ./stability_check.py --f1 \"cable_out_${year}_${prev_prev_count}.nc\" --f2 \"cable_out_${year}_${prev_count}.nc\" -n $count)", end="\n", file=f)
+    print("restart_count=$[$restart_count-1]", end="\n", file=f)
+
+    print("prev_count=$[$restart_count-1]", end="\n", file=f)
+
+    print("in_equilibrium=$(python ./stability_check.py --f1 \"cable_out_${end_yr}_${prev_count}.nc\" --f2 \"cable_out_${end_yr}_${restart_count}.nc\" -n $prev_count)", end="\n", file=f)
+    print("next_count=$[$restart_count+1]", end="\n", file=f)
     print("if [ $in_equilibrium == 0 ]", end="\n", file=f)
     print("then", end="\n", file=f)
-    print("    python ./run_cable_spatial_CNP.py -s -i $cable_rst_in --ci $casa_rst_in", end="\n", file=f)
+    print("    python ./run_cable_spatial_CNP.py -s -i $cable_rst_in --ci $casa_rst_in --ct $next_count", end="\n", file=f)
     print("fi", end="\n", file=f)
 
     f.close()
