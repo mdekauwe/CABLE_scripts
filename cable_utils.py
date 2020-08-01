@@ -634,7 +634,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print(" ", end="\n", file=f)
 
     print("prev_prev_count=$[$prev_count-1]", end="\n", file=f)
-    print("in_equilibrium=$(python ./stability_check.py --f1 \"cable_out_${year}_${prev_prev_count}.nc\" --f2 \"cable_out_${year}_${prev_count}.nc\" -n $count", end="\n", file=f)
+    print("in_equilibrium=$(python ./stability_check.py --f1 \"cable_out_${year}_${prev_prev_count}.nc\" --f2 \"cable_out_${year}_${prev_count}.nc\" -n $count)", end="\n", file=f)
     print("if [ $in_equilibrium == 0 ]", end="\n", file=f)
     print("then", end="\n", file=f)
     print("    python ./run_cable_spatial_CNP.py -s -i $cable_rst_in --ci $casa_rst_in", end="\n", file=f)
