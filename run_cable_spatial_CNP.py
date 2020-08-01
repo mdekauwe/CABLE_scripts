@@ -36,10 +36,10 @@ def cmd_line_parser():
     p.add_option("-y", default="1900", help="year")
     p.add_option("-l", default="", help="log filename")
     p.add_option("-o", default="", help="out filename")
-    p.add_option("-i", default="", help="restart in filename")
-    p.add_option("-r", default="", help="restart out filename")
-    p.add_option("--ci", default="", help="casa restart in filename")
-    p.add_option("--cr", default="", help="casa restart out filename")
+    p.add_option("-i", default="missing", help="cable restart in filename")
+    p.add_option("-r", default="missing", help="cable restart out filename")
+    p.add_option("--ci", default="missing", help="casa restart in filename")
+    p.add_option("--cr", default="missing", help="casa restart out filename")
     p.add_option("-c", default="400.0", help="CO2 concentration")
     p.add_option("-n", default=None, help="nml_fname")
     options, args = p.parse_args()
@@ -160,7 +160,8 @@ class RunCable(object):
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
                         "output%averaging": "'monthly'",
-                        "cable_user%CASA_OUT_FREQ": "'monthly'",
+                        #"cable_user%CASA_OUT_FREQ": "'monthly'",
+                        "cable_user%CASA_OUT_FREQ": "'‘annually’'",
 
                         "output%casa": ".TRUE.",
                         "output%carbon": ".TRUE.",
@@ -274,13 +275,11 @@ if __name__ == "__main__":
     #cable_src = "../../src/trunk/trunk/"
     cable_src = "../../src/trunk_cnp_spatial/trunk_cnp_spatial/"
     spinup_start_yr = 1901 # GSWP3 starts in 1901
-    spinup_end_yr = 1921
+    spinup_end_yr = 1903#1921
     run_start_yr = 1924
     run_end_yr = 1950
     biogeochem = "C"
     experiment_name = "GSWP3_CNP"
-    cable_rst_in = "missing" # we don't have a restart file
-    casa_rst_in = "missing" # we don't have a restart file
     # ------------------------------------------- #
 
     (log_fname, out_fname, cable_rst_ifname,
@@ -297,8 +296,8 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        walltime = "10:00:00"
-        #walltime = "0:30:00"
+        #walltime = "10:00:00"
+        walltime = "4:00:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
@@ -310,8 +309,8 @@ if __name__ == "__main__":
     if adjust_nml == False:
         C.initialise_stuff()
         C.setup_nml_file()
-        C.run_qsub_script(qsub_fname, cable_rst_in, casa_rst_in, start_yr,
-                          end_yr, walltime)
+        C.run_qsub_script(qsub_fname, cable_rst_ifname, casa_rst_ifname,
+                          start_yr, end_yr, walltime)
     # qsub script is adjusting namelist file, i.e. for a different year
     else:
         C.create_new_nml_file(log_fname, out_fname, cable_rst_ifname,
