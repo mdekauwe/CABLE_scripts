@@ -576,6 +576,8 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print(" ", end="\n", file=f)
 
     print("count=0", end="\n", file=f)
+    print("prev_count=0", end="\n", file=f)
+    print("prev_prev_count=0", end="\n", file=f)
     print("N=2", end="\n", file=f)
     print("for i in $(seq 1 $N)", end="\n", file=f)
     print("do", end="\n", file=f)
@@ -623,10 +625,21 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
 
     print(" ", end="\n", file=f)
     print("    count=$[$count+1]", end="\n", file=f)
+    print("    prev_count=$[$count-1]", end="\n", file=f)
     print(" ", end="\n", file=f)
 
     print("done", end="\n", file=f)
 
-    print("\n# HERE IS WHERE WE NEED STABILITY CHECK AND NEW QSUB SUBMISSION", end="\n", file=f)
+
+    print(" ", end="\n", file=f)
+
+    print("prev_prev_count=$[$prev_count-1]", end="\n", file=f)
+    print("in_equilibrium=$(python ./stability_check.py --f1 \"cable_out_${year}_${prev_prev_count}.nc\" --f2 \"cable_out_${year}_${prev_count}.nc\" -n $count", end="\n", file=f)
+    print("if [ $in_equilibrium == 1 ]", end="\n", file=f)
+    print("then", end="\n", file=f)
+    print("    echo \"in equilibrium\"", end="\n", file=f)
+    print("else", end="\n", file=f)
+    print("    echo \"not in equilibrium\"", end="\n", file=f)
+    print("fi", end="\n", file=f)
 
     f.close()
