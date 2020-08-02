@@ -74,8 +74,6 @@ tol_pass = 0.5
  root_newv, fast_new, slow_new,
  passive_new) = get_data(fn_new)
 
-
-
 out_fname = "stability_log.txt"
 if os.path.exists(out_fname):
     of = open(out_fname, 'a')
@@ -104,9 +102,9 @@ for i in range(3):
     #print(i, npp_new[i], npp_prev[i], delta_npp[i])
 
 in_equilibrium = False
-if ( (delta_npp[0] < tol_npp) and
-     (delta_npp[1] < tol_npp) and
-     (delta_npp[2] < tol_npp) and
+if ( (delta_npp[0] < tol_npp) and # top lat chunk
+     (delta_npp[1] < tol_npp) and # middle lat chunk
+     (delta_npp[2] < tol_npp) and # bottom lat chunk
      (delta_plant[0] < tol_plant) and
      (delta_plant[1] < tol_plant) and
      (delta_plant[2] < tol_plant) and
