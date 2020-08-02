@@ -47,6 +47,9 @@ def get_data(fn):
     """
     ds = xr.open_dataset(fn)
     lats = ds.latitude[:,0]
+
+    # Average across all months first and then horizontally to leave a single
+    # latitude slice
     npp = ds.NPP.mean(axis=0).mean(axis=1)
     leaf = ds.PlantCarbLeaf.mean(axis=0).mean(axis=1)
     wood = ds.PlantCarbWood.mean(axis=0).mean(axis=1)
