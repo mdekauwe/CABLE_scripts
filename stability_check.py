@@ -30,7 +30,9 @@ def cmd_line_parser():
     return (options.f1, options.f2, int(options.n))
 
 def split_data(var):
-    # Split the data into three latitudinal segments, top, middle & bottom
+    """
+    Split the data into three latitudinal segments, top, middle & bottom
+    """
     kg_2_g = 1000.
     var_split = np.array_split(var, 3)
     top = np.nansum(var_split[0].values) #* kg_2_g
@@ -40,6 +42,9 @@ def split_data(var):
     return (np.array([top, middle, bottom]))
 
 def get_data(fn):
+    """
+    Keep NPP, plant C and soil organic matter pools.
+    """
     ds = xr.open_dataset(fn)
     lats = ds.latitude[:,0]
     npp = ds.NPP.mean(axis=0).mean(axis=1)
