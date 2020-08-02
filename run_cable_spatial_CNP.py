@@ -207,9 +207,9 @@ class RunCable(object):
 
 
         # Run qsub script
-        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s,cable_rst_in=%s,casa_rst_in=%s,restart_count=%d %s' % \
+        qs_cmd = 'qsub -v start_yr=%d,end_yr=%d,co2_fname=%s,cable_rst_in=%s,casa_rst_in=%s,restart_count=%d,output_dir=%s %s' % \
                     (start_yr, end_yr, self.co2_fname, cable_rst_in,
-                     casa_rst_in, restart_count, qsub_fname)
+                     casa_rst_in, restart_count, self.output_dir, qsub_fname)
 
         error = subprocess.call(qs_cmd, shell=True)
         if error is 1:

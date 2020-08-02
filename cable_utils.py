@@ -573,6 +573,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("cable_rst_in=$cable_rst_in", end="\n", file=f)
     print("casa_rst_in=$casa_rst_in", end="\n", file=f)
     print("restart_count=$restart_count", end="\n", file=f)
+    print("output_dir=$output_dir", end="\n", file=f)
 
     print(" ", end="\n", file=f)
 
@@ -641,7 +642,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
 
     print("prev_count=$[$restart_count-1]", end="\n", file=f)
 
-    print("in_equilibrium=$(python ./stability_check.py --f1 \"cable_out_${end_yr}_${prev_count}.nc\" --f2 \"cable_out_${end_yr}_${restart_count}.nc\" -n $prev_count)", end="\n", file=f)
+    print("in_equilibrium=$(python ./stability_check.py --f1 \"${output_dir}/cable_out_${end_yr}_${prev_count}.nc\" --f2 \"${output_dir}/cable_out_${end_yr}_${restart_count}.nc\" -n $prev_count)", end="\n", file=f)
     print("next_count=$[$restart_count+1]", end="\n", file=f)
     print("if [ $in_equilibrium == 0 ]", end="\n", file=f)
     print("then", end="\n", file=f)
