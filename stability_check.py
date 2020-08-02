@@ -72,7 +72,7 @@ def get_data(fn):
 tol_npp = 5E-6 # kg, delta < 10^-4 g C m-2, Xia et al. 2013
 tol_plant = 0.01 # delta steady-state carbon (%), Xia et al. 2013
 tol_soil = 0.01
-tol_pass = 0.5
+tol_pass = 0.0005 # kg C m-2 yr-1
 
 (fn_prev, fn_new, num) = cmd_line_parser()
 
@@ -97,7 +97,7 @@ delta_leaf = np.zeros(3)
 delta_wood = np.zeros(3)
 prev_plant = np.zeros(3)
 delta_root = np.zeros(3)
-delta_soil = np.zeros(3)
+delta_passive = np.zeros(3)
 pass_stabile = np.zeros(3).astype(int)
 for i in range(3):
 
@@ -109,9 +109,7 @@ for i in range(3):
     delta_plant[i] = delta_leaf[i] + delta_wood[i] + delta_root[i]
     prev_plant[i] = leaf_prev[i] + wood_prev[i] + root_prev[i]
 
-    csoil_new = fast_new + slow_new + passive_new
-    csoil_prev = fast_prev + slow_prev + passive_prev
-    delta_soil[i] = np.fabs((csoil_new[i] - csoil_prev[i]) / csoil_new[i])
+    delta_passive[i] = np.fabs(passive_prev[i] - passive_prev[i])
 
 
 in_equilibrium = False
@@ -121,9 +119,9 @@ if ( (delta_npp[0] < tol_npp) and # top lat chunk
      (delta_plant[0] < tol_plant * prev_plant[0]) and
      (delta_plant[1] < tol_plant * prev_plant[1]) and
      (delta_plant[2] < tol_plant * prev_plant[2]) and
-     (delta_soil[0] < tol_soil) and
-     (delta_soil[1] < tol_soil) and
-     (delta_soil[2] < tol_soil) ):
+     (delta_passive[0] < tol_pass) and
+     (delta_passive[1] < tol_pass) and
+     (delta_passive[2] < tol_pass) ):
     in_equilibrium = True
     print("1")
 else:
