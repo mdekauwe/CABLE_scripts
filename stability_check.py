@@ -38,6 +38,26 @@ def split_data(var):
 
     return (np.array([top, middle, bottom]))
 
+def get_data(fn):
+    ds = xr.open_dataset(fn)
+    lats = ds.latitude[:,0]
+    npp = ds.NPP.mean(axis=0).mean(axis=1)
+    leaf = ds.PlantCarbLeaf.mean(axis=0).mean(axis=1)
+    wood = ds.PlantCarbWood.mean(axis=0).mean(axis=1)
+    root = ds.PlantCarbFineRoot.mean(axis=0).mean(axis=1)
+    fast = ds.SoilCarbFast.mean(axis=0).mean(axis=1)
+    slow = ds.SoilCarbSlow.mean(axis=0).mean(axis=1)
+    passive = ds.SoilCarbPassive.mean(axis=0).mean(axis=1)
+
+    (npp) = split_data(npp)
+    (leaf) = split_data(leaf)
+    (wood) = split_data(wood)
+    (root) = split_data(root)
+    (fast) = split_data(fast)
+    (slow) = split_data(slow)
+    (passive) = split_data(passive)
+
+    return (npp, leaf, wood, root, fast, slow, passive)
 
 tol_npp = 5E-6 # kg, delta < 10^-4 g C m-2, Xia et al. 2013
 tol_plant = 0.01 # delta steady-state carbon (%), Xia et al. 2013
@@ -46,41 +66,15 @@ tol_pass = 0.5
 
 (fn_prev, fn_new, num) = cmd_line_parser()
 
-ds_prev = xr.open_dataset(fn_prev)
-lats = ds_prev.latitude[:,0]
-npp_prev = ds_prev.NPP.mean(axis=0).mean(axis=1)
-leaf_prev = ds_prev.PlantCarbLeaf.mean(axis=0).mean(axis=1)
-wood_prev = ds_prev.PlantCarbWood.mean(axis=0).mean(axis=1)
-root_prev = ds_prev.PlantCarbFineRoot.mean(axis=0).mean(axis=1)
-fast_prev = ds_prev.SoilCarbFast.mean(axis=0).mean(axis=1)
-slow_prev = ds_prev.SoilCarbSlow.mean(axis=0).mean(axis=1)
-passive_prev = ds_prev.SoilCarbPassive.mean(axis=0).mean(axis=1)
+(npp_prev, leaf_prev, wood_prev,
+ root_prev, fast_prev, slow_prev,
+ passive_prev) = get_data(fn_prev)
 
-(npp_prev) = split_data(npp_prev)
-(leaf_prev) = split_data(leaf_prev)
-(wood_prev) = split_data(wood_prev)
-(root_prev) = split_data(root_prev)
-(fast_prev) = split_data(fast_prev)
-(slow_prev) = split_data(slow_prev)
-(passive_prev) = split_data(passive_prev)
+(npp_newv, leaf_new, wood_new,
+ root_newv, fast_new, slow_new,
+ passive_new) = get_data(fn_new)
 
-ds_new = xr.open_dataset(fn_new)
-lats = ds_new.latitude[:,0]
-npp_new = ds_new.NPP.mean(axis=0).mean(axis=1)
-leaf_new = ds_new.PlantCarbLeaf.mean(axis=0).mean(axis=1)
-wood_new = ds_new.PlantCarbWood.mean(axis=0).mean(axis=1)
-root_new = ds_new.PlantCarbFineRoot.mean(axis=0).mean(axis=1)
-fast_new = ds_new.SoilCarbFast.mean(axis=0).mean(axis=1)
-slow_new = ds_new.SoilCarbSlow.mean(axis=0).mean(axis=1)
-passive_new = ds_new.SoilCarbPassive.mean(axis=0).mean(axis=1)
 
-(npp_new) = split_data(npp_new)
-(leaf_new) = split_data(leaf_new)
-(wood_new) = split_data(wood_new)
-(root_new) = split_data(root_new)
-(fast_new) = split_data(fast_new)
-(slow_new) = split_data(slow_new)
-(passive_new) = split_data(passive_new)
 
 out_fname = "stability_log.txt"
 if os.path.exists(out_fname):
