@@ -41,7 +41,7 @@ def cmd_line_parser():
     p.add_option("--ci", default="missing", help="casa restart in filename")
     p.add_option("--cr", default="missing", help="casa restart out filename")
     p.add_option("-c", default="400.0", help="CO2 concentration")
-    p.add_option("-ct", default="0", help="count")
+    p.add_option("--ct", default="0", help="count")
     p.add_option("-n", default=None, help="nml_fname")
     options, args = p.parse_args()
 
