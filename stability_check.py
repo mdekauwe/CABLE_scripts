@@ -80,16 +80,16 @@ tol_pass = 0.0005 # kg C m-2 yr-1
  root_prev, fast_prev, slow_prev,
  passive_prev) = get_data(fn_prev)
 
-(npp_newv, leaf_new, wood_new,
- root_newv, fast_new, slow_new,
+(npp_new, leaf_new, wood_new,
+ root_new, fast_new, slow_new,
  passive_new) = get_data(fn_new)
 
-out_fname = "stability_log.txt"
-if os.path.exists(out_fname):
-    of = open(out_fname, 'a')
-else:
-    of = open(out_fname, 'w')
-    print("N,equilibrium,delta_npp,delta_plant,delta_soil", file=of)
+#out_fname = "stability_log.txt"
+#if os.path.exists(out_fname):
+#    of = open(out_fname, 'a')
+#else:
+#    of = open(out_fname, 'w')
+#    print("N,equilibrium,delta_npp,delta_plant,delta_soil", file=of)
 
 delta_npp = np.zeros(3)
 delta_plant = np.zeros(3)
@@ -111,6 +111,7 @@ for i in range(3):
 
     delta_passive[i] = np.fabs(passive_prev[i] - passive_prev[i])
 
+    print(i, delta_npp[i], delta_leaf[i], delta_wood[i], delta_root[i], delta_plant[i], delta_passive[i])
 
 in_equilibrium = False
 if ( (delta_npp[0] < tol_npp) and # top lat chunk
@@ -126,7 +127,7 @@ if ( (delta_npp[0] < tol_npp) and # top lat chunk
     print("1")
 else:
     print("0")
-print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant),
-      np.mean(delta_soil), file=of)
+#print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant),
+#      np.mean(delta_soil), file=of)
 
-of.close()
+#of.close()
