@@ -58,6 +58,7 @@ def get_data(fn):
     slow = ds.SoilCarbSlow.mean(axis=0).mean(axis=1)
     passive = ds.SoilCarbPassive.mean(axis=0).mean(axis=1)
 
+    # Split the data into three latitudinal arrays
     (npp) = split_data(npp)
     (leaf) = split_data(leaf)
     (wood) = split_data(wood)
