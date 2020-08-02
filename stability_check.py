@@ -24,7 +24,7 @@ def cmd_line_parser():
     p = optparse.OptionParser()
     p.add_option("--f1", default="", help="CABLE prev file")
     p.add_option("--f2", default="", help="CABLE new file")
-    p.add_option("-n", default="0", help="CO2 concentration")
+    p.add_option("-n", default="0", help="Cycle number, just for record keeping")
     options, args = p.parse_args()
 
     return (options.f1, options.f2, int(options.n))
