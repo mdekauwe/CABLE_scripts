@@ -93,31 +93,34 @@ else:
 
 delta_npp = np.zeros(3)
 delta_plant = np.zeros(3)
+delta_leaf = np.zeros(3)
+delta_wood = np.zeros(3)
+prev_plant = np.zeros(3)
+delta_root = np.zeros(3)
 delta_soil = np.zeros(3)
 pass_stabile = np.zeros(3).astype(int)
 for i in range(3):
 
     delta_npp[i] = np.fabs(npp_new[i] - npp_prev[i])
 
-    cplant_new = leaf_new + wood_new + root_new
-    cplant_prev = leaf_prev + wood_prev + root_prev
-    delta_plant[i] = np.fabs((cplant_new[i] - cplant_prev[i]) / cplant_new[i])
+    delta_leaf[i] = np.fabs((leaf_new[i] - leaf_prev[i] / leaf_new[i]))
+    delta_wood[i] = np.fabs((wood_new[i] - wood_prev[i] / wood_new[i]))
+    delta_root[i] = np.fabs((root_new[i] - root_prev[i] / root_new[i]))
+    delta_plant[i] = delta_leaf[i] + delta_wood[i] + delta_root[i]
+    prev_plant[i] = leaf_prev[i] + wood_prev[i] + root_prev[i]
 
     csoil_new = fast_new + slow_new + passive_new
     csoil_prev = fast_prev + slow_prev + passive_prev
     delta_soil[i] = np.fabs((csoil_new[i] - csoil_prev[i]) / csoil_new[i])
 
-    #print(i, cplant_new[i], cplant_prev[i], delta_plant[i])
-    #print(i, csoil_new[i], csoil_prev[i], delta_soil[i])
-    #print(i, npp_new[i], npp_prev[i], delta_npp[i])
 
 in_equilibrium = False
 if ( (delta_npp[0] < tol_npp) and # top lat chunk
      (delta_npp[1] < tol_npp) and # middle lat chunk
      (delta_npp[2] < tol_npp) and # bottom lat chunk
-     (delta_plant[0] < tol_plant) and
-     (delta_plant[1] < tol_plant) and
-     (delta_plant[2] < tol_plant) and
+     (delta_plant[0] < tol_plant * prev_plant[0]) and
+     (delta_plant[1] < tol_plant * prev_plant[1]) and
+     (delta_plant[2] < tol_plant * prev_plant[2]) and
      (delta_soil[0] < tol_soil) and
      (delta_soil[1] < tol_soil) and
      (delta_soil[2] < tol_soil) ):
