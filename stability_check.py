@@ -30,6 +30,7 @@ def cmd_line_parser():
     return (options.f1, options.f2, int(options.n))
 
 def split_data(var):
+    # Split the data into three latitudinal segments, top, middle & bottom
     kg_2_g = 1000.
     var_split = np.array_split(var, 3)
     top = np.nansum(var_split[0].values) #* kg_2_g
