@@ -103,9 +103,9 @@ for i in range(3):
 
     delta_npp[i] = np.fabs(npp_new[i] - npp_prev[i])
 
-    delta_leaf[i] = np.fabs((leaf_new[i] - leaf_prev[i] / leaf_new[i]))
-    delta_wood[i] = np.fabs((wood_new[i] - wood_prev[i] / wood_new[i]))
-    delta_root[i] = np.fabs((root_new[i] - root_prev[i] / root_new[i]))
+    delta_leaf[i] = np.fabs((leaf_new[i] - leaf_prev[i]) / leaf_new[i])
+    delta_wood[i] = np.fabs((wood_new[i] - wood_prev[i]) / wood_new[i])
+    delta_root[i] = np.fabs((root_new[i] - root_prev[i]) / root_new[i])
     delta_plant[i] = delta_leaf[i] + delta_wood[i] + delta_root[i]
     prev_plant[i] = leaf_prev[i] + wood_prev[i] + root_prev[i]
 
