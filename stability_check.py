@@ -69,9 +69,12 @@ def get_data(fn):
 
     return (npp, leaf, wood, root, fast, slow, passive)
 
-tol_npp = 5E-6 # kg, delta < 10^-4 g C m-2, Xia et al. 2013
-tol_plant = 0.01 # delta steady-state carbon (%), Xia et al. 2013
-tol_soil = 0.01
+# Xia, J. Y., Luo, Y. Q., Wang, Y.-P., Weng, E. S., and Hararuk, O.: A
+# semi-analytical solution to accelerate spin-up of a coupled carbon and
+# nitrogen land model to steady state, Geosci. Model Dev., 5, 1259–1271,
+# https://doi.org/10.5194/gmd-5-1259-2012, 2012.
+tol_npp = 5E-6 # Originally 0.01 g, relaxed to 0.05 g, note this is in kg
+tol_plant = 0.0001 # 0.01 % of previous plant C state
 tol_pass = 0.0005 # kg C m-2 yr-1
 
 (fn_prev, fn_new, num) = cmd_line_parser()
@@ -89,7 +92,7 @@ tol_pass = 0.0005 # kg C m-2 yr-1
 #    of = open(out_fname, 'a')
 #else:
 #    of = open(out_fname, 'w')
-#    print("N,equilibrium,delta_npp,delta_plant,delta_soil", file=of)
+#    print("N,equilibrium,delta_npp,delta_plant,delta_passive", file=of)
 
 delta_npp = np.zeros(3)
 delta_plant = np.zeros(3)
@@ -109,9 +112,13 @@ for i in range(3):
     delta_plant[i] = delta_leaf[i] + delta_wood[i] + delta_root[i]
     prev_plant[i] = leaf_prev[i] + wood_prev[i] + root_prev[i]
 
-    delta_passive[i] = np.fabs(passive_prev[i] - passive_prev[i])
+    delta_passive[i] = np.fabs(passive_new[i] - passive_prev[i])
 
-    print(i, delta_npp[i], delta_leaf[i], delta_wood[i], delta_root[i], delta_plant[i], delta_passive[i])
+    #print("cf", delta_leaf[i], leaf_new[i],  leaf_prev[i], (leaf_new[i] - leaf_prev[i]))
+    #print("cw", delta_wood[i], wood_new[i],  wood_prev[i], (wood_new[i] - wood_prev[i]))
+    #print("cr", delta_root[i], root_new[i],  root_prev[i], (root_new[i] - root_prev[i]))
+    #print(i, delta_npp[i], delta_leaf[i], delta_wood[i], delta_root[i], delta_plant[i], delta_passive[i])
+    #sys.exit()
 
 in_equilibrium = False
 if ( (delta_npp[0] < tol_npp) and # top lat chunk
@@ -128,6 +135,8 @@ if ( (delta_npp[0] < tol_npp) and # top lat chunk
 else:
     print("0")
 #print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant),
-#      np.mean(delta_soil), file=of)
+#      np.mean(delta_passive), file=of)
+
+print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant), np.mean(delta_passive))
 
 #of.close()
