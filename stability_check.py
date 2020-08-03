@@ -73,9 +73,16 @@ def get_data(fn):
 # semi-analytical solution to accelerate spin-up of a coupled carbon and
 # nitrogen land model to steady state, Geosci. Model Dev., 5, 1259–1271,
 # https://doi.org/10.5194/gmd-5-1259-2012, 2012.
-tol_npp = 5E-6 # Originally 0.01 g, relaxed to 0.05 g, note this is in kg
-tol_plant = 0.0001 # 0.01 % of previous plant C state
-tol_pass = 0.0005 # kg C m-2 yr-1
+
+# Xia suggested 0.01 g, relaxed to 0.05 g, note this is in kg
+tol_npp = 5E-6
+
+# Steady-state carbon influx is 0.01% of the total plant C pool size from the
+# previous cycle
+tol_plant = 0.0001
+
+# Xia suggested 0.5 g C m-2 yr-1, which we're using in kg
+tol_pass = 0.0005
 
 (fn_prev, fn_new, num) = cmd_line_parser()
 
@@ -87,12 +94,12 @@ tol_pass = 0.0005 # kg C m-2 yr-1
  root_new, fast_new, slow_new,
  passive_new) = get_data(fn_new)
 
-#out_fname = "stability_log.txt"
-#if os.path.exists(out_fname):
-#    of = open(out_fname, 'a')
-#else:
-#    of = open(out_fname, 'w')
-#    print("N,equilibrium,delta_npp,delta_plant,delta_passive", file=of)
+out_fname = "stability_log.txt"
+if os.path.exists(out_fname):
+    of = open(out_fname, 'a')
+else:
+    of = open(out_fname, 'w')
+    print("N,equilibrium,delta_npp,delta_plant,delta_passive", file=of)
 
 delta_npp = np.zeros(3)
 delta_plant = np.zeros(3)
@@ -134,9 +141,10 @@ if ( (delta_npp[0] < tol_npp) and # top lat chunk
     print("1")
 else:
     print("0")
-#print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant),
-#      np.mean(delta_passive), file=of)
 
-print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant), np.mean(delta_passive))
+print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant),
+      np.mean(delta_passive), file=of)
 
-#of.close()
+#print(num, in_equilibrium, np.mean(delta_npp), np.mean(delta_plant), np.mean(delta_passive))
+
+of.close()
