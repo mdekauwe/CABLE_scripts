@@ -224,7 +224,6 @@ class RunCable(object):
 
         # i.e. no restart file for first spinup year
         if cable_rst_ifname == "missing":
-            print("here - yeah")
             cable_rst_ifname = ""
             casa_rst_ifname = ""
         else:
@@ -298,8 +297,14 @@ if __name__ == "__main__":
     if spin_up:
         start_yr = spinup_start_yr
         end_yr = spinup_end_yr
-        #walltime = "10:00:00"
-        walltime = "6:00:00"
+
+        if cable_rst_ifname == "missing":
+            # ~3 years per hour, we're doing 2 x 20 year blocks on the first
+            # run through
+            walltime = "14:00:00"
+        else:
+            # we're doing 20 year blocks now
+            walltime = "7:00:00"
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
