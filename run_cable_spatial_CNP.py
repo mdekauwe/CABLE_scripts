@@ -305,6 +305,7 @@ if __name__ == "__main__":
         else:
             # we're doing 20 year blocks now
             walltime = "7:00:00"
+            
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
