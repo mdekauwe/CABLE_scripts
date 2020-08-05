@@ -29,24 +29,24 @@ from cable_utils import generate_spatialCNP_qsub_script_spinup
 def cmd_line_parser():
 
     p = optparse.OptionParser()
-    p.add_option("-s", action="store_true", default=False,
-                   help="Spinup model")
-    p.add_option("-a", action="store_true", default=False,
-                   help="Adjust namelist file")
-    p.add_option("-y", default="1900", help="year")
     p.add_option("-l", default="", help="log filename")
     p.add_option("-o", default="", help="out filename")
     p.add_option("-i", default="missing", help="cable restart in filename")
     p.add_option("-r", default="missing", help="cable restart out filename")
     p.add_option("--ci", default="missing", help="casa restart in filename")
     p.add_option("--cr", default="missing", help="casa restart out filename")
+    p.add_option("-y", default="1900", help="year")
     p.add_option("-c", default="400.0", help="CO2 concentration")
-    p.add_option("--ct", default="0", help="count")
     p.add_option("-n", default=None, help="nml_fname")
+    p.add_option("-s", action="store_true", default=False,
+                   help="Spinup model")
+    p.add_option("-a", action="store_true", default=False,
+                   help="Adjust namelist file")
+    p.add_option("--ct", default="0", help="count")
     options, args = p.parse_args()
 
     return (options.l, options.o, options.i,  options.r, options.ci,
-            options.cr, int(options.y),float(options.c), options.n, options.s,
+            options.cr, int(options.y), float(options.c), options.n, options.s,
             options.a, int(options.ct))
 
 
@@ -302,10 +302,12 @@ if __name__ == "__main__":
             # ~3 years per hour, we're doing 2 x 20 year blocks on the first
             # run through
             walltime = "14:00:00"
+            #walltime = "3:00:00"
         else:
             # we're doing 20 year blocks now
             walltime = "7:00:00"
-            
+            #walltime = "2:00:00"
+
         qsub_fname = "qsub_wrapper_script_spinup.sh"
     else:
         start_yr = run_start_yr
