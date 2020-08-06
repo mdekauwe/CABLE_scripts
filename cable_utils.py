@@ -611,9 +611,11 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("                                          -c $co2_conc -n $nml_fname", end="\n", file=f)
 
     print(" ", end="\n", file=f)
+
+
     print("        mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
     print(" ", end="\n", file=f)
-
+    print("        # set restart in for next iteration", end="\n", file=f)
     print("        cable_rst_in=\"cable_restart_$year.nc\"", end="\n", file=f)
     print("        casa_rst_in=\"casa_restart_$year.nc\"", end="\n", file=f)
 
@@ -625,11 +627,12 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("    done", end="\n", file=f)
     print(" ", end="\n", file=f)
 
-    print("    # reset restart files for next iteration", end="\n", file=f)
-    print("    cp \"cable_restart_$end_yr.nc\" \"cable_restart_$start_yr.nc\"", end="\n", file=f)
-    print("    cp \"casa_restart_$end_yr.nc\" \"casa_restart_$start_yr.nc\"", end="\n", file=f)
-    print("    cable_rst_in=\"cable_restart_$start_yr.nc\"", end="\n", file=f)
-    print("    casa_rst_in=\"casa_restart_$start_yr.nc\"", end="\n", file=f)
+    print("    # reset restart files for next cycle", end="\n", file=f)
+
+    print("    cp \"cable_restart_$end_yr.nc\" \"cable_restart_$[$start_yr-1].nc\"", end="\n", file=f)
+    print("    cp \"casa_restart_$end_yr.nc\" \"casa_restart_$[$start_yr-1].nc\"", end="\n", file=f)
+    print("    cable_rst_in=\"cable_restart_$[$start_yr-1].nc\"", end="\n", file=f)
+    print("    casa_rst_in=\"casa_restart_$[$start_yr-1].nc\"", end="\n", file=f)
 
     print(" ", end="\n", file=f)
     print("    restart_count=$[$restart_count+1]", end="\n", file=f)
