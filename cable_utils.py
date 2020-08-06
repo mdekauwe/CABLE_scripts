@@ -626,6 +626,8 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print(" ", end="\n", file=f)
 
     print("    # reset restart files for next iteration", end="\n", file=f)
+    print("    cp \"cable_restart_$end_yr.nc\" \"cable_restart_$start_yr.nc\"", end="\n", file=f)
+    print("    cp \"casa_restart_$end_yr.nc\" \"casa_restart_$start_yr.nc\"", end="\n", file=f)
     print("    cable_rst_in=\"cable_restart_$start_yr.nc\"", end="\n", file=f)
     print("    casa_rst_in=\"casa_restart_$start_yr.nc\"", end="\n", file=f)
 
