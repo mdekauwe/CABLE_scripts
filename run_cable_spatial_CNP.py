@@ -162,7 +162,7 @@ class RunCable(object):
                         "icycle": "%d" % (self.biogeochem_id),
                         "output%averaging": "'monthly'",
                         #"cable_user%CASA_OUT_FREQ": "'monthly'",
-                        "cable_user%CASA_OUT_FREQ": "'‘annually’'",
+                        "cable_user%CASA_OUT_FREQ": "'annually'",
 
                         "output%casa": ".TRUE.",
                         "output%carbon": ".TRUE.",
