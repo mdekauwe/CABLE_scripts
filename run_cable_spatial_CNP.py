@@ -158,7 +158,7 @@ class RunCable(object):
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%vcmax": "'standard'",
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
-                        "l_casacnp": ".TRUE.", 
+                        "l_casacnp": ".TRUE.",
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
                         "output%averaging": "'monthly'",
@@ -228,9 +228,11 @@ class RunCable(object):
         if cable_rst_ifname == "missing":
             cable_rst_ifname = ""
             casa_rst_ifname = ""
+            casa_from_zero = ".TRUE."
         else:
             cable_rst_ifname = os.path.join(self.restart_dir, cable_rst_ifname)
             casa_rst_ifname = os.path.join(self.restart_dir, casa_rst_ifname)
+            casa_from_zero = ".FALSE."
 
         cable_rst_ofname = os.path.join(self.restart_dir, cable_rst_ofname)
         casa_rst_ofname = os.path.join(self.restart_dir, casa_rst_ofname)
@@ -242,7 +244,7 @@ class RunCable(object):
                         "filename%restart_out": "'%s'" % (cable_rst_ofname),
                         "casafile%cnpipool": "'%s'" % (casa_rst_ifname),
                         "casafile%cnpepool": "'%s'" % (casa_rst_ofname),
-
+                        "cable_user%CASA_fromZero": "%s" % (casa_from_zero),
                         "fixedCO2": "%f" % (co2_conc),
                         "ncciy": "%s" % (year), # 0 for not using gswp; 4-digit year input for year of gswp met
                         "CABLE_USER%YearStart": "0", # needs to be 0 so the ncciy is set
@@ -255,6 +257,7 @@ class RunCable(object):
                         "gswpfile%Qair": "'%s'" % (os.path.join(self.met_dir, "Qair/GSWP3.BC.Qair.3hrMap.%s.nc" % (year))),
                         "gswpfile%Tair": "'%s'" % (os.path.join(self.met_dir, "Tair/GSWP3.BC.Tair.3hrMap.%s.nc" % (year))),
                         "gswpfile%wind": "'%s'" % (os.path.join(self.met_dir, "Wind/GSWP3.BC.Wind.3hrMap.%s.nc" % (year))),
+
 
         }
         adjust_nml_file(self.nml_fname, replace_dict)
