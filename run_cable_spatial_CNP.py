@@ -158,6 +158,7 @@ class RunCable(object):
                         "cable_user%RunIden": "'%s'" % (self.experiment_id),
                         "cable_user%vcmax": "'standard'",
                         "l_vcmaxFeedbk": "%s" % (self.vcmax_feedback),
+                        "l_casacnp": ".TRUE.", 
                         "l_laiFeedbk": ".TRUE.", # prognoistic LAI
                         "icycle": "%d" % (self.biogeochem_id),
                         "output%averaging": "'monthly'",
