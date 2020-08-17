@@ -281,6 +281,9 @@ if __name__ == "__main__":
     run_end_yr = 1950
     biogeochem = "C"
     experiment_name = "GSWP3_CNP"
+    #co2_fname="Annual_CO2_concentration_until_2010.txt"
+    co2_fname = "pre_industrial_fixed_co2.txt"
+
     # ------------------------------------------- #
 
     (log_fname, out_fname, cable_rst_ifname,
@@ -293,7 +296,8 @@ if __name__ == "__main__":
     C = RunCable(met_dir=met_dir, log_dir=log_dir, output_dir=output_dir,
                  restart_dir=restart_dir, aux_dir=aux_dir,
                  cable_src=cable_src, nml_fname=nml_fname,
-                 biogeochem=biogeochem, experiment_name=experiment_name)
+                 biogeochem=biogeochem, experiment_name=experiment_name,
+                 co2_fname=co2_fname)
 
     if spin_up:
         start_yr = spinup_start_yr
