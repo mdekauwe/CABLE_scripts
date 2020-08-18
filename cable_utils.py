@@ -595,7 +595,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print("    do", end="\n", file=f)
 
     print("        co2_conc=$(gawk -v yr=$year 'NR==yr' $co2_fname)", end="\n", file=f)
-    
+
 
 
     print("        cable_rst_out=\"cable_restart_$year.nc\"", end="\n", file=f)
@@ -614,7 +614,8 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
     print(" ", end="\n", file=f)
 
 
-    print("        mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
+    #print("        mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
+    print("        mpirun -n $cpus $exe", end="\n", file=f)
     print(" ", end="\n", file=f)
     print("        # set restart in for next iteration", end="\n", file=f)
     print("        cable_rst_in=\"cable_restart_$year.nc\"", end="\n", file=f)
