@@ -615,6 +615,7 @@ def generate_spatialCNP_qsub_script_spinup(qsub_fname, walltime, mem, ncpus):
 
 
     #print("        mpirun -n $cpus $exe $nml_fname", end="\n", file=f)
+    print("        # cant pass nml file with casa", end="\n", file=f)
     print("        mpirun -n $cpus $exe", end="\n", file=f)
     print(" ", end="\n", file=f)
     print("        # set restart in for next iteration", end="\n", file=f)
