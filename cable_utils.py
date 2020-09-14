@@ -198,8 +198,8 @@ def change_traits(met_fname, site, b_plant, c_plant, vcmax25):
 
     vcmax[:] = vcmax25 * 1e-6
     ejmax[:] = vcmax25 * 1.67 * 1e-6
-    b_plant[:] = b_plant
-    c_plant[:] = c_plant
+    b_plant[:] = b
+    c_plant[:] = c
 
     nc.close()  # close the new file
 
