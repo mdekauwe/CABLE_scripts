@@ -182,7 +182,7 @@ def ncdump(nc_fid):
 
     return nc_attrs, nc_dims, nc_vars
 
-def change_traits(met_fname, site, b_plant, c_plant, vcmax):
+def change_traits(met_fname, site, b_plant, c_plant, vcmax25):
 
     new_met_fname = "%s_tmp.nc" % (site)
 
@@ -196,15 +196,15 @@ def change_traits(met_fname, site, b_plant, c_plant, vcmax):
     b_plant = nc.createVariable('b_plant', 'f8', ('y', 'x'))
     c_plant = nc.createVariable('c_plant', 'f8', ('y', 'x'))
 
-    vcmax[:] = vcmax * 1e-6
-    ejmax[:] = vcmax * 1.67 * 1e-6
+    vcmax[:] = vcmax25 * 1e-6
+    ejmax[:] = vcmax25 * 1.67 * 1e-6
     b_plant[:] = b_plant
     c_plant[:] = c_plant
 
     nc.close()  # close the new file
 
     return new_met_fname
-    
+
 def change_LAI(met_fname, site, fixed=None, lai_dir=None):
 
     new_met_fname = "%s_tmp.nc" % (site)
