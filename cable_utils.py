@@ -182,9 +182,9 @@ def ncdump(nc_fid):
 
     return nc_attrs, nc_dims, nc_vars
 
-def change_traits(met_fname, site, b_plant, c_plant, vcmax25):
+def change_traits(met_fname, id, site, b_plant, c_plant, vcmax25):
 
-    new_met_fname = "%s_tmp.nc" % (site)
+    new_met_fname = "%s_%s_tmp.nc" % (id, site)
 
     shutil.copyfile(met_fname, new_met_fname)
 
