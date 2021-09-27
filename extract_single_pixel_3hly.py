@@ -28,8 +28,22 @@ fdir = "/g/data/w35/Shared_data/AWAP_3h_v1"
 vars = ["LWdown","PSurf","Qair","Rainf","SWdown","Snowf","Tair","Wind"]
 start_yr = 2016
 end_yr = 2019
+#row = 272
+#col = 792
 row = 272
-col = 792
+col = 772
+#row = 258
+#col = 779
+#row = 258
+#col = 610
+#row = 280
+#col = 588
+
+#-30.417600:151.623400 <-> 272:792
+#-30.400000:150.600000 <-> 272:772
+#-31.092700:150.932000 <-> 258:779
+#-31.092700:142.500000 <-> 258:610
+#-30.000000:141.400000 <-> 280:588
 
 if len(sys.argv) < 2:
     raise TypeError("Expecting pft name to be supplied on cmd line!")
